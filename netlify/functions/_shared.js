@@ -2,6 +2,9 @@
 // Files starting with "_" are NOT treated as endpoints by Netlify, but can be
 // required by the real functions (esbuild bundles them in).
 
+if (typeof globalThis.WebSocket === "undefined") {
+  try { globalThis.WebSocket = require("ws"); } catch (e) {}
+}
 const { createClient } = require("@supabase/supabase-js");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
