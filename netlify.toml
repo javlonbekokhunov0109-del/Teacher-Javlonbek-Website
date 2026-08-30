@@ -1,0 +1,24 @@
+# Netlify configuration for the Teacher Javlonbek learning hub
+# Static single-page site (index.html) + serverless functions for the
+# AI Writing Checker and the Teacher Admin Dashboard.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[build.environment]
+  # Serverless functions run on Node 20 (global fetch available).
+  NODE_VERSION = "20"
+
+[functions]
+  # esbuild bundles the @supabase/supabase-js dependency into each function.
+  node_bundler = "esbuild"
+
+# Safety net: serve the homepage for any non-function path so a refresh or a
+# stray/deep link never returns Netlify's 404 page.
+# NOTE: requests to /.netlify/functions/* are handled BEFORE this rule, so the
+# API keeps working.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
