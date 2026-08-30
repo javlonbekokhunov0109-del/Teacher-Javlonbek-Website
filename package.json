@@ -2,8 +2,9 @@
   "name": "teacher-javlonbek-hub",
   "version": "1.0.0",
   "private": true,
-  "description": "Teacher Javlonbek · Premium English learning hub — LexUP, Collocation KING, AI IELTS Writing Checker + Teacher Admin Dashboard.",
+  "description": "Teacher Javlonbek Premium English learning hub",
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0"
+    "@supabase/supabase-js": "^2.45.0",
+    "ws": "^8.18.0"
   }
 }
