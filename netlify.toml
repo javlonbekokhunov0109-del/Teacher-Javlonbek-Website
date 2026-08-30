@@ -8,7 +8,7 @@
 
 [build.environment]
   # Serverless functions run on Node 20 (global fetch available).
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 
 [functions]
   # esbuild bundles the @supabase/supabase-js dependency into each function.
