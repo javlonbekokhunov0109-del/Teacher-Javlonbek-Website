@@ -2,7 +2,7 @@
 // Auth: any signed-in user. Returns everyone's total time today and this
 // month, sorted by today's time (most active first).
 
-const { json, missingEnv, serviceClient, getUserFromRequest } = require("./_shared");
+const { json, missingEnv, serviceClient, getUserFromRequest, isAdminEmail } = require("./_shared");
 
 exports.handler = async (event) => {
   if (missingEnv()) {
@@ -32,12 +32,15 @@ exports.handler = async (event) => {
   if (pErr) return json(500, { error: "Could not load students." });
 
   const nameById = {};
+  const excluded = {};
   for (const p of profiles || []) {
     nameById[p.id] = (p.full_name && p.full_name.trim()) || (p.email || "").split("@")[0] || "Student";
+    if (isAdminEmail(p.email)) excluded[p.id] = true;
   }
 
   const byUser = {};
   for (const l of logs || []) {
+    if (excluded[l.user_id]) continue;
     const u = (byUser[l.user_id] = byUser[l.user_id] || { today: 0, month: 0 });
     u.month += l.seconds;
     if (l.day === todayStr) u.today += l.seconds;
