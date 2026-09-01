@@ -658,7 +658,7 @@ body[data-view="auth"]  .tj-home-btn{display:inline-flex}
 .tj-menu .who b{display:block; color:var(--tj-fg); font-size:13.5px; font-weight:600; margin-top:2px}
 
 /* ---- shared new-panel shell ---- */
-#auth-root, #writing-root, #admin-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
+#auth-root, #writing-root, #admin-root, #lessons-root, #leaderboard-root, #typing-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
 .wc-eyebrow{font-family:'Space Grotesk',monospace; font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--tj-gold-deep); margin-bottom:12px}
 .wc-h1{font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:clamp(30px,5vw,50px); line-height:1.03; margin:0 0 10px; color:var(--tj-fg)}
 .wc-sub{color:var(--tj-fg-soft); font-size:clamp(14px,1.5vw,16px); line-height:1.6; max-width:60ch; margin:0 0 clamp(22px,3vw,32px)}
@@ -3106,7 +3106,7 @@ ov.addEventListener('click',function(e){ if(e.target===ov)close(); });
 $$('[data-search]').forEach(function(b){ b.addEventListener('click',open); });
 document.addEventListener('keydown',function(e){
   if((e.key==='k'||e.key==='K')&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); ov.classList.contains('open')?close():open(); }
-  else if(e.key==='/'&&!ov.classList.contains('open')&&document.activeElement.tagName!=='INPUT'){ e.preventDefault(); open(); }
+  else if(e.key==='/'&&!ov.classList.contains('open')&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){ e.preventDefault(); open(); }
   else if(e.key==='Escape'&&ov.classList.contains('open')){ close(); }
 });
 window.CKSEARCH={open:open,close:close};
@@ -3997,6 +3997,7 @@ function pickEssay(i){
   stopEssayTimer(); essayStart=null;
   updateEssayStats(0,0,100);
   renderEssayPicker();
+  setTimeout(function(){ var el=$("twEssayInput"); if(el && !el.disabled) el.focus(); },0);
 }
 
 function renderEssayPicker(){
@@ -4163,7 +4164,10 @@ function initWhenReady(){
   pickEssay(0);
   setDuration(15);
   new MutationObserver(function(){
-    if(document.body.getAttribute("data-view")==="typing" && !$("twEssayDisplay").innerHTML){ pickEssay(curEssayIdx); }
+    if(document.body.getAttribute("data-view")==="typing"){
+      if(!$("twEssayDisplay").innerHTML){ pickEssay(curEssayIdx); }
+      else if(!$("twEssayPanel").hidden){ setTimeout(function(){ var el=$("twEssayInput"); if(el && !el.disabled) el.focus(); },50); }
+    }
   }).observe(document.body,{attributes:true,attributeFilter:["data-view"]});
 }
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initWhenReady); else initWhenReady();
