@@ -784,6 +784,7 @@ html[data-theme="dark"] .wc-fix .o{color:#ff8c7a}
 html[data-theme="dark"] .tj-door.lessons{--accent:#79C3B2}
 
 body[data-view="lessons"] .tj-home-btn{display:inline-flex}
+body[data-view="leaderboard"] .tj-home-btn{display:inline-flex}
 
 /* admin sub-tabs */
 .ad-tabs{display:inline-flex; gap:5px; background:var(--tj-bg2); border:1px solid var(--tj-line); border-radius:12px; padding:5px; margin-bottom:24px; flex-wrap:wrap}
@@ -1239,6 +1240,14 @@ body[data-view="lessons"] .tj-home-btn{display:inline-flex}
   <p class="wc-sub">Videos and files your teacher has shared with you, organised by course and lesson.</p>
   <div id="lsRoot"><div class="wc-loading"><span class="d"></span> Loading your lessons…</div></div>
 </section>
+
+<!-- ================= LEADERBOARD ================= -->
+<section id="leaderboard-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">Premium English &middot; Practice</div>
+  <h1 class="wc-h1">Leaderboard</h1>
+  <p class="wc-sub">Ranked by time spent practising today. Every minute you're actively on the site counts.</p>
+  <div id="lbRoot"><div class="wc-loading"><span class="d"></span> Loading leaderboard…</div></div>
+</section>
 </main>
 <script>
 (function(){
@@ -1251,7 +1260,7 @@ body[data-view="lessons"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root'};
   var navHist=[]; var curView=null;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -3041,6 +3050,7 @@ window.CKSEARCH={open:open,close:close};
 "use strict";
 
 var sb=null, user=null, isAdmin=false, adminCache=null, pendingView=null, configOk=false, CFG=null;
+var lastActivity=Date.now();
 var FN="/.netlify/functions/";
 
 function $(id){return document.getElementById(id);}
@@ -3089,7 +3099,10 @@ async function boot(){
     renderAcct();
   });
 
-  // presence heartbeat
+  // presence + active-time heartbeat
+  ["mousemove","keydown","touchstart","scroll","click"].forEach(function(ev){
+    document.addEventListener(ev,function(){ lastActivity=Date.now(); },{passive:true});
+  });
   setInterval(ping, 60000);
 }
 
@@ -3103,6 +3116,8 @@ async function onSignedIn(){
 async function ping(){
   if(!sb||!user) return;
   try{ await sb.from("profiles").update({last_seen_at:new Date().toISOString()}).eq("id",user.id); }catch(e){}
+  var active = document.visibilityState==="visible" && (Date.now()-lastActivity)<90000;
+  if(active){ try{ await sb.rpc("add_time_seconds",{p_seconds:60}); }catch(e){} }
 }
 
 async function probeAdmin(){
@@ -3133,6 +3148,7 @@ function renderAcct(){
       '<div class="sep"></div>'+
       '<button data-go="write">My Writing Checker</button>'+
       '<button data-go="lessons">My Lessons</button>'+
+      '<button data-go="leaderboard">Leaderboard</button>'+
       (isAdmin?'<button data-go="admin">Admin Dashboard</button>':'')+
       '<div class="sep"></div>'+
       '<button id="tjSignOut">Sign out</button>'+
@@ -3429,8 +3445,44 @@ document.addEventListener("DOMContentLoaded",function(){
     var v=document.body.getAttribute("data-view");
     if(v==="admin" && isAdmin){ loadAdmin(); }
     if(v==="write" && user){ loadHistory(); }
+    if(v==="leaderboard" && user){ loadLeaderboard(); }
   }).observe(obsTarget,{attributes:true,attributeFilter:["data-view"]});
 });
+
+function fmtDur(sec){
+  sec=Number(sec)||0;
+  var h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60);
+  if(h>0) return h+"h "+m+"m";
+  if(m>0) return m+"m";
+  return sec+"s";
+}
+
+async function loadLeaderboard(){
+  var root=$("lbRoot"); if(!root) return;
+  if(!configOk){ root.innerHTML='<div class="wc-err">Backend not configured yet.</div>'; return; }
+  root.innerHTML='<div class="wc-loading"><span class="d"></span> Loading leaderboard…</div>';
+  try{
+    var t=await token();
+    var res=await fetch(FN+"leaderboard",{headers:{Authorization:"Bearer "+t}});
+    var data=await res.json();
+    if(!res.ok){ root.innerHTML='<div class="wc-err">'+esc(data.error||"Could not load leaderboard.")+'</div>'; return; }
+    var rows=data.leaderboard||[];
+    if(!rows.length){ root.innerHTML='<div class="wc-empty">No activity yet today. Be the first!</div>'; return; }
+    var html='<div class="wc-card" style="padding:0;overflow:hidden">';
+    rows.forEach(function(r,i){
+      var rank=i+1;
+      var crown=(rank===1 && r.today_seconds>0) ? '<span title="Today\'s leader" style="margin-right:6px">\uD83D\uDC51</span>' : '';
+      html+='<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;'+(i>0?'border-top:1px solid var(--tj-border,rgba(127,127,127,.18));':'')+'">'+
+        '<div style="font-weight:700;min-width:28px;opacity:.6">#'+rank+'</div>'+
+        '<div style="flex:1;font-weight:600">'+crown+esc(r.name)+'</div>'+
+        '<div style="text-align:right;min-width:90px"><div style="font-weight:700">'+fmtDur(r.today_seconds)+'</div><div style="font-size:12px;opacity:.6">today</div></div>'+
+        '<div style="text-align:right;min-width:90px"><div style="font-weight:700">'+fmtDur(r.month_seconds)+'</div><div style="font-size:12px;opacity:.6">this month</div></div>'+
+      '</div>';
+    });
+    html+='</div>';
+    root.innerHTML=html;
+  }catch(e){ root.innerHTML='<div class="wc-err">Network error. Please try again.</div>'; }
+}
 
 window.TJ={
   getSb:function(){return sb;},
