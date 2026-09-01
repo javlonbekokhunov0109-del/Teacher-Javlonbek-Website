@@ -620,7 +620,6 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 .tw-incorrect{color:#e5484d; text-decoration:underline; text-decoration-color:#e5484d}
 .tw-current{background:rgba(120,120,255,.25); border-radius:2px}
 .tw-current-word{background:rgba(120,120,255,.22); border-radius:5px}
-@media (max-width:860px){ .tw-grid{grid-template-columns:1fr !important} }
 .tw-caret{display:inline-block; width:2px; height:1.05em; background:var(--tj-gold,#c9a24b); vertical-align:-0.15em; margin:0 -1px; animation:twblink 1s steps(1) infinite}
 @keyframes twblink{0%,50%{opacity:1} 51%,100%{opacity:0}}
 /* ---- daily goal celebration ---- */
@@ -1279,12 +1278,15 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
 <section id="typing-root" class="tj-panel" hidden>
   <div class="wc-eyebrow">Premium English &middot; Speed</div>
   <h1 class="wc-h1">Typing Trainer</h1>
-  <p class="wc-sub">Race the clock with random exam vocabulary on the left, or type a full band 7&ndash;7.5 Task 2 essay on the right. Live WPM and accuracy on both.</p>
+  <p class="wc-sub">Race the clock with random exam vocabulary in Word Rush, or type a full band 7&ndash;7.5 Task 2 essay. Live WPM and accuracy as you go.</p>
 
-  <div class="tw-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+  <div class="au-tabs" id="twTabs">
+    <button class="on" data-twtab="rush">Word Rush</button>
+    <button data-twtab="essay">Essay Typing</button>
+  </div>
+
   <div id="twRushPanel">
     <div class="wc-card">
-      <div class="wc-eyebrow" style="margin-bottom:6px">Word Rush</div>
       <div class="wc-row">
         <label class="wc-label">Duration</label>
         <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">
@@ -1312,9 +1314,8 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
     <div id="twRushResult"></div>
   </div>
 
-  <div id="twEssayPanel">
+  <div id="twEssayPanel" hidden>
     <div class="wc-card">
-      <div class="wc-eyebrow" style="margin-bottom:6px">Essay Typing</div>
       <div class="wc-row">
         <label class="wc-label">Choose an essay</label>
         <div id="twEssayPicker" style="display:flex;flex-wrap:wrap;gap:8px"></div>
@@ -1333,7 +1334,6 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
       <button class="wc-btn" id="twEssayRestart" style="margin-top:14px">Restart this essay</button>
     </div>
     <div id="twEssayResult"></div>
-  </div>
   </div>
 </section>
 </main>
@@ -4228,6 +4228,15 @@ function onRushInput(){
 /* ---------- wiring ---------- */
 function wireTabs(){
   document.addEventListener("click",function(e){
+    var t=e.target.closest("[data-twtab]");
+    if(t){
+      document.querySelectorAll("#twTabs button").forEach(function(b){ b.classList.toggle("on",b===t); });
+      var mode=t.getAttribute("data-twtab");
+      $("twEssayPanel").hidden = mode!=="essay";
+      $("twRushPanel").hidden = mode!=="rush";
+      if(mode==="essay"){ setTimeout(function(){ var ei=$("twEssayInput"); if(ei && !ei.disabled) ei.focus(); },0); }
+      if(mode==="rush"){ setTimeout(function(){ var ri=$("twRushInput"); if(ri && !ri.disabled) ri.focus(); },0); }
+    }
     var d=e.target.closest("#twDurTabs button");
     if(d && !rushRunning){ setDuration(Number(d.getAttribute("data-sec"))); }
     if(e.target.closest("#twEssayZone")){ var ei=$("twEssayInput"); if(ei && !ei.disabled) ei.focus(); }
