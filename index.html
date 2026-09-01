@@ -620,6 +620,17 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 .tw-incorrect{color:#e5484d; text-decoration:underline; text-decoration-color:#e5484d}
 .tw-current{background:rgba(120,120,255,.25); border-radius:2px}
 .tw-current-word{background:rgba(120,120,255,.22); border-radius:5px}
+.tw-caret{display:inline-block; width:2px; height:1.05em; background:var(--tj-gold,#c9a24b); vertical-align:-0.15em; margin:0 -1px; animation:twblink 1s steps(1) infinite}
+@keyframes twblink{0%,50%{opacity:1} 51%,100%{opacity:0}}
+/* ---- daily goal celebration ---- */
+#tjConfettiLayer{position:fixed; inset:0; pointer-events:none; z-index:9998; overflow:hidden}
+.tj-confetti{position:absolute; top:-40px; font-size:24px; animation:tjfall linear forwards}
+@keyframes tjfall{to{transform:translateY(110vh) rotate(360deg); opacity:.9}}
+#tjGoalToast{position:fixed; left:50%; top:18%; transform:translate(-50%,-20px); z-index:9999; background:var(--tj-card,#fff); border:1px solid var(--tj-line,rgba(127,127,127,.3)); border-radius:16px; padding:28px 34px; text-align:center; box-shadow:0 20px 60px -10px rgba(0,0,0,.4); opacity:0; transition:opacity .35s ease, transform .35s ease; max-width:360px}
+#tjGoalToast.show{opacity:1; transform:translate(-50%,0)}
+#tjGoalToast .tj-goal-emoji{font-size:44px; margin-bottom:8px}
+#tjGoalToast h3{margin:0 0 6px; font-size:20px}
+#tjGoalToast p{margin:0 0 16px; opacity:.75; font-size:14px}
 /* Reuses the shell tokens (--tj-*). All rules scoped to the new panels. */
 
 /* third door accent + responsive 3-up doors */
@@ -1281,8 +1292,11 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
         <div id="twEssayPicker" style="display:flex;flex-wrap:wrap;gap:8px"></div>
       </div>
       <div id="twPrompt" class="wc-sub" style="margin-top:4px"></div>
-      <div id="twEssayDisplay" style="font-size:19px;line-height:1.85;font-family:ui-monospace,Menlo,Consolas,monospace;padding:18px;border:1px solid var(--tj-border,rgba(127,127,127,.25));border-radius:12px;margin-top:14px;max-height:260px;overflow:auto"></div>
-      <textarea id="twEssayInput" class="wc-area" style="margin-top:14px;min-height:110px" placeholder="Click here and start typing the essay above…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div id="twEssayZone" style="position:relative;margin-top:14px;cursor:text">
+        <div id="twEssayDisplay" style="font-size:20px;line-height:1.9;font-family:ui-monospace,Menlo,Consolas,monospace;padding:18px;border:1px solid var(--tj-border,rgba(127,127,127,.25));border-radius:12px;max-height:300px;overflow:auto;user-select:none"></div>
+        <textarea id="twEssayInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="position:absolute;opacity:0;height:1px;width:1px;top:0;left:0;pointer-events:none"></textarea>
+      </div>
+      <p id="twEssayHint" class="wc-sub" style="margin-top:8px;text-align:center">Click above, then just start typing — no separate box needed.</p>
       <div class="wc-meta" style="margin-top:10px">
         <span id="twEssayTime">Time: 0s</span>
         <span id="twEssayWpm">WPM: 0</span>
@@ -1307,8 +1321,11 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
           <button class="wc-btn" id="twCustomApply" style="width:auto;padding:10px 16px">Use custom</button>
         </div>
       </div>
-      <div id="twRushDisplay" style="font-size:20px;line-height:2.1;font-family:ui-monospace,Menlo,Consolas,monospace;padding:18px;border:1px solid var(--tj-border,rgba(127,127,127,.25));border-radius:12px;margin-top:14px;max-height:220px;overflow:auto"></div>
-      <input class="wc-input" id="twRushInput" style="margin-top:14px" placeholder="Click Start, then type the highlighted word and press space…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled>
+      <div id="twRushZone" style="position:relative;margin-top:14px;cursor:text">
+        <div id="twRushDisplay" style="font-size:22px;line-height:2.2;font-family:ui-monospace,Menlo,Consolas,monospace;padding:18px;border:1px solid var(--tj-border,rgba(127,127,127,.25));border-radius:12px;max-height:220px;overflow:auto;user-select:none"></div>
+        <textarea id="twRushInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled style="position:absolute;opacity:0;height:1px;width:1px;top:0;left:0;pointer-events:none"></textarea>
+      </div>
+      <p id="twRushHint" class="wc-sub" style="margin-top:8px;text-align:center">Press Start, then just start typing — no separate box needed.</p>
       <div class="wc-meta" style="margin-top:10px">
         <span id="twRushTime">Time left: 15s</span>
         <span id="twRushWpm">WPM: 0</span>
@@ -3181,6 +3198,7 @@ async function onSignedIn(){
   ping();
   await probeAdmin();
   renderAcct();
+  checkDailyGoal();
   var p=pendingView; pendingView=null; nav(p||"home");
 }
 
@@ -3188,7 +3206,53 @@ async function ping(){
   if(!sb||!user) return;
   try{ await sb.from("profiles").update({last_seen_at:new Date().toISOString()}).eq("id",user.id); }catch(e){}
   var active = document.visibilityState==="visible" && (Date.now()-lastActivity)<90000;
-  if(active){ try{ await sb.rpc("add_time_seconds",{p_seconds:60}); }catch(e){} }
+  if(active){ try{ await sb.rpc("add_time_seconds",{p_seconds:60}); }catch(e){} checkDailyGoal(); }
+}
+
+var DAILY_GOAL_SEC=1200; // 20 minutes
+async function checkDailyGoal(){
+  if(!sb||!user) return;
+  try{
+    var todayStr=new Date().toISOString().slice(0,10);
+    var key="tj_goal_done_"+user.id+"_"+todayStr;
+    if(localStorage.getItem(key)) return;
+    var r=await sb.from("time_logs").select("seconds").eq("user_id",user.id).eq("day",todayStr).single();
+    if(r.data && r.data.seconds>=DAILY_GOAL_SEC){
+      localStorage.setItem(key,"1");
+      celebrateDailyGoal();
+    }
+  }catch(e){}
+}
+
+function celebrateDailyGoal(){
+  var layer=document.createElement("div");
+  layer.id="tjConfettiLayer";
+  var emojis=["\uD83C\uDF89","\uD83C\uDF8A","\u2728","\uD83C\uDF8B","\uD83C\uDF86"];
+  for(var i=0;i<36;i++){
+    var s=document.createElement("span");
+    s.className="tj-confetti";
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left=(Math.random()*100)+"vw";
+    s.style.animationDuration=(2.2+Math.random()*1.6)+"s";
+    s.style.animationDelay=(Math.random()*0.6)+"s";
+    s.style.fontSize=(16+Math.random()*20)+"px";
+    layer.appendChild(s);
+  }
+  document.body.appendChild(layer);
+
+  var toast=document.createElement("div");
+  toast.id="tjGoalToast";
+  toast.innerHTML='<div class="tj-goal-emoji">\uD83C\uDF89</div>'+
+    '<h3>Congratulations!</h3>'+
+    '<p>You just hit your daily 20-minute practice goal. That consistency is exactly what moves your band score up.</p>'+
+    '<button class="wc-btn" id="tjGoalClose" style="width:auto;padding:10px 22px">Keep going</button>';
+  document.body.appendChild(toast);
+  requestAnimationFrame(function(){ toast.classList.add("show"); });
+  document.getElementById("tjGoalClose").addEventListener("click",function(){
+    toast.classList.remove("show");
+    setTimeout(function(){ toast.remove(); },350);
+  });
+  setTimeout(function(){ layer.remove(); },4200);
 }
 
 async function probeAdmin(){
@@ -3985,15 +4049,19 @@ var WORDS=("however therefore furthermore moreover consequently significant cons
 .split(/\s+/).filter(Boolean);
 
 /* ---------- essay typing ---------- */
-var curEssayIdx=0, essayStart=null, essayTimerId=null, essayDone=false;
+var curEssayIdx=0, essayStart=null, essayTimerId=null, essayDone=false, curEssayText="";
+
+function flat(s){ return String(s).replace(/\s+/g," ").trim(); }
 
 function pickEssay(i){
   curEssayIdx=i; essayDone=false;
+  curEssayText=flat(ESSAYS[i].essay);
   $("twPrompt").innerHTML="<b>Task 2:</b> "+ESSAYS[i].q;
   renderEssayDisplay("");
   $("twEssayInput").value="";
   $("twEssayInput").disabled=false;
   $("twEssayResult").innerHTML="";
+  $("twEssayHint").hidden=false;
   stopEssayTimer(); essayStart=null;
   updateEssayStats(0,0,100);
   renderEssayPicker();
@@ -4013,16 +4081,16 @@ function renderEssayPicker(){
 }
 
 function renderEssayDisplay(typed){
-  var target=ESSAYS[curEssayIdx].essay;
+  var target=curEssayText;
   var html="";
   for(var i=0;i<target.length;i++){
+    if(i===typed.length) html+='<span class="tw-caret"></span>';
     var ch=target[i];
     var cls="tw-untyped";
     if(i<typed.length){ cls = typed[i]===ch ? "tw-correct" : "tw-incorrect"; }
-    else if(i===typed.length){ cls="tw-current"; }
-    var show = ch==="\n" ? "<br>" : esc(ch);
-    html+='<span class="'+cls+'">'+show+'</span>';
+    html+='<span class="'+cls+'">'+esc(ch)+'</span>';
   }
+  if(typed.length>=target.length) html+='<span class="tw-caret"></span>';
   $("twEssayDisplay").innerHTML=html;
 }
 function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
@@ -4045,8 +4113,9 @@ function updateEssayStats(correctChars,typedChars,acc){
 }
 
 function onEssayInput(){
-  var target=ESSAYS[curEssayIdx].essay;
+  var target=curEssayText;
   var typed=$("twEssayInput").value;
+  if(typed.length>0){ $("twEssayHint").hidden=true; }
   if(!essayStart && typed.length>0){ essayStart=Date.now(); startEssayTimer(); }
   var correct=0;
   for(var i=0;i<typed.length && i<target.length;i++){ if(typed[i]===target[i]) correct++; }
@@ -4064,17 +4133,38 @@ function onEssayInput(){
 
 /* ---------- word rush ---------- */
 var rushSecTotal=15, rushLeft=15, rushTimerId=null, rushRunning=false;
-var rushWords=[], rushIdx=0, rushCorrectWords=0, rushCorrectChars=0, rushTypedChars=0;
+var rushWords=[], rushMeta=[], rushIdx=0, rushCorrectWords=0, rushCorrectChars=0, rushTypedChars=0;
 
 function genRushWords(n){
   var arr=[]; for(var i=0;i<n;i++){ arr.push(WORDS[Math.floor(Math.random()*WORDS.length)]); } return arr;
 }
+function metaFor(words){ return words.map(function(){ return {typed:"",ok:false}; }); }
 
-function renderRushDisplay(){
+function renderRushDisplay(liveTyped){
   var html="";
   rushWords.forEach(function(w,i){
-    var cls = i<rushIdx ? (w.__ok?"tw-correct":"tw-incorrect") : (i===rushIdx?"tw-current-word":"tw-untyped");
-    html+='<span class="'+cls+'" style="margin-right:10px;padding:2px 4px;border-radius:4px">'+esc(w)+'</span>';
+    if(i<rushIdx){
+      var typed=rushMeta[i].typed||"";
+      var wHtml="";
+      for(var c=0;c<w.length;c++){
+        var cls = (c<typed.length) ? (typed[c]===w[c]?"tw-correct":"tw-incorrect") : "tw-incorrect";
+        wHtml+='<span class="'+cls+'">'+esc(w[c])+'</span>';
+      }
+      html+='<span style="margin-right:12px">'+wHtml+'</span>';
+    } else if(i===rushIdx){
+      var typed=liveTyped||"";
+      var wHtml="";
+      for(var c=0;c<w.length;c++){
+        if(c===typed.length) wHtml+='<span class="tw-caret"></span>';
+        var cls="tw-untyped";
+        if(c<typed.length) cls = typed[c]===w[c] ? "tw-correct":"tw-incorrect";
+        wHtml+='<span class="'+cls+'">'+esc(w[c])+'</span>';
+      }
+      if(typed.length>=w.length) wHtml+='<span class="tw-caret"></span>';
+      html+='<span class="tw-word-active" style="margin-right:12px">'+wHtml+'</span>';
+    } else {
+      html+='<span class="tw-untyped" style="margin-right:12px">'+esc(w)+'</span>';
+    }
   });
   $("twRushDisplay").innerHTML=html;
 }
@@ -4088,14 +4178,14 @@ function setDuration(sec){
 }
 
 function startRush(){
-  rushWords=genRushWords(400); rushIdx=0; rushCorrectWords=0; rushCorrectChars=0; rushTypedChars=0;
-  rushWords.forEach(function(w){ /* per-word ok flag set on submit */ });
+  rushWords=genRushWords(400); rushMeta=metaFor(rushWords);
+  rushIdx=0; rushCorrectWords=0; rushCorrectChars=0; rushTypedChars=0;
   rushLeft=rushSecTotal; rushRunning=true;
-  $("twRushResult").innerHTML="";
+  $("twRushResult").innerHTML=""; $("twRushHint").hidden=true;
   $("twRushInput").disabled=false; $("twRushInput").value=""; $("twRushInput").focus();
   $("twRushTime").textContent="Time left: "+rushLeft+"s";
   $("twRushWpm").textContent="WPM: 0"; $("twRushAcc").textContent="Accuracy: 100%";
-  renderRushDisplay();
+  renderRushDisplay("");
   if(rushTimerId) clearInterval(rushTimerId);
   rushTimerId=setInterval(function(){
     rushLeft--;
@@ -4116,20 +4206,22 @@ function endRush(){
   $("twRushResult").innerHTML='<div class="wc-ok" style="margin-top:16px">Time\u2019s up — '+wpm+' WPM, '+acc+'% accuracy, '+rushCorrectWords+' words correct. Well done!</div>';
 }
 
-function onRushInput(e){
+function onRushInput(){
   if(!rushRunning) return;
   var val=$("twRushInput").value;
-  if(val.endsWith(" ")){
-    var typedWord=val.trim();
+  var spaceAt=val.indexOf(" ");
+  if(spaceAt>=0){
+    var typedWord=val.slice(0,spaceAt);
     var target=rushWords[rushIdx]||"";
-    var ok = typedWord===target;
-    rushWords[rushIdx].__ok=ok;
-    if(ok) rushCorrectWords++;
+    rushMeta[rushIdx]={typed:typedWord, ok:(typedWord===target)};
+    if(rushMeta[rushIdx].ok) rushCorrectWords++;
     for(var i=0;i<typedWord.length;i++){ rushTypedChars++; if(target[i]===typedWord[i]) rushCorrectChars++; }
     rushIdx++;
     $("twRushInput").value="";
-    renderRushDisplay();
-    if(rushIdx>=rushWords.length-20){ rushWords=rushWords.concat(genRushWords(200)); }
+    if(rushIdx>=rushWords.length-20){ var more=genRushWords(200); rushWords=rushWords.concat(more); rushMeta=rushMeta.concat(metaFor(more)); }
+    renderRushDisplay("");
+  } else {
+    renderRushDisplay(val);
   }
 }
 
@@ -4145,6 +4237,8 @@ function wireTabs(){
     }
     var d=e.target.closest("#twDurTabs button");
     if(d && !rushRunning){ setDuration(Number(d.getAttribute("data-sec"))); }
+    if(e.target.closest("#twEssayZone")){ var ei=$("twEssayInput"); if(ei && !ei.disabled) ei.focus(); }
+    if(e.target.closest("#twRushZone")){ var ri=$("twRushInput"); if(ri && !ri.disabled) ri.focus(); }
   });
   $("twEssayInput").addEventListener("input",onEssayInput);
   $("twEssayRestart").addEventListener("click",function(){ pickEssay(curEssayIdx); });
