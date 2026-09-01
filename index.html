@@ -614,6 +614,12 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 </style>
 <style>
 /* ================= AI Writing Checker · Admin · Auth — additions ================= */
+/* ---- typing trainer ---- */
+.tw-untyped{opacity:.45}
+.tw-correct{color:#2e8b57}
+.tw-incorrect{color:#e5484d; text-decoration:underline; text-decoration-color:#e5484d}
+.tw-current{background:rgba(120,120,255,.25); border-radius:2px}
+.tw-current-word{background:rgba(120,120,255,.22); border-radius:5px}
 /* Reuses the shell tokens (--tj-*). All rules scoped to the new panels. */
 
 /* third door accent + responsive 3-up doors */
@@ -785,6 +791,7 @@ html[data-theme="dark"] .tj-door.lessons{--accent:#79C3B2}
 
 body[data-view="lessons"] .tj-home-btn{display:inline-flex}
 body[data-view="leaderboard"] .tj-home-btn{display:inline-flex}
+body[data-view="typing"] .tj-home-btn{display:inline-flex}
 
 /* admin sub-tabs */
 .ad-tabs{display:inline-flex; gap:5px; background:var(--tj-bg2); border:1px solid var(--tj-line); border-radius:12px; padding:5px; margin-bottom:24px; flex-wrap:wrap}
@@ -933,6 +940,13 @@ body[data-view="leaderboard"] .tj-home-btn{display:inline-flex}
       <h2>My Lessons</h2>
       <p>Watch the class videos and open the PDFs, slides and worksheets your teacher has shared with you &mdash; organised by course and lesson.</p>
       <span class="tj-go">Open My Lessons <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="tj-door typing" data-go="typing">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7 14h6M15 14h2"/></svg></div>
+      <div class="tj-tag">Speed &middot; Typing</div>
+      <h2>Typing Trainer</h2>
+      <p>Build real exam speed. Type full band 7&ndash;7.5 Task 2 essays, or race the clock in Word Rush &mdash; live WPM and accuracy, timer included.</p>
+      <span class="tj-go">Open Typing Trainer <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
   </div>
   <div class="tj-foot">
@@ -1248,6 +1262,63 @@ body[data-view="leaderboard"] .tj-home-btn{display:inline-flex}
   <p class="wc-sub">Ranked by time spent practising today. Every minute you're actively on the site counts.</p>
   <div id="lbRoot"><div class="wc-loading"><span class="d"></span> Loading leaderboard…</div></div>
 </section>
+
+<!-- ================= TYPING TRAINER ================= -->
+<section id="typing-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">Premium English &middot; Speed</div>
+  <h1 class="wc-h1">Typing Trainer</h1>
+  <p class="wc-sub">Type real band 7&ndash;7.5 Task 2 essays, or race the clock with random exam vocabulary. Live WPM and accuracy as you go.</p>
+
+  <div class="au-tabs" id="twTabs">
+    <button class="on" data-twtab="essay">Essay Typing</button>
+    <button data-twtab="rush">Word Rush</button>
+  </div>
+
+  <div id="twEssayPanel">
+    <div class="wc-card">
+      <div class="wc-row">
+        <label class="wc-label">Choose an essay</label>
+        <div id="twEssayPicker" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
+      <div id="twPrompt" class="wc-sub" style="margin-top:4px"></div>
+      <div id="twEssayDisplay" style="font-size:19px;line-height:1.85;font-family:ui-monospace,Menlo,Consolas,monospace;padding:18px;border:1px solid var(--tj-border,rgba(127,127,127,.25));border-radius:12px;margin-top:14px;max-height:260px;overflow:auto"></div>
+      <textarea id="twEssayInput" class="wc-area" style="margin-top:14px;min-height:110px" placeholder="Click here and start typing the essay above…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="wc-meta" style="margin-top:10px">
+        <span id="twEssayTime">Time: 0s</span>
+        <span id="twEssayWpm">WPM: 0</span>
+        <span id="twEssayAcc">Accuracy: 100%</span>
+      </div>
+      <button class="wc-btn" id="twEssayRestart" style="margin-top:14px">Restart this essay</button>
+    </div>
+    <div id="twEssayResult"></div>
+  </div>
+
+  <div id="twRushPanel" hidden>
+    <div class="wc-card">
+      <div class="wc-row">
+        <label class="wc-label">Duration</label>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+          <div class="au-tabs" id="twDurTabs" style="max-width:280px;margin-bottom:0">
+            <button class="on" data-sec="15">15s</button>
+            <button data-sec="30">30s</button>
+            <button data-sec="60">1 min</button>
+          </div>
+          <input class="wc-input" id="twCustomSec" type="number" min="5" max="600" placeholder="Custom seconds" style="width:150px">
+          <button class="wc-btn" id="twCustomApply" style="width:auto;padding:10px 16px">Use custom</button>
+        </div>
+      </div>
+      <div id="twRushDisplay" style="font-size:20px;line-height:2.1;font-family:ui-monospace,Menlo,Consolas,monospace;padding:18px;border:1px solid var(--tj-border,rgba(127,127,127,.25));border-radius:12px;margin-top:14px;max-height:220px;overflow:auto"></div>
+      <input class="wc-input" id="twRushInput" style="margin-top:14px" placeholder="Click Start, then type the highlighted word and press space…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled>
+      <div class="wc-meta" style="margin-top:10px">
+        <span id="twRushTime">Time left: 15s</span>
+        <span id="twRushWpm">WPM: 0</span>
+        <span id="twRushAcc">Accuracy: 100%</span>
+      </div>
+      <button class="wc-btn" id="twRushStart" style="margin-top:14px">Start</button>
+    </div>
+    <div id="twRushResult"></div>
+  </div>
+</section>
 </main>
 <script>
 (function(){
@@ -1260,7 +1331,7 @@ body[data-view="leaderboard"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root'};
   var navHist=[]; var curView=null;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -3831,6 +3902,271 @@ function init(){
   }).observe(document.body,{attributes:true,attributeFilter:["data-view"]});
 }
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
+})();
+</script>
+<script>
+/* ===== Typing Trainer (Essay Typing + Word Rush) — isolated ===== */
+(function(){
+"use strict";
+function $(id){return document.getElementById(id);}
+
+var ESSAYS=[
+{title:"Technology & personal communication",q:"Some people believe that modern technology has made communication between people less personal. To what extent do you agree or disagree?",
+essay:`It is often argued that the growth of digital communication has weakened the personal quality of human interaction. While I accept that technology has changed the way people connect, I believe this shift has brought both drawbacks and genuine benefits, and the overall effect depends largely on how these tools are used.
+
+On one hand, there is some truth to the claim that face-to-face contact has declined. Many people now prefer to send a text message or a voice note rather than meet in person, even when the two parties live close together. This can make relationships feel more superficial, since tone, body language and shared moments are often lost in written exchanges. Furthermore, constant access to smartphones during social gatherings can distract people from the conversation happening right in front of them, which undoubtedly reduces the depth of that interaction.
+
+On the other hand, technology has also made it possible to maintain relationships that would otherwise fade due to distance. Video calls, for instance, allow families separated by migration or work to see each other regularly, something that was simply impossible a few decades ago. In this sense, digital tools do not replace personal connection but extend it across geography and time.
+
+In conclusion, while excessive reliance on screens can undoubtedly make communication feel less intimate, technology itself is not inherently impersonal. The real determinant is how thoughtfully individuals choose to use these tools alongside, rather than instead of, real-world contact.`},
+
+{title:"Free university education",q:"Some people think that university education should be free for everyone, while others believe students should pay for their own studies. Discuss both views and give your opinion.",
+essay:`The question of whether higher education should be funded entirely by the state or paid for by individual students remains a contentious issue worldwide. Both positions carry considerable merit, and in my view, a balanced approach is the most realistic solution.
+
+Advocates of free tuition argue that education is a fundamental right rather than a commercial product. When universities charge high fees, talented students from low-income families may be discouraged from applying, regardless of their academic potential. This can widen the gap between social classes and prevent society from benefiting fully from its brightest minds. Countries that have adopted free or heavily subsidised higher education often report higher rates of social mobility as a result.
+
+Conversely, those who support tuition fees contend that free education places an unsustainable burden on public finances, particularly as student numbers continue to rise. Requiring students to contribute financially can also increase their sense of responsibility, encouraging them to take their studies seriously and select courses with genuine career value rather than enrolling purely because the opportunity is free.
+
+In my opinion, neither extreme is entirely satisfactory. Governments should aim to keep tuition affordable through subsidies and means-tested support, ensuring that cost never becomes the deciding factor for a capable student, while still allowing institutions to charge fees that reflect the true cost of quality teaching.
+
+Ultimately, a fair and sustainable system likely lies somewhere between these two positions, combining public investment with a reasonable, income-adjusted financial contribution from students themselves.`},
+
+{title:"Environmental responsibility",q:"Protecting the environment is the responsibility of governments rather than individuals. To what extent do you agree?",
+essay:`Environmental degradation is one of the most pressing challenges of our time, and there is ongoing debate over who should bear the primary responsibility for addressing it. Although governments undeniably hold the greatest capacity to enact meaningful change, I would argue that individual action remains an essential part of any long-term solution.
+
+Governments possess the legislative and financial power that individuals simply do not have. They can introduce carbon taxes, regulate industrial emissions, invest in renewable energy infrastructure and enforce international agreements. Without such large-scale policies, even the most environmentally conscious citizens would struggle to offset the damage caused by heavy industry and mass transportation systems. For this reason, it is reasonable to view government intervention as the backbone of environmental protection.
+
+Nevertheless, individual choices still matter considerably. Everyday decisions, such as reducing single-use plastic, conserving energy at home, or choosing public transport over private cars, collectively create significant environmental impact when adopted widely. Moreover, public demand often drives government policy; when citizens actively campaign for stricter environmental laws or support sustainable products, authorities are more likely to respond with corresponding legislation.
+
+In conclusion, while governments clearly have greater resources and authority to combat environmental problems, it would be a mistake to view individuals as powerless bystanders. A combination of top-down regulation and bottom-up personal responsibility offers the most realistic path towards a sustainable future.`},
+
+{title:"Working from home",q:"In recent years, more people have started working from home. Do the advantages of this trend outweigh the disadvantages?",
+essay:`The rise of remote working has transformed the modern workplace, allowing millions of employees to perform their jobs from home rather than a traditional office. While this shift offers clear benefits, it also presents notable challenges, and in my opinion, the advantages generally outweigh the drawbacks for most workers.
+
+One of the most significant benefits of remote work is the flexibility it provides. Employees can design their schedules around personal responsibilities, eliminate lengthy commutes, and often achieve a better balance between professional and family life. This increased autonomy tends to boost morale and, in many cases, overall productivity, as workers can focus during their most effective hours rather than a fixed nine-to-five period.
+
+However, working from home is not without its difficulties. Isolation is a common complaint, as employees miss the spontaneous collaboration and social interaction that an office environment naturally fosters. Communication can also become less efficient, with misunderstandings arising more easily through written messages than face-to-face conversation. Additionally, some individuals struggle to separate work from personal life when both occur in the same physical space, potentially leading to longer, more stressful working hours.
+
+Despite these challenges, most surveys suggest that employees value the freedom remote work provides more than they miss the traditional office setting. Companies that invest in clear communication tools and occasional in-person meetings can successfully minimise the disadvantages while retaining the considerable benefits of a flexible workforce.`},
+
+{title:"Youth crime",q:"In many countries, the rate of youth crime is increasing. What are the causes of this problem, and what solutions can be suggested?",
+essay:`Rising levels of youth crime have become a growing concern in numerous societies, prompting debate over both the root causes of this trend and the most effective ways to address it.
+
+Several interconnected factors contribute to this problem. Poverty and limited access to opportunity are among the most significant, as young people from disadvantaged backgrounds may see criminal activity as one of the few paths to financial security. Family instability also plays a considerable role; a lack of parental supervision or guidance can leave adolescents without the structure needed to develop a strong sense of right and wrong. Furthermore, peer pressure and the influence of gangs often push impressionable teenagers towards behaviour they might otherwise avoid.
+
+Addressing youth crime therefore requires action on multiple fronts. Governments should invest in community programmes that provide young people with constructive alternatives, such as sports clubs, vocational training and mentoring schemes, thereby reducing idle time that could otherwise be spent on harmful activities. Schools also have an important part to play by identifying at-risk students early and offering counselling or additional support before problems escalate. Finally, targeted economic policies that improve employment prospects in deprived areas can tackle one of the fundamental drivers of criminal behaviour.
+
+In conclusion, youth crime stems from a complex mixture of social and economic pressures, and no single measure will resolve it entirely. A coordinated effort involving families, schools, communities and government is essential to reverse this troubling trend.`},
+
+{title:"Social media's influence",q:"Social media has had a significant impact on the way people interact and share information. Do you think this influence has been mostly positive or negative?",
+essay:`Social media platforms have fundamentally reshaped how people communicate, access news and form opinions. Although these platforms offer undeniable advantages, I believe their overall impact on society has been mixed, with certain negative consequences beginning to outweigh the initial benefits.
+
+On the positive side, social media has democratised the flow of information. Ordinary citizens can now share their experiences instantly with a global audience, raising awareness of issues that traditional media might otherwise overlook. It has also enabled small businesses to reach customers directly, and allowed people to maintain relationships across vast distances with remarkable ease.
+
+However, several serious drawbacks have emerged alongside these benefits. The spread of misinformation is perhaps the most concerning, as false or misleading content can circulate widely before it is corrected, sometimes influencing public opinion. Excessive use of these platforms has also been linked to declining mental health among young users, who frequently compare their lives unfavourably to the curated images presented online. Moreover, algorithms designed to maximise engagement often trap users within narrow echo chambers, reinforcing existing beliefs rather than exposing them to diverse perspectives.
+
+In conclusion, while social media has brought genuine improvements in connectivity and access to information, the growing problems of misinformation, mental health strain and polarisation suggest that its overall influence is becoming increasingly negative. Stronger regulation and greater digital literacy will be necessary to restore a healthier balance.`}
+];
+
+var WORDS=("however therefore furthermore moreover consequently significant considerable substantial "+
+"government society technology environment education employment economy population community "+
+"increase decrease improve reduce maintain achieve provide require ensure promote encourage "+
+"important essential beneficial effective efficient sustainable inevitable widespread growing "+
+"opportunity responsibility development infrastructure regulation legislation investment "+
+"argue believe suggest indicate demonstrate highlight emphasise acknowledge conclude "+
+"individual citizen resident employee student professional generation authority institution "+
+"advantage disadvantage benefit drawback impact influence outcome consequence solution "+
+"traditional modern global local urban rural domestic international national regional "+
+"access quality standard level rate degree extent range variety diversity "+
+"despite although while whereas nonetheless nevertheless overall ultimately primarily largely "+
+"data evidence research study survey statistics analysis findings results trend pattern "+
+"balance approach strategy policy measure initiative programme scheme framework "+
+"critical crucial vital major minor relevant valid reliable accurate consistent")
+.split(/\s+/).filter(Boolean);
+
+/* ---------- essay typing ---------- */
+var curEssayIdx=0, essayStart=null, essayTimerId=null, essayDone=false;
+
+function pickEssay(i){
+  curEssayIdx=i; essayDone=false;
+  $("twPrompt").innerHTML="<b>Task 2:</b> "+ESSAYS[i].q;
+  renderEssayDisplay("");
+  $("twEssayInput").value="";
+  $("twEssayInput").disabled=false;
+  $("twEssayResult").innerHTML="";
+  stopEssayTimer(); essayStart=null;
+  updateEssayStats(0,0,100);
+  renderEssayPicker();
+}
+
+function renderEssayPicker(){
+  var box=$("twEssayPicker"); box.innerHTML="";
+  ESSAYS.forEach(function(e,i){
+    var b=document.createElement("button");
+    b.textContent=e.title;
+    b.className="wc-btn";
+    b.style.cssText="width:auto;padding:8px 14px;font-size:13px;"+(i===curEssayIdx?"":"opacity:.55");
+    b.addEventListener("click",function(){ pickEssay(i); });
+    box.appendChild(b);
+  });
+}
+
+function renderEssayDisplay(typed){
+  var target=ESSAYS[curEssayIdx].essay;
+  var html="";
+  for(var i=0;i<target.length;i++){
+    var ch=target[i];
+    var cls="tw-untyped";
+    if(i<typed.length){ cls = typed[i]===ch ? "tw-correct" : "tw-incorrect"; }
+    else if(i===typed.length){ cls="tw-current"; }
+    var show = ch==="\n" ? "<br>" : esc(ch);
+    html+='<span class="'+cls+'">'+show+'</span>';
+  }
+  $("twEssayDisplay").innerHTML=html;
+}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+
+function startEssayTimer(){
+  if(essayTimerId) return;
+  essayTimerId=setInterval(function(){
+    if(!essayStart) return;
+    var secs=Math.floor((Date.now()-essayStart)/1000);
+    $("twEssayTime").textContent="Time: "+secs+"s";
+  },1000);
+}
+function stopEssayTimer(){ if(essayTimerId){ clearInterval(essayTimerId); essayTimerId=null; } }
+
+function updateEssayStats(correctChars,typedChars,acc){
+  var mins = essayStart ? Math.max((Date.now()-essayStart)/60000,1/60) : 1/60;
+  var wpm = Math.round((correctChars/5)/mins);
+  $("twEssayWpm").textContent="WPM: "+(isFinite(wpm)?wpm:0);
+  $("twEssayAcc").textContent="Accuracy: "+acc+"%";
+}
+
+function onEssayInput(){
+  var target=ESSAYS[curEssayIdx].essay;
+  var typed=$("twEssayInput").value;
+  if(!essayStart && typed.length>0){ essayStart=Date.now(); startEssayTimer(); }
+  var correct=0;
+  for(var i=0;i<typed.length && i<target.length;i++){ if(typed[i]===target[i]) correct++; }
+  var acc = typed.length ? Math.round((correct/typed.length)*100) : 100;
+  renderEssayDisplay(typed);
+  updateEssayStats(correct,typed.length,acc);
+  if(typed.length>=target.length && !essayDone){
+    essayDone=true; stopEssayTimer();
+    $("twEssayInput").disabled=true;
+    var secs=Math.max(1,Math.round((Date.now()-essayStart)/1000));
+    $("twEssayResult").innerHTML='<div class="wc-ok" style="margin-top:16px">Essay complete — '+secs+'s, '+
+      $("twEssayWpm").textContent.replace("WPM: ","")+' WPM, '+acc+'% accuracy. Nice work!</div>';
+  }
+}
+
+/* ---------- word rush ---------- */
+var rushSecTotal=15, rushLeft=15, rushTimerId=null, rushRunning=false;
+var rushWords=[], rushIdx=0, rushCorrectWords=0, rushCorrectChars=0, rushTypedChars=0;
+
+function genRushWords(n){
+  var arr=[]; for(var i=0;i<n;i++){ arr.push(WORDS[Math.floor(Math.random()*WORDS.length)]); } return arr;
+}
+
+function renderRushDisplay(){
+  var html="";
+  rushWords.forEach(function(w,i){
+    var cls = i<rushIdx ? (w.__ok?"tw-correct":"tw-incorrect") : (i===rushIdx?"tw-current-word":"tw-untyped");
+    html+='<span class="'+cls+'" style="margin-right:10px;padding:2px 4px;border-radius:4px">'+esc(w)+'</span>';
+  });
+  $("twRushDisplay").innerHTML=html;
+}
+
+function setDuration(sec){
+  rushSecTotal=sec; rushLeft=sec;
+  $("twRushTime").textContent="Time left: "+sec+"s";
+  document.querySelectorAll("#twDurTabs button").forEach(function(b){
+    b.classList.toggle("on", Number(b.getAttribute("data-sec"))===sec);
+  });
+}
+
+function startRush(){
+  rushWords=genRushWords(400); rushIdx=0; rushCorrectWords=0; rushCorrectChars=0; rushTypedChars=0;
+  rushWords.forEach(function(w){ /* per-word ok flag set on submit */ });
+  rushLeft=rushSecTotal; rushRunning=true;
+  $("twRushResult").innerHTML="";
+  $("twRushInput").disabled=false; $("twRushInput").value=""; $("twRushInput").focus();
+  $("twRushTime").textContent="Time left: "+rushLeft+"s";
+  $("twRushWpm").textContent="WPM: 0"; $("twRushAcc").textContent="Accuracy: 100%";
+  renderRushDisplay();
+  if(rushTimerId) clearInterval(rushTimerId);
+  rushTimerId=setInterval(function(){
+    rushLeft--;
+    $("twRushTime").textContent="Time left: "+Math.max(rushLeft,0)+"s";
+    if(rushLeft<=0) endRush();
+  },1000);
+}
+
+function endRush(){
+  rushRunning=false;
+  if(rushTimerId){ clearInterval(rushTimerId); rushTimerId=null; }
+  $("twRushInput").disabled=true;
+  var mins=rushSecTotal/60;
+  var wpm=Math.round((rushCorrectChars/5)/mins);
+  var acc=rushTypedChars? Math.round((rushCorrectChars/rushTypedChars)*100):100;
+  $("twRushWpm").textContent="WPM: "+wpm;
+  $("twRushAcc").textContent="Accuracy: "+acc+"%";
+  $("twRushResult").innerHTML='<div class="wc-ok" style="margin-top:16px">Time\u2019s up — '+wpm+' WPM, '+acc+'% accuracy, '+rushCorrectWords+' words correct. Well done!</div>';
+}
+
+function onRushInput(e){
+  if(!rushRunning) return;
+  var val=$("twRushInput").value;
+  if(val.endsWith(" ")){
+    var typedWord=val.trim();
+    var target=rushWords[rushIdx]||"";
+    var ok = typedWord===target;
+    rushWords[rushIdx].__ok=ok;
+    if(ok) rushCorrectWords++;
+    for(var i=0;i<typedWord.length;i++){ rushTypedChars++; if(target[i]===typedWord[i]) rushCorrectChars++; }
+    rushIdx++;
+    $("twRushInput").value="";
+    renderRushDisplay();
+    if(rushIdx>=rushWords.length-20){ rushWords=rushWords.concat(genRushWords(200)); }
+  }
+}
+
+/* ---------- wiring ---------- */
+function wireTabs(){
+  document.addEventListener("click",function(e){
+    var t=e.target.closest("[data-twtab]");
+    if(t){
+      document.querySelectorAll("#twTabs button").forEach(function(b){ b.classList.toggle("on",b===t); });
+      var mode=t.getAttribute("data-twtab");
+      $("twEssayPanel").hidden = mode!=="essay";
+      $("twRushPanel").hidden = mode!=="rush";
+    }
+    var d=e.target.closest("#twDurTabs button");
+    if(d && !rushRunning){ setDuration(Number(d.getAttribute("data-sec"))); }
+  });
+  $("twEssayInput").addEventListener("input",onEssayInput);
+  $("twEssayRestart").addEventListener("click",function(){ pickEssay(curEssayIdx); });
+  $("twCustomApply").addEventListener("click",function(){
+    if(rushRunning) return;
+    var v=Math.max(5,Math.min(600,parseInt($("twCustomSec").value,10)||15));
+    rushSecTotal=v; rushLeft=v;
+    $("twRushTime").textContent="Time left: "+v+"s";
+    document.querySelectorAll("#twDurTabs button").forEach(function(b){ b.classList.remove("on"); });
+  });
+  $("twRushStart").addEventListener("click",startRush);
+  $("twRushInput").addEventListener("input",onRushInput);
+}
+
+function initWhenReady(){
+  wireTabs();
+  pickEssay(0);
+  setDuration(15);
+  new MutationObserver(function(){
+    if(document.body.getAttribute("data-view")==="typing" && !$("twEssayDisplay").innerHTML){ pickEssay(curEssayIdx); }
+  }).observe(document.body,{attributes:true,attributeFilter:["data-view"]});
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initWhenReady); else initWhenReady();
 })();
 </script>
 </body>
