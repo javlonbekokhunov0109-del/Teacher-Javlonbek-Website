@@ -898,7 +898,7 @@ body[data-view="lessons"] .tj-home-btn{display:inline-flex}
   </div>
 </header>
 <main>
-<section id="home" class="tj-panel">
+<section id="home" class="tj-panel" hidden>
   <div class="tj-hero">
     <div class="eyebrow">IELTS Preparation · Premium English</div>
     <h1>Sharpen your English,<br>one <span class="g">word</span> at a time.</h1>
@@ -1177,6 +1177,10 @@ body[data-view="lessons"] .tj-home-btn{display:inline-flex}
       <label class="wc-label" for="auPass">Password</label>
       <input class="wc-input" id="auPass" type="password" autocomplete="current-password" placeholder="At least 6 characters">
     </div>
+    <div class="wc-row" id="auConfirmRow" hidden>
+      <label class="wc-label" for="auConfirm">Confirm password</label>
+      <input class="wc-input" id="auConfirm" type="password" autocomplete="new-password" placeholder="Re-enter your password">
+    </div>
     <button class="wc-btn" id="auSubmit" style="width:100%">Sign in</button>
     <p class="wc-note" style="margin-top:16px" id="auHint">New here? Switch to <b>Create account</b> to register.</p>
   </div>
@@ -1271,7 +1275,7 @@ body[data-view="lessons"] .tj-home-btn{display:inline-flex}
     var f=e.target.closest('[data-fs]'); if(f){ fs+= (f.getAttribute('data-fs')==='+'?FS_STEP:-FS_STEP); applyFs(); return; }
     var t=e.target.closest('[data-theme-toggle]'); if(t){ theme=(theme==='light'?'dark':'light'); applyTheme(); return; }
   });
-  function boot(){ applyFs(); showPanel('home'); var y=document.getElementById('tj-yr'); if(y)y.textContent=new Date().getFullYear(); }
+  function boot(){ applyFs(); var y=document.getElementById('tj-yr'); if(y)y.textContent=new Date().getFullYear(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
 </script>
@@ -3062,9 +3066,8 @@ async function boot(){
 
   // router guard
   window.__tjGuard=function(name){
-    if(name==="write" && !user){ pendingView="write"; return "auth"; }
-    if(name==="lessons" && !user){ pendingView="lessons"; return "auth"; }
-    if(name==="admin"){ if(!user){ pendingView="admin"; return "auth"; } if(!isAdmin){ return "home"; } }
+    if(configOk && !user && name!=="auth"){ pendingView=(name==="home"?null:name); return "auth"; }
+    if(name==="admin" && !isAdmin){ return "home"; }
     return name;
   };
 
@@ -3072,11 +3075,12 @@ async function boot(){
   wireChecker();
   document.addEventListener("click",function(){ var m=$("tjMenu"); if(m) m.classList.remove("open"); });
 
-  if(!configOk){ renderAcct(); return; }
+  if(!configOk){ renderAcct(); nav("home"); return; }
 
   var s=await sb.auth.getSession();
   if(s.data.session){ user=s.data.session.user; }
   renderAcct();
+  nav(user?"home":"auth");
   if(user){ await onSignedIn(); }
 
   sb.auth.onAuthStateChange(function(_e,session){
@@ -3093,7 +3097,7 @@ async function onSignedIn(){
   ping();
   await probeAdmin();
   renderAcct();
-  if(pendingView){ var p=pendingView; pendingView=null; nav(p); }
+  var p=pendingView; pendingView=null; nav(p||"home");
 }
 
 async function ping(){
@@ -3136,7 +3140,7 @@ function renderAcct(){
   $("tjUserBtn").addEventListener("click",function(e){ e.stopPropagation(); $("tjMenu").classList.toggle("open"); });
   $("tjSignOut").addEventListener("click",async function(){
     await sb.auth.signOut(); user=null; isAdmin=false; adminCache=null; renderAcct();
-    var v=document.body.getAttribute("data-view"); if(v==="write"||v==="admin"||v==="auth") nav("home");
+    nav("auth");
   });
 }
 
@@ -3148,6 +3152,7 @@ function wireAuthForm(){
     $("auTabIn").classList.toggle("on",m==="in");
     $("auTabUp").classList.toggle("on",m==="up");
     $("auNameRow").hidden = (m!=="up");
+    $("auConfirmRow").hidden = (m!=="up");
     $("auSubmit").textContent = (m==="in"?"Sign in":"Create account");
     $("auPass").setAttribute("autocomplete", m==="in"?"current-password":"new-password");
     $("auHint").innerHTML = (m==="in")
@@ -3164,23 +3169,29 @@ function wireAuthForm(){
     if(!configOk){ msg("Backend not configured yet. Add your Supabase keys in Netlify."); return; }
     var email=$("auEmail").value.trim(), pass=$("auPass").value, nm=$("auName").value.trim();
     if(!email||!pass){ msg("Please enter your email and password."); return; }
+    if(mode==="up"){
+      if(!nm){ msg("Please enter your full name."); return; }
+      if(pass.length<6){ msg("Password must be at least 6 characters."); return; }
+      var confirm=$("auConfirm").value;
+      if(pass!==confirm){ msg("Passwords do not match. Please re-enter them."); return; }
+    }
     var btn=$("auSubmit"); btn.disabled=true; var old=btn.textContent; btn.innerHTML='<span class="wc-spin"></span>Please wait…';
     try{
       if(mode==="up"){
         var r=await sb.auth.signUp({email:email,password:pass,options:{data:{full_name:nm}}});
         if(r.error){ msg(esc(r.error.message)); }
         else if(!r.data.session){ msg("Account created. Please check your email to confirm, then sign in.",true); setMode("in"); }
-        else { /* onAuthStateChange handles the rest */ user=r.data.session.user; await onSignedIn(); nav("write"); }
+        else { /* onAuthStateChange handles the rest */ user=r.data.session.user; await onSignedIn(); }
       } else {
         var r2=await sb.auth.signInWithPassword({email:email,password:pass});
         if(r2.error){ msg(esc(r2.error.message)); }
-        else { user=r2.data.session.user; await onSignedIn(); nav(pendingView||"write"); pendingView=null; }
+        else { user=r2.data.session.user; await onSignedIn(); }
       }
     }catch(e){ msg("Something went wrong. Please try again."); }
     btn.disabled=false; btn.textContent=old;
   }
   $("auSubmit").addEventListener("click",submit);
-  ["auEmail","auPass","auName"].forEach(function(id){
+  ["auEmail","auPass","auName","auConfirm"].forEach(function(id){
     $(id).addEventListener("keydown",function(e){ if(e.key==="Enter") submit(); });
   });
 }
