@@ -669,7 +669,7 @@ body[data-view="auth"]  .tj-home-btn{display:inline-flex}
 .tj-menu .who b{display:block; color:var(--tj-fg); font-size:13.5px; font-weight:600; margin-top:2px}
 
 /* ---- shared new-panel shell ---- */
-#auth-root, #writing-root, #admin-root, #lessons-root, #leaderboard-root, #typing-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
+#auth-root, #writing-root, #admin-root, #lessons-root, #leaderboard-root, #typing-root, #share-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
 .wc-eyebrow{font-family:'Space Grotesk',monospace; font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--tj-gold-deep); margin-bottom:12px}
 .wc-h1{font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:clamp(30px,5vw,50px); line-height:1.03; margin:0 0 10px; color:var(--tj-fg)}
 .wc-sub{color:var(--tj-fg-soft); font-size:clamp(14px,1.5vw,16px); line-height:1.6; max-width:60ch; margin:0 0 clamp(22px,3vw,32px)}
@@ -803,6 +803,7 @@ html[data-theme="dark"] .tj-door.lessons{--accent:#79C3B2}
 body[data-view="lessons"] .tj-home-btn{display:inline-flex}
 body[data-view="leaderboard"] .tj-home-btn{display:inline-flex}
 body[data-view="typing"] .tj-home-btn{display:inline-flex}
+body[data-view="share"] .tj-home-btn{display:inline-flex}
 
 /* admin sub-tabs */
 .ad-tabs{display:inline-flex; gap:5px; background:var(--tj-bg2); border:1px solid var(--tj-line); border-radius:12px; padding:5px; margin-bottom:24px; flex-wrap:wrap}
@@ -1336,6 +1337,11 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
     <div id="twEssayResult"></div>
   </div>
 </section>
+
+<!-- ================= PUBLIC SHARED RESULT (no sign-in required) ================= -->
+<section id="share-root" class="tj-panel" hidden>
+  <div id="shareRoot"><div class="wc-loading"><span class="d"></span> Loading result…</div></div>
+</section>
 </main>
 <script>
 (function(){
@@ -1348,7 +1354,7 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root'};
   var navHist=[]; var curView=null;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -3144,6 +3150,41 @@ var FN="/.netlify/functions/";
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function band(v){var n=Number(v); return isFinite(n)?n.toFixed(1):"–";}
+
+async function loadSharedResult(id){
+  var root=document.getElementById("shareRoot");
+  if(!root) return;
+  try{
+    var res=await fetch(FN+"share-writing?id="+encodeURIComponent(id));
+    var d=await res.json();
+    if(!res.ok){
+      root.innerHTML='<div class="wc-err" style="max-width:520px;margin:60px auto;text-align:center">'+
+        esc(d.error||"This result isn't available or hasn't been shared.")+'</div>';
+      return;
+    }
+    var essayShort=d.essay && d.essay.length>900 ? d.essay.slice(0,900)+"…" : (d.essay||"");
+    root.innerHTML=
+      '<div style="max-width:720px;margin:40px auto"><div class="wc-eyebrow" style="text-align:center">Premium English &middot; IELTS Writing Result</div>'+
+      '<div class="wc-card">'+
+        '<div class="wc-overall"><div class="wc-band"><div class="n">'+band(d.overall_band)+'</div><div class="l">Overall</div></div>'+
+          '<div><h3>'+esc(d.name)+'\u2019s Band '+band(d.overall_band)+'</h3><p>'+esc(d.summary||"")+'</p></div></div>'+
+        '<div class="wc-crits">'+
+          critRow("Task Response",{band:d.task_response})+
+          critRow("Coherence & Cohesion",{band:d.coherence_cohesion})+
+          critRow("Lexical Resource",{band:d.lexical_resource})+
+          critRow("Grammar",{band:d.grammatical_range_accuracy})+
+        '</div>'+
+        '<div class="wc-sec"><h4>Task 2 Question</h4><p class="wc-sub">'+esc(d.question||"")+'</p></div>'+
+        '<div class="wc-sec"><h4>Essay ('+(d.word_count||0)+' words)</h4><p style="white-space:pre-wrap;line-height:1.7">'+esc(essayShort)+'</p></div>'+
+      '</div>'+
+      '<div style="text-align:center;margin-top:24px">'+
+        '<p class="wc-sub">Want your own AI-scored IELTS Writing feedback like this?</p>'+
+        '<button class="wc-btn" style="width:auto;padding:12px 26px" onclick="location.href=location.pathname">Try it free on Teacher Javlonbek</button>'+
+      '</div></div>';
+  }catch(e){
+    root.innerHTML='<div class="wc-err" style="max-width:520px;margin:60px auto;text-align:center">Network error. Please try again.</div>';
+  }
+}
 function nav(name){ if(window.tjShowPanel) window.tjShowPanel(name); }
 function fmtDate(s){ if(!s) return ""; var d=new Date(s); return d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"}); }
 function fmtWhen(s){ if(!s) return "never"; var d=new Date(s), diff=(Date.now()-d.getTime())/1000;
@@ -3164,7 +3205,7 @@ async function boot(){
 
   // router guard
   window.__tjGuard=function(name){
-    if(configOk && !user && name!=="auth"){ pendingView=(name==="home"?null:name); return "auth"; }
+    if(configOk && !user && name!=="auth" && name!=="share"){ pendingView=(name==="home"?null:name); return "auth"; }
     if(name==="admin" && !isAdmin){ return "home"; }
     return name;
   };
@@ -3173,13 +3214,17 @@ async function boot(){
   wireChecker();
   document.addEventListener("click",function(){ var m=$("tjMenu"); if(m) m.classList.remove("open"); });
 
-  if(!configOk){ renderAcct(); nav("home"); return; }
+  // a shared writing result is public — show it regardless of sign-in state
+  var shareId=new URLSearchParams(location.search).get("share");
+  if(shareId){ loadSharedResult(shareId); }
+
+  if(!configOk){ renderAcct(); nav(shareId?"share":"home"); return; }
 
   var s=await sb.auth.getSession();
   if(s.data.session){ user=s.data.session.user; }
   renderAcct();
-  nav(user?"home":"auth");
-  if(user){ await onSignedIn(); }
+  nav(shareId ? "share" : (user?"home":"auth"));
+  if(user){ await onSignedIn(!!shareId); }
 
   sb.auth.onAuthStateChange(function(_e,session){
     user = session? session.user : null;
@@ -3194,11 +3239,12 @@ async function boot(){
   setInterval(ping, 60000);
 }
 
-async function onSignedIn(){
+async function onSignedIn(skipNav){
   ping();
   await probeAdmin();
   renderAcct();
   checkDailyGoal();
+  if(skipNav) return;
   var p=pendingView; pendingView=null; nav(p||"home");
 }
 
@@ -3405,8 +3451,39 @@ function renderResult(d){
     html+='<div class="wc-sec"><h4>How to improve</h4><ul class="wc-list tip">';
     d.improvements.forEach(function(w){ html+='<li>'+esc(w)+'</li>'; }); html+='</ul></div>';
   }
+  if(d.id){
+    html+='<div class="wc-sec" id="wcShareBox" data-sid="'+esc(d.id)+'">'+
+      '<button class="wc-btn" id="wcShareBtn" style="width:auto;padding:10px 18px">Share this result</button>'+
+      '<div id="wcShareLinkWrap" hidden style="margin-top:10px"></div>'+
+      '</div>';
+  }
   html+='</div>';
   $("wcResult").innerHTML=html;
+  var sbtn=$("wcShareBtn");
+  if(sbtn){ sbtn.addEventListener("click",function(){ shareSubmission(d.id,sbtn); }); }
+}
+
+async function shareSubmission(id,btn){
+  if(!sb||!user) return;
+  var old=btn.textContent; btn.disabled=true; btn.textContent="Publishing…";
+  try{
+    var t=await token();
+    var res=await fetch(FN+"share-writing-toggle",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({id:id,enable:true})});
+    var data=await res.json();
+    btn.disabled=false;
+    if(!res.ok){ btn.textContent=old; alert(data.error||"Could not create a share link."); return; }
+    var url=location.origin+location.pathname+"?share="+encodeURIComponent(id);
+    btn.textContent="Shared ✓";
+    var wrap=document.getElementById("wcShareLinkWrap");
+    wrap.hidden=false;
+    wrap.innerHTML='<input class="wc-input" readonly value="'+esc(url)+'" onclick="this.select()" style="margin-bottom:8px">'+
+      '<button class="wc-btn" id="wcCopyBtn" style="width:auto;padding:8px 16px">Copy link</button>';
+    document.getElementById("wcCopyBtn").addEventListener("click",function(){
+      navigator.clipboard.writeText(url).then(function(){
+        var cb=document.getElementById("wcCopyBtn"); var o=cb.textContent; cb.textContent="Copied!"; setTimeout(function(){ cb.textContent=o; },1500);
+      });
+    });
+  }catch(e){ btn.disabled=false; btn.textContent=old; alert("Network error. Please try again."); }
 }
 
 async function loadHistory(){
@@ -3420,7 +3497,7 @@ async function loadHistory(){
       var row=document.createElement("div"); row.className="wc-hrow";
       row.innerHTML='<span class="hb">'+band(s.overall_band)+'</span><span class="hq">'+esc(s.question||"(no question)")+'</span><span class="hd">'+fmtDate(s.created_at)+'</span>';
       row.addEventListener("click",function(){
-        var fb=s.feedback||{}; fb.overall_band=(fb.overall_band!=null?fb.overall_band:s.overall_band);
+        var fb=s.feedback||{}; fb.overall_band=(fb.overall_band!=null?fb.overall_band:s.overall_band); fb.id=s.id;
         $("wcQuestion").value=s.question||""; $("wcEssay").value=s.essay||"";
         $("wcEssay").dispatchEvent(new Event("input"));
         renderResult(fb); $("wcResult").scrollIntoView({behavior:"smooth",block:"start"});
