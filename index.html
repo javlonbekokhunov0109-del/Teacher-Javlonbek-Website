@@ -4239,7 +4239,9 @@ function onEssayInput(){
 
 /* ---------- word rush ---------- */
 var rushSecTotal=15, rushLeft=15, rushTimerId=null, rushRunning=false;
-var rushWords=[], rushMeta=[], rushIdx=0, rushCorrectWords=0, rushCorrectChars=0, rushTypedChars=0;
+var rushWords=[], rushMeta=[], rushIdx=0, rushCorrectWords=0;
+var rushCorrectChars=0, rushIncorrectChars=0, rushMissedChars=0, rushExtraChars=0;
+var rushWpmSamples=[], rushLastCorrectChars=0;
 
 var RUSH_BATCH=20;
 function genRushWords(n){
@@ -4287,9 +4289,11 @@ function setDuration(sec){
 
 function startRush(){
   newBatch();
-  rushCorrectWords=0; rushCorrectChars=0; rushTypedChars=0;
+  rushCorrectWords=0; rushCorrectChars=0; rushIncorrectChars=0; rushMissedChars=0; rushExtraChars=0;
+  rushWpmSamples=[]; rushLastCorrectChars=0;
   rushLeft=rushSecTotal; rushRunning=true;
   $("twRushResult").innerHTML=""; $("twRushHint").hidden=true;
+  $("twRushZone").hidden=false;
   $("twRushInput").disabled=false; $("twRushInput").value=""; $("twRushInput").focus();
   $("twRushTime").textContent="Time left: "+rushLeft+"s";
   $("twRushWpm").textContent="WPM: 0"; $("twRushAcc").textContent="Accuracy: 100%";
@@ -4298,8 +4302,30 @@ function startRush(){
   rushTimerId=setInterval(function(){
     rushLeft--;
     $("twRushTime").textContent="Time left: "+Math.max(rushLeft,0)+"s";
+    var delta=rushCorrectChars-rushLastCorrectChars;
+    rushWpmSamples.push(Math.max(0,Math.round((delta/5)*60)));
+    rushLastCorrectChars=rushCorrectChars;
     if(rushLeft<=0) endRush();
   },1000);
+}
+
+function wpmSparkline(samples){
+  if(!samples.length) return "";
+  var w=560,h=140,pad=8;
+  var max=Math.max.apply(null,samples.concat([1]));
+  var stepX = samples.length>1 ? (w-2*pad)/(samples.length-1) : 0;
+  var pts=samples.map(function(v,i){
+    var x=pad+i*stepX;
+    var y=h-pad-((v/max)*(h-2*pad));
+    return x.toFixed(1)+","+y.toFixed(1);
+  });
+  var line=pts.join(" ");
+  var area=pts.join(" L ");
+  var gold=getComputedStyle(document.documentElement).getPropertyValue("--tj-gold").trim()||"#c9a24b";
+  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:140px;overflow:visible">'+
+    '<polyline points="'+esc(line)+'" fill="none" stroke="'+esc(gold)+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
+    '<path d="M '+esc(area)+' L '+(w-pad)+','+(h-pad)+' L '+pad+','+(h-pad)+' Z" fill="'+esc(gold)+'" opacity="0.12"/>'+
+  '</svg>';
 }
 
 function endRush(){
@@ -4308,10 +4334,37 @@ function endRush(){
   $("twRushInput").disabled=true;
   var mins=rushSecTotal/60;
   var wpm=Math.round((rushCorrectChars/5)/mins);
-  var acc=rushTypedChars? Math.round((rushCorrectChars/rushTypedChars)*100):100;
+  var attempted=rushCorrectChars+rushIncorrectChars+rushExtraChars;
+  var acc=attempted? Math.round((rushCorrectChars/attempted)*100):100;
   $("twRushWpm").textContent="WPM: "+wpm;
   $("twRushAcc").textContent="Accuracy: "+acc+"%";
-  $("twRushResult").innerHTML='<div class="wc-ok" style="margin-top:16px">Time\u2019s up — '+wpm+' WPM, '+acc+'% accuracy, '+rushCorrectWords+' words correct. Well done!</div>';
+
+  var mean=rushWpmSamples.length? rushWpmSamples.reduce(function(a,b){return a+b;},0)/rushWpmSamples.length : 0;
+  var variance=rushWpmSamples.length? rushWpmSamples.reduce(function(a,b){return a+Math.pow(b-mean,2);},0)/rushWpmSamples.length : 0;
+  var sd=Math.sqrt(variance);
+  var consistency = mean>0 ? Math.max(0,Math.round(100-(sd/mean)*100)) : 100;
+
+  $("twRushZone").hidden=true;
+  $("twRushHint").hidden=true;
+  $("twRushResult").innerHTML=
+    '<div class="wc-card" style="margin-top:16px">'+
+      '<div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">'+
+        '<div style="min-width:110px">'+
+          '<div class="wc-eyebrow" style="margin-bottom:2px">wpm</div>'+
+          '<div style="font-size:52px;font-weight:800;line-height:1;color:var(--tj-gold,#c9a24b)">'+wpm+'</div>'+
+          '<div class="wc-eyebrow" style="margin:14px 0 2px">acc</div>'+
+          '<div style="font-size:36px;font-weight:800;line-height:1">'+acc+'%</div>'+
+        '</div>'+
+        '<div style="flex:1;min-width:260px">'+wpmSparkline(rushWpmSamples)+'</div>'+
+      '</div>'+
+      '<div class="wc-meta" style="margin-top:20px;flex-wrap:wrap;gap:22px 34px">'+
+        '<span><b>test type</b><br>time '+rushSecTotal+'s</span>'+
+        '<span><b>characters</b><br>'+rushCorrectChars+'/'+rushIncorrectChars+'/'+rushExtraChars+'/'+rushMissedChars+'</span>'+
+        '<span><b>consistency</b><br>'+consistency+'%</span>'+
+        '<span><b>words correct</b><br>'+rushCorrectWords+'</span>'+
+        '<span><b>time</b><br>'+rushSecTotal+'s</span>'+
+      '</div>'+
+    '</div>';
   $("twRushStart").textContent="Try again";
 }
 
@@ -4324,7 +4377,13 @@ function onRushInput(){
     var target=rushWords[rushIdx]||"";
     rushMeta[rushIdx]={typed:typedWord, ok:(typedWord===target)};
     if(rushMeta[rushIdx].ok) rushCorrectWords++;
-    for(var i=0;i<typedWord.length;i++){ rushTypedChars++; if(target[i]===typedWord[i]) rushCorrectChars++; }
+    var overlap=Math.min(target.length, typedWord.length);
+    var correctHere=0;
+    for(var i=0;i<overlap;i++){ if(target[i]===typedWord[i]) correctHere++; }
+    rushCorrectChars+=correctHere;
+    rushIncorrectChars+=(overlap-correctHere);
+    rushMissedChars+=Math.max(0,target.length-typedWord.length);
+    rushExtraChars+=Math.max(0,typedWord.length-target.length);
     rushIdx++;
     $("twRushInput").value="";
     if(rushIdx>=rushWords.length){ newBatch(); }
