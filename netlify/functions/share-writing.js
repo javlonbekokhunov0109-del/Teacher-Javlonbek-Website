@@ -40,6 +40,9 @@ exports.handler = async (event) => {
     overall_band: sub.overall_band,
     word_count: sub.word_count,
     summary: (sub.feedback && sub.feedback.summary) || "",
+    corrections: (sub.feedback && sub.feedback.corrections) || [],
+    weaknesses: (sub.feedback && sub.feedback.weaknesses) || [],
+    improvements: (sub.feedback && sub.feedback.improvements) || [],
     created_at: sub.created_at,
   });
 };

@@ -3167,6 +3167,23 @@ async function loadSharedResult(id){
       return;
     }
     var essayShort=d.essay && d.essay.length>900 ? d.essay.slice(0,900)+"…" : (d.essay||"");
+    var extra="";
+    if(d.corrections&&d.corrections.length){
+      extra+='<div class="wc-sec"><h4>Corrections</h4>';
+      d.corrections.forEach(function(c){
+        extra+='<div class="wc-fix"><span class="o">'+esc(c.original)+'</span><span class="arrow">→</span><span class="c">'+esc(c.correction)+'</span>'+
+          (c.explanation?'<span class="why">'+esc(c.explanation)+'</span>':'')+'</div>';
+      });
+      extra+='</div>';
+    }
+    if(d.weaknesses&&d.weaknesses.length){
+      extra+='<div class="wc-sec"><h4>Weaknesses</h4><ul class="wc-list warn">';
+      d.weaknesses.forEach(function(w){ extra+='<li>'+esc(w)+'</li>'; }); extra+='</ul></div>';
+    }
+    if(d.improvements&&d.improvements.length){
+      extra+='<div class="wc-sec"><h4>How to improve</h4><ul class="wc-list tip">';
+      d.improvements.forEach(function(w){ extra+='<li>'+esc(w)+'</li>'; }); extra+='</ul></div>';
+    }
     root.innerHTML=
       '<div style="max-width:720px;margin:40px auto"><div class="wc-eyebrow" style="text-align:center">Premium English &middot; IELTS Writing Result</div>'+
       '<div class="wc-card">'+
@@ -3180,6 +3197,7 @@ async function loadSharedResult(id){
         '</div>'+
         '<div class="wc-sec"><h4>Task 2 Question</h4><p class="wc-sub">'+esc(d.question||"")+'</p></div>'+
         '<div class="wc-sec"><h4>Essay ('+(d.word_count||0)+' words)</h4><p style="white-space:pre-wrap;line-height:1.7">'+esc(essayShort)+'</p></div>'+
+        extra+
       '</div>'+
       '<div style="text-align:center;margin-top:24px">'+
         '<p class="wc-sub">Want your own AI-scored IELTS Writing feedback like this?</p>'+
