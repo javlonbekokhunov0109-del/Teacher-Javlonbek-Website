@@ -1314,9 +1314,9 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
         <span id="twRushWpm">WPM: 0</span>
         <span id="twRushAcc">Accuracy: 100%</span>
       </div>
+      <div id="twRushResult"></div>
       <button class="wc-btn" id="twRushStart" style="margin-top:14px">Start</button>
     </div>
-    <div id="twRushResult"></div>
   </div>
 
   <div id="twEssayPanel" hidden>
@@ -4312,6 +4312,7 @@ function endRush(){
   $("twRushWpm").textContent="WPM: "+wpm;
   $("twRushAcc").textContent="Accuracy: "+acc+"%";
   $("twRushResult").innerHTML='<div class="wc-ok" style="margin-top:16px">Time\u2019s up — '+wpm+' WPM, '+acc+'% accuracy, '+rushCorrectWords+' words correct. Well done!</div>';
+  $("twRushStart").textContent="Try again";
 }
 
 function onRushInput(){
