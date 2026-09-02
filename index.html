@@ -898,6 +898,10 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
 </style>
 </head>
 <body>
+<div id="tjBootLoader" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:var(--tj-bg,#0b0b0c)">
+  <div style="width:34px;height:34px;border-radius:50%;border:3px solid rgba(201,162,75,.25);border-top-color:var(--tj-gold,#c9a24b);animation:tjbootspin .8s linear infinite"></div>
+</div>
+<style>@keyframes tjbootspin{to{transform:rotate(360deg)}}</style>
 <header class="tj-top">
   <div class="tj-brand" data-go="home" title="Home">
     <svg class="tj-crown" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tjhc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7DE96"/><stop offset="1" stop-color="#C9A227"/></linearGradient></defs><path d="M8 34h32l2 6H6l2-6z" fill="url(#tjhc)"/><path d="M6 12l8 9 10-15 10 15 8-9-4 22H10L6 12z" fill="url(#tjhc)"/><circle cx="6" cy="12" r="2.6" fill="#F7DE96"/><circle cx="42" cy="12" r="2.6" fill="#F7DE96"/><circle cx="24" cy="4" r="2.8" fill="#F7DE96"/></svg>
@@ -3193,6 +3197,12 @@ function fmtWhen(s){ if(!s) return "never"; var d=new Date(s), diff=(Date.now()-
 
 async function token(){ if(!sb) return null; var r=await sb.auth.getSession(); return r.data.session? r.data.session.access_token : null; }
 
+function removeBootLoader(){
+  var el=document.getElementById("tjBootLoader");
+  if(el) el.remove();
+}
+setTimeout(removeBootLoader,4000); // safety net — never leave the loader stuck
+
 /* ---------- boot ---------- */
 async function boot(){
   try{
@@ -3218,12 +3228,13 @@ async function boot(){
   var shareId=new URLSearchParams(location.search).get("share");
   if(shareId){ loadSharedResult(shareId); }
 
-  if(!configOk){ renderAcct(); nav(shareId?"share":"home"); return; }
+  if(!configOk){ renderAcct(); nav(shareId?"share":"home"); removeBootLoader(); return; }
 
   var s=await sb.auth.getSession();
   if(s.data.session){ user=s.data.session.user; }
   renderAcct();
   nav(shareId ? "share" : (user?"home":"auth"));
+  removeBootLoader();
   if(user){ await onSignedIn(!!shareId); }
 
   sb.auth.onAuthStateChange(function(_e,session){
