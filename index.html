@@ -4241,10 +4241,12 @@ function onEssayInput(){
 var rushSecTotal=15, rushLeft=15, rushTimerId=null, rushRunning=false;
 var rushWords=[], rushMeta=[], rushIdx=0, rushCorrectWords=0, rushCorrectChars=0, rushTypedChars=0;
 
+var RUSH_BATCH=20;
 function genRushWords(n){
   var arr=[]; for(var i=0;i<n;i++){ arr.push(WORDS[Math.floor(Math.random()*WORDS.length)]); } return arr;
 }
 function metaFor(words){ return words.map(function(){ return {typed:"",ok:false}; }); }
+function newBatch(){ rushWords=genRushWords(RUSH_BATCH); rushMeta=metaFor(rushWords); rushIdx=0; }
 
 function renderRushDisplay(liveTyped){
   var html="";
@@ -4284,8 +4286,8 @@ function setDuration(sec){
 }
 
 function startRush(){
-  rushWords=genRushWords(400); rushMeta=metaFor(rushWords);
-  rushIdx=0; rushCorrectWords=0; rushCorrectChars=0; rushTypedChars=0;
+  newBatch();
+  rushCorrectWords=0; rushCorrectChars=0; rushTypedChars=0;
   rushLeft=rushSecTotal; rushRunning=true;
   $("twRushResult").innerHTML=""; $("twRushHint").hidden=true;
   $("twRushInput").disabled=false; $("twRushInput").value=""; $("twRushInput").focus();
@@ -4324,7 +4326,7 @@ function onRushInput(){
     for(var i=0;i<typedWord.length;i++){ rushTypedChars++; if(target[i]===typedWord[i]) rushCorrectChars++; }
     rushIdx++;
     $("twRushInput").value="";
-    if(rushIdx>=rushWords.length-20){ var more=genRushWords(200); rushWords=rushWords.concat(more); rushMeta=rushMeta.concat(metaFor(more)); }
+    if(rushIdx>=rushWords.length){ newBatch(); }
     renderRushDisplay("");
   } else {
     renderRushDisplay(val);
