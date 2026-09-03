@@ -613,6 +613,31 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 #ck-root .col-grid{grid-template-columns:1fr}
 #ck-root .tprog-row .tp-name{flex-basis:auto; max-width:110px}}
 @media(prefers-reduced-motion:reduce){#ck-root *{animation:none!important; transition:none!important}}
+/* ---- Article reader ---- */
+#ck-root .article-layout{display:grid; grid-template-columns:280px 1fr; gap:28px; align-items:start}
+@media(max-width:860px){#ck-root .article-layout{grid-template-columns:1fr}}
+#ck-root .article-index{border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:var(--ink2); max-height:70vh; overflow-y:auto}
+#ck-root .article-topic-item{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none; border:none; border-top:1px solid var(--line);
+  color:var(--mist); padding:12px 16px; font-size:13.5px; cursor:pointer}
+#ck-root .article-topic-item:first-child{border-top:none}
+#ck-root .article-topic-item .n{font-family:'Space Grotesk',monospace; font-size:12px; color:var(--gold-dim); width:22px; flex-shrink:0}
+#ck-root .article-topic-item.active{background:var(--ink3); color:var(--ivory)}
+#ck-root .article-topic-item.active .n{color:var(--gold)}
+#ck-root .article-topic-item.locked{color:var(--muted); cursor:default}
+#ck-root .article-topic-item.locked .n{color:var(--line2)}
+#ck-root .article-topic-item.locked .dot{margin-left:auto; font-size:10.5px; color:var(--muted)}
+#ck-root .article-topic-item:not(.locked):hover{background:var(--ink3)}
+#ck-root .article-page{background:#EDE5D2; color:#241F17; border-radius:8px; padding:clamp(28px,4vw,52px) clamp(24px,4vw,56px);
+  box-shadow:0 26px 60px -18px rgba(0,0,0,.5); min-height:420px}
+#ck-root .article-eyebrow{font-size:12.5px; color:#5C5442; margin:0 0 4px}
+#ck-root .article-title{font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:34px; margin:0 0 8px; line-height:1.1; color:#241F17}
+#ck-root .article-focus{font-size:13.5px; color:#5C5442; font-style:italic; margin:0 0 24px; border-bottom:1px solid rgba(36,31,23,.14); padding-bottom:20px}
+#ck-root .article-text{font-family:'Source Serif 4',Georgia,serif; font-size:19px; line-height:1.75; max-width:68ch}
+#ck-root .article-text mark.coll{background:rgba(124,43,43,.1); color:inherit; text-decoration:underline; text-decoration-color:#7C2B2B;
+  text-decoration-thickness:1.5px; text-underline-offset:3px; padding:0 1px; cursor:pointer; font-weight:600}
+#ck-root .article-locked{display:flex; flex-direction:column; align-items:flex-start; justify-content:center; min-height:380px; color:#5C5442}
+#ck-root .article-locked .lt{font-family:'Cormorant Garamond',Georgia,serif; font-size:26px; color:#241F17; margin-bottom:10px}
+#ck-root .article-locked p{font-size:14.5px; max-width:46ch; line-height:1.6}
 </style>
 <style>
 /* ================= AI Writing Checker · Admin · Auth — additions ================= */
@@ -1132,6 +1157,7 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
       <a data-nav="flashcards" data-navkey="flashcards">Flashcards</a>
       <a data-nav="quiz" data-navkey="quiz">Quiz</a>
       <a data-nav="favourites" data-navkey="favourites">Favourites</a>
+      <a data-nav="article" data-navkey="article">Article</a>
       <a data-nav="progress" data-navkey="progress">Progress</a>
     </nav>
     <div class="searchbtn" data-search title="Search (press /)">
@@ -3011,6 +3037,44 @@ function progress(){
 }
 
 /* ================= misc ================= */
+var ARTICLES={
+  t1:{essay:"Governments worldwide accept that [[equal-access-to-education|equal access to education]] is the bedrock of a fair society, yet in practice, deep-rooted [[educational-inequality|educational inequality]] persists. In many developing regions, [[disadvantaged-students|disadvantaged students]] still face significant [[barriers-to-education|barriers to education]], from [[high-tuition-fees|high tuition fees]] to a chronic [[lack-of-funding|lack of funding]], which in turn drives up [[high-dropout-rates|high dropout rates]]. Those fortunate enough to [[attend-university|attend university]] must first [[gain-admission-to-university|gain admission to university]] and, once enrolled, work tirelessly to [[obtain-a-degree|obtain a degree]] that will later [[enhance-career-prospects|enhance their career prospects]]. Inside the classroom, effective teachers do far more than merely [[deliver-lessons|deliver lessons]]; they [[encourage-critical-thinking|encourage critical thinking]], [[foster-independent-learning|foster independent learning]], and help students [[develop-problem-solving-skills|develop problem-solving skills]] that extend well beyond the [[school-curriculum|school curriculum]]. The rise of [[online-education|online education]] and [[distance-learning|distance learning]] has undeniably widened access, but it has also exposed troubling gaps in [[digital-literacy|digital literacy]] among learners from low-income households. Meanwhile, policymakers under pressure to [[raise-educational-standards|raise educational standards]] must decide how best to [[allocate-funds-to-education|allocate funds to education]] without neglecting [[overcrowded-classrooms|overcrowded classrooms]] or worsening [[teacher-shortages|teacher shortages]]. Ultimately, education's true value lies not merely in [[academic-qualifications|academic qualifications]] but in its power to broaden students' horizons, [[build-confidence|build their confidence]], and [[bridge-the-skills-gap|bridge the skills gap]] between what schools teach and what the labour market demands."}
+};
+
+function markify(text){
+  return esc(text).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g,function(_,cid,label){
+    return '<mark class="coll" data-nav="card/'+cid+'">'+label+'</mark>';
+  });
+}
+
+function articleView(arg){
+  var tid = arg || 't1';
+  var t = TOPIC[tid];
+  if(!t){ notFound(); return; }
+  var list = D.topics.map(function(tp){
+    var locked = !ARTICLES[tp.id];
+    return '<button class="article-topic-item'+(tp.id===tid?' active':'')+(locked?' locked':'')+'"'+(locked?'':' data-nav="article/'+tp.id+'"')+'>'+
+      '<span class="n">'+(tp.id.replace('t','').length<2?'0':'')+tp.id.replace('t','')+'</span><span>'+esc(titleCase(tp.name))+'</span>'+
+      (locked?'<span class="dot">queued</span>':'')+
+    '</button>';
+  }).join('');
+  var body;
+  if(ARTICLES[tid]){
+    body = '<p class="article-eyebrow">Model paragraph &middot; built from real Collocation KING phrases</p>'+
+      '<h1 class="article-title">'+esc(titleCase(t.name))+'</h1>'+
+      '<p class="article-focus">Every underlined phrase below is a real collocation from your book. Click one to see its meaning and example.</p>'+
+      '<div class="article-text">'+markify(ARTICLES[tid].essay)+'</div>';
+  } else {
+    body = '<div class="article-locked"><div class="lt">'+esc(titleCase(t.name))+'</div>'+
+      '<p>Not written yet &mdash; this topic is queued for the next batch, in the same style as Education.</p></div>';
+  }
+  view.innerHTML=CK.goldDefs()+'<div class="wrap page"><div class="article-layout">'+
+    '<nav class="article-index">'+list+'</nav>'+
+    '<div class="article-page">'+body+'</div>'+
+  '</div></div>';
+}
+
+
 function emptyState(title,msg,nav,btn){
   view.innerHTML='<div class="wrap page"><div class="empty">'+CK.crownSVG('crown')+
     '<h3>'+esc(title)+'</h3><p class="muted" style="max-width:420px;margin:0 auto 22px">'+esc(msg)+'</p>'+
@@ -3036,13 +3100,14 @@ function route(){
     case 'quiz': arg?startQuiz(arg):quizPicker(); break;
     case 'favourites': favourites(); break;
     case 'progress': progress(); break;
+    case 'article': articleView(arg); break;
     default: notFound();
   }
   setActiveNav(head);
 }
 function setActiveNav(head){
   var map={home:'home',topics:'topics',topic:'topics',sub:'topics',card:'topics',
-    flashcards:'flashcards',study:'flashcards',review:'review',quiz:'quiz',favourites:'favourites',progress:'progress'};
+    flashcards:'flashcards',study:'flashcards',review:'review',quiz:'quiz',favourites:'favourites',progress:'progress',article:'article'};
   var key=map[head]||'home';
   $$('nav.main a, .mobnav a').forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-navkey')===key); });
 }
