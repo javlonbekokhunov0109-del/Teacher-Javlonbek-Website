@@ -5069,6 +5069,32 @@ var BOOM_ADJS=[
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
 
+/* ---- sound effects (synthesized, no audio files needed) ---- */
+var boomAC=null;
+function boomAudioCtx(){
+  if(!boomAC){ var Ctx=window.AudioContext||window.webkitAudioContext; if(Ctx) boomAC=new Ctx(); }
+  if(boomAC && boomAC.state==='suspended'){ boomAC.resume(); }
+  return boomAC;
+}
+function boomTone(freq,start,dur,type,vol){
+  var ac=boomAudioCtx(); if(!ac) return;
+  var osc=ac.createOscillator(), gain=ac.createGain();
+  osc.type=type||'sine'; osc.frequency.value=freq;
+  gain.gain.setValueAtTime(vol||0.18, ac.currentTime+start);
+  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+start+dur);
+  osc.connect(gain); gain.connect(ac.destination);
+  osc.start(ac.currentTime+start); osc.stop(ac.currentTime+start+dur+0.05);
+}
+function playCorrectSound(){
+  boomTone(523.25,0,0.14,'sine');
+  boomTone(659.25,0.1,0.14,'sine');
+  boomTone(783.99,0.2,0.22,'sine');
+}
+function playWrongSound(){
+  boomTone(220,0,0.16,'sawtooth',0.14);
+  boomTone(164.81,0.13,0.22,'sawtooth',0.14);
+}
+
 /* ---- word list rendering ---- */
 function renderWordList(container, data){
   var html = data.map(function(d){
@@ -5108,7 +5134,7 @@ function setupScreen(){
    + '<div class="boom-toggle-row"><span>Word translation cards (Uzbek &rarr; English, 15 pts)</span><button class="boom-switch'+(opts.wordQ?' on':'')+'" data-tg="wordQ"><i></i></button></div>'
    + '<div class="boom-toggle-row"><span>Sentence translation cards (Uzbek &rarr; English, 25 pts)</span><button class="boom-switch'+(opts.sentQ?' on':'')+'" data-tg="sentQ"><i></i></button></div>'
    + '<div class="boom-toggle-row"><span>Bonus cards (double, +30, steal, swap)</span><button class="boom-switch'+(opts.bonus?' on':'')+'" data-tg="bonus"><i></i></button></div>'
-   + '<div class="boom-toggle-row" style="border-bottom:none"><span>Punishment cards (virus, germ)</span><button class="boom-switch'+(opts.punish?' on':'')+'" data-tg="punish"><i></i></button></div>'
+   + '<div class="boom-toggle-row" style="border-bottom:none"><span>Punishment cards (virus, bacteria)</span><button class="boom-switch'+(opts.punish?' on':'')+'" data-tg="punish"><i></i></button></div>'
    + '<button class="wc-btn" id="bStart" style="margin-top:20px">Start Game</button>'
    + '</div>';
   $('boomQuizRoot').innerHTML = html;
@@ -5229,8 +5255,8 @@ function openCard(idx){
       '</div>';
     document.body.appendChild(back);
     $('bReveal').addEventListener('click', function(){ $('bReveal').hidden=true; $('bAnswerWrap').hidden=false; });
-    $('bOk').addEventListener('click', function(){ G.teams[G.turn].score += pts; finishCard(idx); });
-    $('bNo').addEventListener('click', function(){ finishCard(idx); });
+    $('bOk').addEventListener('click', function(){ playCorrectSound(); G.teams[G.turn].score += pts; finishCard(idx); });
+    $('bNo').addEventListener('click', function(){ playWrongSound(); finishCard(idx); });
   } else if(c.kind==='bonus'){
     var label, desc;
     if(c.btype==='double'){ label='Double Score \uD83C\uDF89'; desc=esc(G.teams[G.turn].name)+'\u2019s score is doubled!'; }
@@ -5264,7 +5290,7 @@ function openCard(idx){
       });
     }
   } else {
-    var plabel = c.ptype==='virus' ? 'Virus! \uD83E\uDDA0' : 'Germ / Bacteria \uD83E\uDD60';
+    var plabel = c.ptype==='virus' ? 'Virus! \uD83E\uDDA0' : 'Bacteria! \uD83E\uDD60';
     var pdesc = c.ptype==='virus' ? 'All teams\u2019 scores are wiped to zero!' : esc(G.teams[G.turn].name)+'\u2019s score is wiped to zero!';
     back.innerHTML =
       '<div class="boom-modal punish">'+
