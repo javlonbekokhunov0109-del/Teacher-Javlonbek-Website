@@ -3558,7 +3558,7 @@ async function ping(){
   if(active){ try{ await sb.rpc("add_time_seconds",{p_seconds:60}); }catch(e){} checkDailyGoal(); }
 }
 
-var DAILY_GOAL_SEC=1200; // 20 minutes
+var DAILY_GOAL_SEC=5400; // 1 hour 30 minutes
 async function checkDailyGoal(){
   if(!sb||!user) return;
   try{
@@ -3593,7 +3593,7 @@ function celebrateDailyGoal(){
   toast.id="tjGoalToast";
   toast.innerHTML='<div class="tj-goal-emoji">\uD83C\uDF89</div>'+
     '<h3>Congratulations!</h3>'+
-    '<p>You just hit your daily 20-minute practice goal. That consistency is exactly what moves your band score up.</p>'+
+    '<p>You just hit your daily 1 hour 30 minute practice goal. That consistency is exactly what moves your band score up.</p>'+
     '<button class="wc-btn" id="tjGoalClose" style="width:auto;padding:10px 22px">Keep going</button>';
   document.body.appendChild(toast);
   requestAnimationFrame(function(){ toast.classList.add("show"); });
