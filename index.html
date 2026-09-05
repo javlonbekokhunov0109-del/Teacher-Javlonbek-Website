@@ -98,6 +98,8 @@ main{display:block; zoom:var(--tj-zoom,1)}
 .tj-door.colloc{--accent:var(--tj-gold-deep)}
 .tj-door.typing{--accent:var(--tj-gold-deep)}
 html[data-theme="dark"] .tj-door.typing{--accent:var(--tj-gold)}
+.tj-door.boom{--accent:#B23A48}
+html[data-theme="dark"] .tj-door.boom{--accent:#E6707D}
 .tj-foot{max-width:1080px; margin:10px auto 0; padding:26px clamp(18px,4vw,28px) 40px; border-top:1px solid var(--tj-line);
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; color:var(--tj-fg-soft); font-size:13px}
 .tj-foot a{color:var(--tj-gold-deep); text-decoration:none; font-weight:600} .tj-foot a:hover{text-decoration:underline}
@@ -657,6 +659,42 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 .wc-eye:hover{background:rgba(127,127,127,.12); color:var(--tj-fg)}
 .tw-caret{display:inline-block; width:2px; height:1.05em; background:var(--tj-gold,#c9a24b); vertical-align:-0.15em; margin:0 -1px; animation:twblink 1s steps(1) infinite}
 @keyframes twblink{0%,50%{opacity:1} 51%,100%{opacity:0}}
+/* ---- beginner boom ---- */
+.boom-word-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:18px}
+.boom-word-card{border:1px solid var(--tj-border,rgba(127,127,127,.25)); border-radius:12px; padding:14px 16px}
+.boom-word-card .en{font-weight:700; font-size:16px}
+.boom-word-card .uz{color:var(--tj-gold-deep,#8C7A3E); font-size:14px; margin-top:2px}
+.boom-word-card .ex{font-size:13px; opacity:.7; margin-top:8px; font-style:italic}
+.boom-setup-row{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:18px}
+.boom-pill-group{display:flex; gap:8px; flex-wrap:wrap}
+.boom-pill{border:1px solid var(--tj-border,rgba(127,127,127,.3)); border-radius:10px; padding:8px 16px; background:none; cursor:pointer; font-weight:600; color:var(--tj-fg)}
+.boom-pill.on{background:var(--tj-gold,#c9a24b); border-color:var(--tj-gold,#c9a24b); color:#1a1408}
+.boom-toggle-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--tj-border,rgba(127,127,127,.15))}
+.boom-switch{position:relative; width:44px; height:24px; border-radius:99px; background:rgba(127,127,127,.3); border:none; cursor:pointer; flex-shrink:0}
+.boom-switch.on{background:var(--tj-gold,#c9a24b)}
+.boom-switch i{position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#fff; transition:transform .15s}
+.boom-switch.on i{transform:translateX(20px)}
+.boom-teambar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px}
+.boom-team{flex:1; min-width:130px; border-radius:12px; padding:12px 16px; text-align:center; border:2px solid var(--tj-border,rgba(127,127,127,.25))}
+.boom-team.turn{border-color:var(--tj-gold,#c9a24b); box-shadow:0 0 0 3px rgba(201,162,75,.2)}
+.boom-team .nm{font-weight:700; font-size:13px; opacity:.75}
+.boom-team .sc{font-size:28px; font-weight:800}
+.boom-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+@media(max-width:700px){.boom-grid{grid-template-columns:repeat(3,1fr)}}
+.boom-card{aspect-ratio:1.2; border-radius:12px; background:linear-gradient(160deg,var(--tj-gold,#c9a24b),var(--tj-gold-deep,#8C7A3E)); color:#1a1408;
+  display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; cursor:pointer; border:none; transition:transform .12s}
+.boom-card:hover{transform:translateY(-2px)}
+.boom-card.used{visibility:hidden}
+.boom-modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:9990; display:flex; align-items:center; justify-content:center; padding:20px}
+.boom-modal{background:var(--tj-card,var(--tj-bg,#fff)); border-radius:16px; max-width:560px; width:100%; padding:32px; text-align:center; box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+.boom-modal .kind{font-size:12px; letter-spacing:.15em; text-transform:uppercase; opacity:.6; margin-bottom:10px}
+.boom-modal .prompt{font-size:26px; font-weight:700; margin-bottom:10px}
+.boom-modal .answer{font-size:20px; color:var(--tj-gold-deep,#8C7A3E); font-weight:700; margin-top:16px}
+.boom-modal .pts{font-size:13px; opacity:.65; margin-top:6px}
+.boom-judge-row{display:flex; gap:12px; justify-content:center; margin-top:22px}
+.boom-judge-row button{flex:1; max-width:160px; padding:12px; border-radius:10px; border:none; font-weight:700; cursor:pointer; font-size:15px}
+.boom-judge-row .ok{background:#3fb96b; color:#fff}
+.boom-judge-row .no{background:#d9534f; color:#fff}
 /* ---- daily goal celebration ---- */
 #tjConfettiLayer{position:fixed; inset:0; pointer-events:none; z-index:9998; overflow:hidden}
 .tj-confetti{position:absolute; top:-40px; font-size:24px; animation:tjfall linear forwards}
@@ -704,7 +742,8 @@ body[data-view="auth"]  .tj-home-btn{display:inline-flex}
 .tj-menu .who b{display:block; color:var(--tj-fg); font-size:13.5px; font-weight:600; margin-top:2px}
 
 /* ---- shared new-panel shell ---- */
-#auth-root, #writing-root, #admin-root, #lessons-root, #leaderboard-root, #typing-root, #share-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
+#auth-root, #writing-root, #admin-root, #lessons-root, #leaderboard-root, #typing-root, #share-root, #boom-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
+#boom-root{max-width:1200px}
 .wc-eyebrow{font-family:'Space Grotesk',monospace; font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--tj-gold-deep); margin-bottom:12px}
 .wc-h1{font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:clamp(30px,5vw,50px); line-height:1.03; margin:0 0 10px; color:var(--tj-fg)}
 .wc-sub{color:var(--tj-fg-soft); font-size:clamp(14px,1.5vw,16px); line-height:1.6; max-width:60ch; margin:0 0 clamp(22px,3vw,32px)}
@@ -839,6 +878,7 @@ body[data-view="lessons"] .tj-home-btn{display:inline-flex}
 body[data-view="leaderboard"] .tj-home-btn{display:inline-flex}
 body[data-view="typing"] .tj-home-btn{display:inline-flex}
 body[data-view="share"] .tj-home-btn{display:inline-flex}
+body[data-view="boom"] .tj-home-btn{display:inline-flex}
 
 /* admin sub-tabs */
 .ad-tabs{display:inline-flex; gap:5px; background:var(--tj-bg2); border:1px solid var(--tj-line); border-radius:12px; padding:5px; margin-bottom:24px; flex-wrap:wrap}
@@ -998,6 +1038,13 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
       <h2>Typing Trainer</h2>
       <p>Build real exam speed. Type full band 7&ndash;7.5 Task 2 essays, or race the clock in Word Rush &mdash; live WPM and accuracy, timer included.</p>
       <span class="tj-go">Open Typing Trainer <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="tj-door boom" data-go="boom">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l2.2 6.8H21l-5.6 4.1 2.1 6.8L12 15.6l-5.5 4.1 2.1-6.8L3 8.8h6.8z"/></svg></div>
+      <div class="tj-tag">Beginner &middot; Vocabulary</div>
+      <h2>Beginner BOOM</h2>
+      <p>Top 100 verbs and adjectives, plus a live team quiz game with bonus and punishment cards &mdash; perfect for beginner classes.</p>
+      <span class="tj-go">Open Beginner BOOM <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
   </div>
   <div class="tj-foot">
@@ -1399,6 +1446,31 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
 <section id="share-root" class="tj-panel" hidden>
   <div id="shareRoot"><div class="wc-loading"><span class="d"></span> Loading result…</div></div>
 </section>
+
+<!-- ================= BEGINNER BOOM ================= -->
+<section id="boom-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">Premium English &middot; Beginner</div>
+  <h1 class="wc-h1">Beginner BOOM</h1>
+  <p class="wc-sub">Top 100 verbs, top 100 adjectives, and a live team quiz game built from both lists.</p>
+
+  <div class="au-tabs" id="boomTabs">
+    <button class="on" data-boomtab="verbs">Most Common Verbs</button>
+    <button data-boomtab="adjs">Most Common Adjectives</button>
+    <button data-boomtab="quiz">Quiz</button>
+  </div>
+
+  <div id="boomVerbsPanel">
+    <div id="boomVerbsList" class="boom-word-grid"></div>
+  </div>
+
+  <div id="boomAdjsPanel" hidden>
+    <div id="boomAdjsList" class="boom-word-grid"></div>
+  </div>
+
+  <div id="boomQuizPanel" hidden>
+    <div id="boomQuizRoot"></div>
+  </div>
+</section>
 </main>
 <script>
 (function(){
@@ -1411,7 +1483,7 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root'};
   var navHist=[]; var curView=null; window.__tjUserNavigated=false;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -4736,6 +4808,455 @@ function initWhenReady(){
   }).observe(document.body,{attributes:true,attributeFilter:["data-view"]});
 }
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initWhenReady); else initWhenReady();
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var BOOM_VERBS=[
+["Like","yoqtirmoq","I like football.","Men futbolni yoqtiraman."],
+["Have","ega bo'lmoq","You have a phone.","Sizda telefon bor."],
+["Do","bajarmoq","We do homework every day.","Biz har kuni uy vazifasini bajaramiz."],
+["Say","aytmoq","He says hello.","U salom aytadi."],
+["Go","bormoq","She goes to school every day.","U har kuni maktabga boradi."],
+["Make","tayyorlamoq","I make breakfast every morning.","Men har kuni ertalab nonushta tayyorlayman."],
+["Know","bilmoq","I know swimming.","Men suzishni bilaman."],
+["Think","o'ylamoq","I think English is interesting.","Menimcha, ingliz tili qiziqarli."],
+["Take","olmoq","My teacher takes my phone.","O'qituvchim telefonimni oladi."],
+["See","ko'rmoq","I see my friends every week.","Men har hafta do'stlarimni ko'raman."],
+["Come","kelmoq","I come home.","Men uyga kelaman."],
+["Want","xohlamoq","I want ice-cream.","Men muzqaymoq xohlayman."],
+["Look","qaramoq","Look at me.","Menga qara."],
+["Use","foydalanmoq","I use my phone every day.","Men har kuni telefonimdan foydalanaman."],
+["Find","topmoq","I find money.","Men pul topaman."],
+["Give","bermoq","Give me money for school.","Menga maktab uchun pul ber."],
+["Tell","aytmoq","My grandfather tells many stories.","Bobom ko'p hikoyalar aytadi."],
+["Work","ishlamoq","My father works at university.","Otam universitetda ishlaydi."],
+["Call","qo'ng'iroq qilmoq","I call my friend.","Men do'stimga qo'ng'iroq qilaman."],
+["Ask","so'ramoq","I like asking questions.","Men savol so'rashni yoqtiraman."],
+["Begin","boshlamoq","Let's begin our lesson.","Keling, darsimizni boshlaylik."],
+["Help","yordam bermoq","I help everyone.","Men hammaga yordam beraman."],
+["Start","boshlamoq","Rain starts.","Yomg'ir boshlanadi."],
+["Show","ko'rsatmoq","I show my grades to my parents.","Men baholarimni ota-onamga ko'rsataman."],
+["Play","o'ynamoq","I play with my friends.","Men do'stlarim bilan o'ynayman."],
+["Run","yugurmoq","I run every morning.","Men har kuni ertalab yuguraman."],
+["Live","yashamoq","I live in Tashkent.","Men Toshkentda yashayman."],
+["Believe","ishonmoq","I believe you.","Men senga ishonaman."],
+["Write","yozmoq","Poets write poems.","Shoirlar she'r yozadi."],
+["Understand","tushunmoq","I understand the lesson.","Men darsni tushunaman."],
+["Eat","yemoq","I eat an apple.","Men olma yeyman."],
+["Drink","ichmoq","I drink water.","Men suv ichaman."],
+["Read","o'qimoq","I read books.","Men kitob o'qiyman."],
+["Sleep","uxlamoq","I sleep early.","Men erta uxlayman."],
+["Open","ochmoq","Open the door.","Eshikni och."],
+["Close","yopmoq","Close the window.","Derazani yop."],
+["Sit","o'tirmoq","Sit down, please.","Iltimos, o'tiring."],
+["Stand","turmoq","Stand up, please.","Iltimos, turing."],
+["Walk","yurmoq","I walk to school.","Men maktabga piyoda boraman."],
+["Talk","gaplashmoq","I talk with my friends.","Men do'stlarim bilan gaplashaman."],
+["Listen","tinglamoq","I listen to music.","Men musiqa tinglayman."],
+["Hear","eshitmoq","I hear a sound.","Men bir ovoz eshitaman."],
+["Watch","tomosha qilmoq","I watch TV.","Men televizor tomosha qilaman."],
+["Buy","sotib olmoq","I buy bread every day.","Men har kuni non sotib olaman."],
+["Sell","sotmoq","He sells fruits.","U meva sotadi."],
+["Teach","o'qitmoq","I teach English.","Men ingliz tilidan dars beraman."],
+["Learn","o'rganmoq","I learn new words.","Men yangi so'zlarni o'rganaman."],
+["Study","o'qimoq","I study at school.","Men maktabda o'qiyman."],
+["Cook","pishirmoq","My mother cooks rice.","Onam guruch pishiradi."],
+["Clean","tozalamoq","I clean my room.","Men xonamni tozalayman."],
+["Wash","yuvmoq","I wash my hands.","Men qo'llarimni yuvaman."],
+["Draw","chizmoq","I draw a cat.","Men mushuk chizaman."],
+["Paint","bo'yamoq","I paint a picture.","Men rasm bo'yayman."],
+["Drive","haydamoq","My father drives a car.","Otam mashina haydaydi."],
+["Ride","minmoq","I ride a bike.","Men velosiped minaman."],
+["Jump","sakramoq","I jump high.","Men baland sakrayman."],
+["Dance","raqsga tushmoq","I dance at parties.","Men bazmlarda raqsga tushaman."],
+["Sing","kuylamoq","I sing a song.","Men qo'shiq kuylayman."],
+["Smile","tabassum qilmoq","She smiles at me.","U menga tabassum qiladi."],
+["Cry","yig'lamoq","The baby cries.","Chaqaloq yig'laydi."],
+["Laugh","kulmoq","We laugh a lot.","Biz ko'p kulamiz."],
+["Wait","kutmoq","Wait for me.","Meni kut."],
+["Stay","qolmoq","I stay at home.","Men uyda qolaman."],
+["Move","harakatlanmoq","Don't move!","Harakatlanma!"],
+["Stop","to'xtamoq","Stop talking!","Gapirishni to'xtat!"],
+["Forget","unutmoq","I forget names easily.","Men ismlarni oson unutaman."],
+["Remember","eslamoq","I remember your name.","Men ismingizni eslayman."],
+["Love","sevmoq","I love my family.","Men oilamni sevaman."],
+["Hate","yomon ko'rmoq","I hate lies.","Men yolg'onni yomon ko'raman."],
+["Need","kerak bo'lmoq","I need help.","Menga yordam kerak."],
+["Choose","tanlamoq","Choose one.","Bittasini tanla."],
+["Wait","kutmoq","Please wait here.","Iltimos, shu yerda kuting."],
+["Meet","uchrashmoq","I meet my friends on weekends.","Men dam olish kunlari do'stlarim bilan uchrashaman."],
+["Send","yubormoq","I send a message.","Men xabar yuboraman."],
+["Bring","olib kelmoq","Bring your book.","Kitobingni olib kel."],
+["Carry","ko'tarmoq","I carry a bag.","Men sumka ko'taraman."],
+["Cut","kesmoq","I cut paper.","Men qog'ozni kesaman."],
+["Break","sindirmoq","Don't break the glass.","Oynani sindirma."],
+["Build","qurmoq","They build a house.","Ular uy qurishadi."],
+["Open","ochmoq","Open your book.","Kitobingizni oching."],
+["Close","yopmoq","Close your eyes.","Ko'zlaringizni yuming."],
+["Win","yutmoq","Our team wins every game.","Bizning jamoamiz har o'yinda yutadi."],
+["Lose","yutqazmoq","Don't lose your key.","Kalitingni yo'qotma."],
+["Stay","qolmoq","Stay with me.","Men bilan qol."],
+["Wait","kutmoq","Wait outside.","Tashqarida kut."],
+["Hope","umid qilmoq","I hope for good weather.","Men yaxshi ob-havoni umid qilaman."],
+["Change","o'zgartirmoq","Change your clothes.","Kiyimingizni almashtiring."],
+["Watch","tomosha qilmoq","We watch movies.","Biz film tomosha qilamiz."],
+["Push","itarmoq","Push the door.","Eshikni it."],
+["Pull","tortmoq","Pull the rope.","Arqonni tort."],
+["Touch","tekkizmoq","Don't touch that.","Unga tegma."],
+["Save","saqlamoq","Save your work.","Ishingizni saqlang."],
+["Spend","sarflamoq","I spend money on food.","Men ovqatga pul sarflayman."],
+["Fix","tuzatmoq","I fix my bike.","Men velosipedimni tuzataman."],
+["Throw","otmoq","Throw the ball!","To'pni ot!"],
+["Catch","ushlamoq","Catch the ball!","To'pni ushla!"],
+["Turn","burilmoq","Turn left.","Chapga buril."],
+["Wait","kutmoq","Wait a minute.","Bir daqiqa kut."],
+["Wash","yuvmoq","Wash your face.","Yuzingizni yuving."],
+["Smell","hidlamoq","I smell flowers.","Men gullarni hidlayman."]
+];
+
+var BOOM_ADJS=[
+["Good","yaxshi","This book is good.","Bu kitob yaxshi."],
+["Bad","yomon","He is a bad driver.","U yomon haydovchi."],
+["Big","katta","They live in a big house.","Ular katta uyda yashashadi."],
+["Small","kichkina","She has a small bag.","Uning kichkina sumkasi bor."],
+["Large","katta","It is a large city.","Bu katta shahar."],
+["Long","uzun","She has long hair.","Uning sochi uzun."],
+["Short","qisqa","The story is short.","Hikoya qisqa."],
+["High","baland","The wall is high.","Devor baland."],
+["Low","past","The price is low.","Narx past."],
+["Old","eski","This is an old car.","Bu eski mashina."],
+["New","yangi","I bought a new phone.","Men yangi telefon sotib oldim."],
+["Young","yosh","She is young.","U yosh."],
+["Early","erta","He woke up early.","U erta uyg'ondi."],
+["Late","kech","She arrived late.","U kech keldi."],
+["Different","boshqacha","We have different ideas.","Bizda boshqacha fikrlar bor."],
+["Same","bir xil","We are in the same class.","Biz bir xil sinfdamiz."],
+["Important","muhim","Health is important.","Sog'liq muhim."],
+["Necessary","zarur","Water is necessary.","Suv zarur."],
+["Possible","mumkin","Anything is possible.","Hammasi mumkin."],
+["Impossible","mumkin emas","That is impossible.","Bu mumkin emas."],
+["Easy","oson","The test was easy.","Test oson edi."],
+["Difficult","qiyin","The exam was difficult.","Imtihon qiyin bo'ldi."],
+["Strong","kuchli","He is strong.","U kuchli."],
+["Weak","kuchsiz","I feel weak.","Men o'zimni kuchsiz his qilyapman."],
+["Hot","issiq","The soup is hot.","Sho'rva issiq."],
+["Cold","sovuq","The room is cold.","Xona sovuq."],
+["Warm","iliq","The water is warm.","Suv iliq."],
+["Cool","salqin","It is cool today.","Bugun havo salqin."],
+["Right","to'g'ri","You are right.","Siz to'g'risiz."],
+["Wrong","noto'g'ri","That answer is wrong.","Bu javob noto'g'ri."],
+["True","rost","The story is true.","Hikoya rost."],
+["False","yolg'on","This news is false.","Bu xabar yolg'on."],
+["Rich","boy","He is a rich man.","U boy odam."],
+["Poor","kambag'al","They are poor.","Ular kambag'al."],
+["Beautiful","chiroyli","She is a beautiful girl.","U chiroyli qiz."],
+["Ugly","xunuk","This house is ugly.","Bu uy xunuk ekan."],
+["Happy","baxtli","I am happy.","Men baxtliman."],
+["Sad","qayg'uli","She is sad.","U qayg'uli."],
+["Angry","jahli chiqqan","He is angry.","Uning jahli chiqqan."],
+["Calm","tinch","Stay calm.","Tinch tur."],
+["Hungry","och","I am hungry.","Men ochman."],
+["Thirsty","chanqagan","She is thirsty.","U chanqagan."],
+["Tired","charchagan","He is tired.","U charchagan."],
+["Busy","band","She is busy now.","U hozir band."],
+["Free","bo'sh","I am free today.","Men bugun bo'shman."],
+["Safe","xavfsiz","This place is safe.","Bu joy xavfsiz."],
+["Dangerous","xavfli","The road is dangerous.","Yo'l xavfli."],
+["Clean","toza","The room is clean.","Xona toza."],
+["Dirty","kir","Your clothes are dirty.","Sening kiyimlaring kir."],
+["Full","to'la","The glass is full.","Stakan to'la."],
+["Empty","bo'sh","The box is empty.","Quti bo'sh."],
+["Interesting","qiziqarli","The film is interesting.","Film qiziqarli."],
+["Boring","zerikarli","The lecture is very boring.","Ma'ruza juda zerikarli."],
+["Famous","mashhur","He is famous.","U mashhur."],
+["Unknown","noma'lum","It is unknown.","Bu noma'lum."],
+["Expensive","qimmat","The car is expensive.","Mashina qimmat."],
+["Cheap","arzon","The shoes are cheap.","Oyoq kiyim arzon."],
+["Bright","yorqin","The sun is bright.","Quyosh yorqin."],
+["Dark","qorong'i","The room is dark.","Xona qorong'i."],
+["Loud","baland","The music is loud.","Musiqa baland."],
+["Quiet","sokin","Be quiet.","Jim bo'l."],
+["Friendly","do'stona","She is friendly.","U do'stona."],
+["Unfriendly","do'stona emas","He is unfriendly.","U do'stona emas."],
+["Generous","saxiy","My uncle is generous.","Mening amakim saxiy."],
+["Selfish","xasis","He is selfish.","U xasis."],
+["Polite","odobli","She is polite.","U odobli."],
+["Rude","qo'pol","He was rude.","U qo'pol edi."],
+["Clever","aqlli","She is clever.","U aqlli."],
+["Stupid","tentak","Don't be stupid.","Tentak bo'lma."],
+["Healthy","sog'lom","This food is healthy.","Bu ovqat sog'lom."],
+["Sick","kasal","He is sick.","U kasal."],
+["Lucky","omadli","She is lucky.","U omadli."],
+["Unlucky","omadsiz","He is unlucky.","U omadsiz."],
+["Modern","zamonaviy","The house is modern.","Uy zamonaviy."],
+["Traditional","an'anaviy","This is traditional Uzbek food.","Bu an'anaviy o'zbek taomi."],
+["Powerful","qudratli","The king was powerful.","Podshoh qudratli edi."],
+["Weak","kuchsiz","The signal is weak.","Signal kuchsiz."],
+["Sleepy","uxlagisi kelayotgan","I am sleepy.","Men uxlagim kelyapti."],
+["Nervous","asabiy","She is nervous.","U asabiy."],
+["Brave","jasur","That soldier is brave.","U askar jasur."],
+["Afraid","qo'rqqan","He is afraid of dogs.","U itlardan qo'rqadi."],
+["Natural","tabiiy","This is natural beauty.","Bu tabiiy go'zallik."],
+["Artificial","sun'iy","These flowers are artificial.","Bu gullar sun'iy."],
+["Simple","oddiy","The question is simple.","Savol oddiy."],
+["Complex","murakkab","This problem is complex.","Bu muammo murakkab."],
+["Noisy","shovqinli","The street is noisy.","Ko'cha shovqinli."],
+["Soft","yumshoq","The bed is soft.","Karavot yumshoq."],
+["Hard","qattiq","The chair is hard.","Stul qattiq."],
+["Deep","chuqur","The lake is deep.","Ko'l chuqur."],
+["Shallow","sayoz","The river is shallow.","Daryo sayoz."],
+["Wide","keng","The road is wide.","Yo'l keng."],
+["Narrow","tor","The path is narrow.","Yo'l tor."],
+["Fast","tez","He is fast.","U tez."],
+["Slow","sekin","The turtle is very slow.","Toshbaqa juda sekin."],
+["Kind","mehribon","She is kind.","U mehribon."],
+["Cruel","shafqatsiz","He is cruel.","U shafqatsiz."],
+["Real","haqiqiy","This is real gold.","Bu haqiqiy oltin."],
+["Fake","soxta","This watch is fake.","Bu soat soxta."],
+["Ready","tayyor","Dinner is ready.","Kechki ovqat tayyor."],
+["Busy","band","I am busy now.","Men hozir bandman."]
+];
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+/* ---- word list rendering ---- */
+function renderWordList(container, data){
+  var html = data.map(function(d){
+    return '<div class="boom-word-card"><div class="en">'+esc(d[0])+'</div><div class="uz">'+esc(d[1])+'</div><div class="ex">'+esc(d[2])+'</div></div>';
+  }).join('');
+  container.innerHTML = html;
+}
+
+/* ---- tabs ---- */
+function wireTabs(){
+  document.querySelectorAll('#boomTabs [data-boomtab]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#boomTabs button').forEach(function(x){ x.classList.toggle('on', x===b); });
+      var m = b.getAttribute('data-boomtab');
+      $('boomVerbsPanel').hidden = m!=='verbs';
+      $('boomAdjsPanel').hidden = m!=='adjs';
+      $('boomQuizPanel').hidden = m!=='quiz';
+    });
+  });
+}
+
+/* ---- quiz game state ---- */
+var G = null;
+
+function setupScreen(){
+  var opts = G && G.opts ? G.opts : {teams:2, grid:16, bonus:true, punish:true, wordQ:true, sentQ:true};
+  var html = ''
+   + '<div class="wc-card">'
+   + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Teams</label>'
+   +   '<div class="boom-pill-group" id="bTeams">'
+   +     [2,3].map(function(n){ return '<button class="boom-pill'+(opts.teams===n?' on':'')+'" data-teams="'+n+'">'+n+' teams</button>'; }).join('')
+   +   '</div></div>'
+   + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Grid size</label>'
+   +   '<div class="boom-pill-group" id="bGrid">'
+   +     [16,24].map(function(n){ return '<button class="boom-pill'+(opts.grid===n?' on':'')+'" data-grid="'+n+'">'+n+' cards</button>'; }).join('')
+   +   '</div></div>'
+   + '<div class="boom-toggle-row"><span>Word translation cards (Uzbek &rarr; English, 15 pts)</span><button class="boom-switch'+(opts.wordQ?' on':'')+'" data-tg="wordQ"><i></i></button></div>'
+   + '<div class="boom-toggle-row"><span>Sentence translation cards (Uzbek &rarr; English, 25 pts)</span><button class="boom-switch'+(opts.sentQ?' on':'')+'" data-tg="sentQ"><i></i></button></div>'
+   + '<div class="boom-toggle-row"><span>Bonus cards (double, +30, steal, swap)</span><button class="boom-switch'+(opts.bonus?' on':'')+'" data-tg="bonus"><i></i></button></div>'
+   + '<div class="boom-toggle-row" style="border-bottom:none"><span>Punishment cards (virus, germ)</span><button class="boom-switch'+(opts.punish?' on':'')+'" data-tg="punish"><i></i></button></div>'
+   + '<button class="wc-btn" id="bStart" style="margin-top:20px">Start Game</button>'
+   + '</div>';
+  $('boomQuizRoot').innerHTML = html;
+  G = G || {}; G.opts = opts;
+
+  $('bTeams').querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ opts.teams=Number(b.getAttribute('data-teams')); setupScreen(); }); });
+  $('bGrid').querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ opts.grid=Number(b.getAttribute('data-grid')); setupScreen(); }); });
+  document.querySelectorAll('#boomQuizRoot [data-tg]').forEach(function(b){
+    b.addEventListener('click', function(){ var k=b.getAttribute('data-tg'); opts[k]=!opts[k]; setupScreen(); });
+  });
+  $('bStart').addEventListener('click', function(){ startGame(opts); });
+}
+
+function shuffle(a){
+  a = a.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+
+function startGame(opts){
+  if(!opts.wordQ && !opts.sentQ){ alert('Turn on at least one question type (word or sentence translation).'); return; }
+  var pool = shuffle(BOOM_VERBS.concat(BOOM_ADJS));
+
+  var specialCount = opts.grid===16 ? 3 : 4;
+  var bonusN = opts.bonus ? specialCount : 0;
+  var punishN = opts.punish ? specialCount : 0;
+  var qCount = opts.grid - bonusN - punishN;
+
+  var qTypes = [];
+  if(opts.wordQ) qTypes.push('word');
+  if(opts.sentQ) qTypes.push('sent');
+
+  var cards = [];
+  var i;
+  for(i=0;i<qCount;i++){
+    cards.push({kind:'q', qtype:qTypes[i % qTypes.length], item:pool[i % pool.length]});
+  }
+  var bonusKinds = ['double','plus30','steal','swap'];
+  for(i=0;i<bonusN;i++){ cards.push({kind:'bonus', btype:bonusKinds[i % bonusKinds.length]}); }
+  var punishKinds = ['virus','germ'];
+  for(i=0;i<punishN;i++){ cards.push({kind:'punish', ptype:punishKinds[i % punishKinds.length]}); }
+
+  cards = shuffle(cards);
+
+  G = {
+    opts: opts,
+    teams: [],
+    turn: 0,
+    cards: cards,
+    used: cards.map(function(){ return false; })
+  };
+  for(i=0;i<opts.teams;i++){ G.teams.push({name:'Team '+(i+1), score:0}); }
+
+  renderGame();
+}
+
+function renderGame(){
+  var teamHtml = G.teams.map(function(tm,i){
+    return '<div class="boom-team'+(i===G.turn?' turn':'')+'"><div class="nm">'+esc(tm.name)+(i===G.turn?' \u2190 turn':'')+'</div><div class="sc">'+tm.score+'</div></div>';
+  }).join('');
+  var gridHtml = G.cards.map(function(c,i){
+    return '<button class="boom-card'+(G.used[i]?' used':'')+'" data-ci="'+i+'" '+(G.used[i]?'disabled':'')+'>'+(i+1)+'</button>';
+  }).join('');
+  $('boomQuizRoot').innerHTML =
+    '<div class="boom-teambar">'+teamHtml+'</div>'+
+    '<div class="boom-grid">'+gridHtml+'</div>'+
+    '<div style="text-align:center;margin-top:24px"><button class="wc-btn" id="bQuit" style="width:auto;padding:10px 20px">End game / New setup</button></div>';
+  document.querySelectorAll('#boomQuizRoot .boom-card').forEach(function(b){
+    b.addEventListener('click', function(){ openCard(Number(b.getAttribute('data-ci'))); });
+  });
+  $('bQuit').addEventListener('click', function(){ if(confirm('End this game and return to setup?')){ setupScreen(); } });
+
+  if(G.used.every(Boolean)) endGame();
+}
+
+function nextTurn(){ G.turn = (G.turn+1) % G.teams.length; }
+function closeModal(){ var m=document.getElementById('boomModalBackdrop'); if(m) m.remove(); }
+
+function swapPickerHtml(){
+  var html = '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px">';
+  G.teams.forEach(function(tm,j){
+    if(j!==G.turn) html += '<button class="wc-btn" style="width:auto;padding:10px 18px" data-swap="'+j+'">Swap with '+esc(tm.name)+'</button>';
+  });
+  return html + '</div>';
+}
+
+function openCard(idx){
+  if(G.used[idx]) return;
+  var c = G.cards[idx];
+  var back = document.createElement('div');
+  back.id = 'boomModalBackdrop';
+  back.className = 'boom-modal-backdrop';
+
+  if(c.kind==='q'){
+    var isWord = c.qtype==='word';
+    var prompt = isWord ? c.item[1] : c.item[3];
+    var answer = isWord ? c.item[0] : c.item[2];
+    var pts = isWord ? 15 : 25;
+    back.innerHTML =
+      '<div class="boom-modal">'+
+        '<div class="kind">'+(isWord?'Word Translation':'Sentence Translation')+' &middot; '+esc(G.teams[G.turn].name)+'\u2019s turn</div>'+
+        '<div class="prompt">'+esc(prompt)+'</div>'+
+        '<div class="pts">Worth '+pts+' points</div>'+
+        '<button class="wc-btn" id="bReveal" style="margin-top:20px">Reveal answer</button>'+
+        '<div id="bAnswerWrap" hidden><div class="answer">'+esc(answer)+'</div>'+
+          '<div class="boom-judge-row"><button class="ok" id="bOk">Correct (+'+pts+')</button><button class="no" id="bNo">Wrong</button></div>'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(back);
+    $('bReveal').addEventListener('click', function(){ $('bReveal').hidden=true; $('bAnswerWrap').hidden=false; });
+    $('bOk').addEventListener('click', function(){ G.teams[G.turn].score += pts; finishCard(idx); });
+    $('bNo').addEventListener('click', function(){ finishCard(idx); });
+  } else if(c.kind==='bonus'){
+    var label, desc;
+    if(c.btype==='double'){ label='Double Score \uD83C\uDF89'; desc=esc(G.teams[G.turn].name)+'\u2019s score is doubled!'; }
+    else if(c.btype==='plus30'){ label='+30 Bonus \u2728'; desc=esc(G.teams[G.turn].name)+' gets +30 points!'; }
+    else if(c.btype==='steal'){ label='Steal 15! \uD83D\uDD75\uFE0F'; desc=esc(G.teams[G.turn].name)+' steals 15 points from every other team.'; }
+    else { label='Swap Scores \uD83D\uDD04'; desc='Choose a team to swap scores with.'; }
+    back.innerHTML =
+      '<div class="boom-modal">'+
+        '<div class="kind">Bonus &middot; '+esc(G.teams[G.turn].name)+'</div>'+
+        '<div class="prompt">'+label+'</div>'+
+        '<div class="pts">'+desc+'</div>'+
+        (c.btype==='swap' ? swapPickerHtml() : '<button class="wc-btn" id="bApply" style="margin-top:20px">Apply</button>')+
+      '</div>';
+    document.body.appendChild(back);
+    if(c.btype==='swap'){
+      document.querySelectorAll('#boomModalBackdrop [data-swap]').forEach(function(b){
+        b.addEventListener('click', function(){
+          var j = Number(b.getAttribute('data-swap'));
+          var tmp = G.teams[G.turn].score; G.teams[G.turn].score = G.teams[j].score; G.teams[j].score = tmp;
+          finishCard(idx);
+        });
+      });
+    } else {
+      $('bApply').addEventListener('click', function(){
+        if(c.btype==='double'){ G.teams[G.turn].score *= 2; }
+        else if(c.btype==='plus30'){ G.teams[G.turn].score += 30; }
+        else if(c.btype==='steal'){
+          G.teams.forEach(function(tm,j){ if(j!==G.turn){ tm.score = Math.max(0,tm.score-15); G.teams[G.turn].score += 15; } });
+        }
+        finishCard(idx);
+      });
+    }
+  } else {
+    var plabel = c.ptype==='virus' ? 'Virus! \uD83E\uDDA0' : 'Germ / Bacteria \uD83E\uDD60';
+    var pdesc = c.ptype==='virus' ? 'All teams\u2019 scores are wiped to zero!' : esc(G.teams[G.turn].name)+'\u2019s score is wiped to zero!';
+    back.innerHTML =
+      '<div class="boom-modal">'+
+        '<div class="kind">Punishment</div>'+
+        '<div class="prompt">'+plabel+'</div>'+
+        '<div class="pts">'+pdesc+'</div>'+
+        '<button class="wc-btn" id="bApply" style="margin-top:20px">Apply</button>'+
+      '</div>';
+    document.body.appendChild(back);
+    $('bApply').addEventListener('click', function(){
+      if(c.ptype==='virus'){ G.teams.forEach(function(tm){ tm.score=0; }); }
+      else { G.teams[G.turn].score = 0; }
+      finishCard(idx);
+    });
+  }
+}
+
+function finishCard(idx){
+  G.used[idx] = true;
+  closeModal();
+  nextTurn();
+  renderGame();
+}
+
+function endGame(){
+  var sorted = G.teams.slice().sort(function(a,b){ return b.score-a.score; });
+  var html = '<div class="wc-card" style="text-align:center">'+
+    '<h2 style="margin-top:0">Game Over!</h2>'+
+    sorted.map(function(tm,i){ return '<div style="font-size:'+(i===0?'26px':'18px')+';font-weight:'+(i===0?'800':'600')+';margin:6px 0">'+(i===0?'\uD83C\uDFC6 ':'')+esc(tm.name)+': '+tm.score+'</div>'; }).join('')+
+    '<button class="wc-btn" id="bAgain" style="margin-top:20px">Play again</button>'+
+  '</div>';
+  $('boomQuizRoot').innerHTML = html;
+  $('bAgain').addEventListener('click', function(){ setupScreen(); });
+}
+
+/* ---- init ---- */
+function initBoom(){
+  var vl = document.getElementById('boomVerbsList');
+  var al = document.getElementById('boomAdjsList');
+  if(vl) renderWordList(vl, BOOM_VERBS);
+  if(al) renderWordList(al, BOOM_ADJS);
+  wireTabs();
+  setupScreen();
+  new MutationObserver(function(){
+    if(document.body.getAttribute('data-view')==='boom' && !G){ setupScreen(); }
+  }).observe(document.body,{attributes:true,attributeFilter:['data-view']});
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initBoom); else initBoom();
+
 })();
 </script>
 </body>
