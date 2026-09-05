@@ -679,22 +679,31 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 .boom-team.turn{border-color:var(--tj-gold,#c9a24b); box-shadow:0 0 0 3px rgba(201,162,75,.2)}
 .boom-team .nm{font-weight:700; font-size:13px; opacity:.75}
 .boom-team .sc{font-size:28px; font-weight:800}
-.boom-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
-@media(max-width:700px){.boom-grid{grid-template-columns:repeat(3,1fr)}}
-.boom-card{aspect-ratio:1.2; border-radius:12px; background:linear-gradient(160deg,var(--tj-gold,#c9a24b),var(--tj-gold-deep,#8C7A3E)); color:#1a1408;
-  display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; cursor:pointer; border:none; transition:transform .12s}
+.boom-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:8px; max-width:820px; margin:0 auto}
+@media(max-width:900px){.boom-grid{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:560px){.boom-grid{grid-template-columns:repeat(4,1fr)}}
+.boom-card{aspect-ratio:1; border-radius:9px; background:linear-gradient(160deg,var(--tj-gold,#c9a24b),var(--tj-gold-deep,#8C7A3E)); color:#1a1408;
+  display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800; cursor:pointer; border:none; transition:transform .12s; min-height:0}
 .boom-card:hover{transform:translateY(-2px)}
 .boom-card.used{visibility:hidden}
 .boom-modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:9990; display:flex; align-items:center; justify-content:center; padding:20px}
-.boom-modal{background:var(--tj-card,var(--tj-bg,#fff)); border-radius:16px; max-width:560px; width:100%; padding:32px; text-align:center; box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+.boom-modal{background:var(--tj-card,var(--tj-bg,#fff)); border-radius:16px; max-width:560px; width:100%; padding:32px; text-align:center; box-shadow:0 30px 80px -20px rgba(0,0,0,.5); border:3px solid transparent}
+.boom-modal.bonus{border-color:#3fb96b; background:linear-gradient(180deg,rgba(63,185,107,.14),transparent 40%),var(--tj-card,var(--tj-bg,#fff))}
+.boom-modal.punish{border-color:#e5484d; background:linear-gradient(180deg,rgba(229,72,77,.16),transparent 40%),var(--tj-card,var(--tj-bg,#fff))}
 .boom-modal .kind{font-size:12px; letter-spacing:.15em; text-transform:uppercase; opacity:.6; margin-bottom:10px}
+.boom-modal.bonus .kind{color:#3fb96b; opacity:1; font-weight:700}
+.boom-modal.punish .kind{color:#e5484d; opacity:1; font-weight:700}
 .boom-modal .prompt{font-size:26px; font-weight:700; margin-bottom:10px}
+.boom-modal.bonus .prompt{color:#2f9e5f}
+.boom-modal.punish .prompt{color:#d9534f}
 .boom-modal .answer{font-size:20px; color:var(--tj-gold-deep,#8C7A3E); font-weight:700; margin-top:16px}
 .boom-modal .pts{font-size:13px; opacity:.65; margin-top:6px}
 .boom-judge-row{display:flex; gap:12px; justify-content:center; margin-top:22px}
 .boom-judge-row button{flex:1; max-width:160px; padding:12px; border-radius:10px; border:none; font-weight:700; cursor:pointer; font-size:15px}
 .boom-judge-row .ok{background:#3fb96b; color:#fff}
 .boom-judge-row .no{background:#d9534f; color:#fff}
+.boom-winner-banner{font-size:34px; font-weight:800; margin:14px 0; animation:boomPulse 1.2s ease-in-out infinite}
+@keyframes boomPulse{0%,100%{transform:scale(1)} 50%{transform:scale(1.05)}}
 /* ---- daily goal celebration ---- */
 #tjConfettiLayer{position:fixed; inset:0; pointer-events:none; z-index:9998; overflow:hidden}
 .tj-confetti{position:absolute; top:-40px; font-size:24px; animation:tjfall linear forwards}
@@ -5090,7 +5099,7 @@ function setupScreen(){
    + '<div class="wc-card">'
    + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Teams</label>'
    +   '<div class="boom-pill-group" id="bTeams">'
-   +     [2,3].map(function(n){ return '<button class="boom-pill'+(opts.teams===n?' on':'')+'" data-teams="'+n+'">'+n+' teams</button>'; }).join('')
+   +     [1,2,3].map(function(n){ return '<button class="boom-pill'+(opts.teams===n?' on':'')+'" data-teams="'+n+'">'+n+(n===1?' team (solo)':' teams')+'</button>'; }).join('')
    +   '</div></div>'
    + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Grid size</label>'
    +   '<div class="boom-pill-group" id="bGrid">'
@@ -5119,6 +5128,13 @@ function shuffle(a){
   return a;
 }
 
+function weightedPick(weighted){
+  var total = weighted.reduce(function(s,w){ return s+w[1]; },0);
+  var r = Math.random()*total;
+  for(var i=0;i<weighted.length;i++){ r -= weighted[i][1]; if(r<=0) return weighted[i][0]; }
+  return weighted[weighted.length-1][0];
+}
+
 function startGame(opts){
   if(!opts.wordQ && !opts.sentQ){ alert('Turn on at least one question type (word or sentence translation).'); return; }
   var pool = shuffle(BOOM_VERBS.concat(BOOM_ADJS));
@@ -5137,10 +5153,13 @@ function startGame(opts){
   for(i=0;i<qCount;i++){
     cards.push({kind:'q', qtype:qTypes[i % qTypes.length], item:pool[i % pool.length]});
   }
-  var bonusKinds = ['double','plus30','steal','swap'];
-  for(i=0;i<bonusN;i++){ cards.push({kind:'bonus', btype:bonusKinds[i % bonusKinds.length]}); }
-  var punishKinds = ['virus','germ'];
-  for(i=0;i<punishN;i++){ cards.push({kind:'punish', ptype:punishKinds[i % punishKinds.length]}); }
+  var bonusWeights = opts.teams>1
+    ? [['double',3],['plus30',4],['steal',3],['swap',2]]
+    : [['double',5],['plus30',5]];
+  for(i=0;i<bonusN;i++){ cards.push({kind:'bonus', btype:weightedPick(bonusWeights)}); }
+  var punishWeights = [['germ',5],['virus',1]];
+  for(i=0;i<punishN;i++){ cards.push({kind:'punish', ptype:weightedPick(punishWeights)}); }
+
 
   cards = shuffle(cards);
 
@@ -5219,7 +5238,7 @@ function openCard(idx){
     else if(c.btype==='steal'){ label='Steal 15! \uD83D\uDD75\uFE0F'; desc=esc(G.teams[G.turn].name)+' steals 15 points from every other team.'; }
     else { label='Swap Scores \uD83D\uDD04'; desc='Choose a team to swap scores with.'; }
     back.innerHTML =
-      '<div class="boom-modal">'+
+      '<div class="boom-modal bonus">'+
         '<div class="kind">Bonus &middot; '+esc(G.teams[G.turn].name)+'</div>'+
         '<div class="prompt">'+label+'</div>'+
         '<div class="pts">'+desc+'</div>'+
@@ -5248,7 +5267,7 @@ function openCard(idx){
     var plabel = c.ptype==='virus' ? 'Virus! \uD83E\uDDA0' : 'Germ / Bacteria \uD83E\uDD60';
     var pdesc = c.ptype==='virus' ? 'All teams\u2019 scores are wiped to zero!' : esc(G.teams[G.turn].name)+'\u2019s score is wiped to zero!';
     back.innerHTML =
-      '<div class="boom-modal">'+
+      '<div class="boom-modal punish">'+
         '<div class="kind">Punishment</div>'+
         '<div class="prompt">'+plabel+'</div>'+
         '<div class="pts">'+pdesc+'</div>'+
@@ -5270,15 +5289,42 @@ function finishCard(idx){
   renderGame();
 }
 
+function fireConfetti(){
+  var layer=document.createElement('div');
+  layer.id='tjConfettiLayer';
+  var emojis=['\uD83C\uDF89','\uD83C\uDF8A','\u2728','\uD83C\uDF8B','\uD83C\uDF86','\uD83C\uDFC6'];
+  for(var i=0;i<50;i++){
+    var s=document.createElement('span');
+    s.className='tj-confetti';
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left=(Math.random()*100)+'vw';
+    s.style.animationDuration=(2.2+Math.random()*1.8)+'s';
+    s.style.animationDelay=(Math.random()*0.7)+'s';
+    s.style.fontSize=(16+Math.random()*22)+'px';
+    layer.appendChild(s);
+  }
+  document.body.appendChild(layer);
+  setTimeout(function(){ layer.remove(); },4500);
+}
+
 function endGame(){
   var sorted = G.teams.slice().sort(function(a,b){ return b.score-a.score; });
+  var banner;
+  if(G.teams.length===1){
+    banner = 'You scored '+sorted[0].score+' points! \uD83C\uDF89';
+  } else {
+    var topScore = sorted[0].score;
+    var winners = sorted.filter(function(t){ return t.score===topScore; });
+    banner = winners.length>1 ? "IT'S A DRAW!" : esc(winners[0].name).toUpperCase()+' IS THE WINNER!';
+  }
   var html = '<div class="wc-card" style="text-align:center">'+
-    '<h2 style="margin-top:0">Game Over!</h2>'+
-    sorted.map(function(tm,i){ return '<div style="font-size:'+(i===0?'26px':'18px')+';font-weight:'+(i===0?'800':'600')+';margin:6px 0">'+(i===0?'\uD83C\uDFC6 ':'')+esc(tm.name)+': '+tm.score+'</div>'; }).join('')+
+    '<div class="boom-winner-banner">'+banner+'</div>'+
+    sorted.map(function(tm,i){ return '<div style="font-size:'+(i===0?'22px':'16px')+';font-weight:'+(i===0?'800':'600')+';margin:6px 0">'+(i===0?'\uD83C\uDFC6 ':'')+esc(tm.name)+': '+tm.score+'</div>'; }).join('')+
     '<button class="wc-btn" id="bAgain" style="margin-top:20px">Play again</button>'+
   '</div>';
   $('boomQuizRoot').innerHTML = html;
   $('bAgain').addEventListener('click', function(){ setupScreen(); });
+  fireConfetti();
 }
 
 /* ---- init ---- */
