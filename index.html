@@ -280,7 +280,7 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 #lexup-root .opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
     font-family:Georgia,serif;font-size:14px;color:var(--gold);border:1px solid var(--line);background:rgba(217,178,74,.06);}
 #lexup-root .opt.locked{cursor:default}
-#lexup-root .opt.selected{border-color:var(--gold,#E9C46A); box-shadow:0 0 0 2px rgba(233,196,106,.25)}
+#lexup-root .opt.selected{border-color:var(--gold,#E9C46A); background:rgba(217,178,74,.12); box-shadow:0 0 0 2px rgba(233,196,106,.35)}
 #lexup-root .opt.correct{border-color:var(--ok);background:var(--ok-bg)}
 #lexup-root .opt.correct .key{border-color:var(--ok);color:#bff2cf;background:rgba(63,185,107,.12)}
 #lexup-root .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
@@ -1065,9 +1065,12 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
   <section id="screen-quiz" class="card hidden">
     <div class="card-pad">
       <div class="quiz-top">
-        <div class="quiz-meta">
-          <div class="q-name" id="qName">—</div>
-          <div class="q-sub" id="qSub">—</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <button class="btn btn-ghost" id="quizExitBtn" style="padding:8px 16px;font-size:13px">Exit</button>
+          <div class="quiz-meta">
+            <div class="q-name" id="qName">—</div>
+            <div class="q-sub" id="qSub">—</div>
+          </div>
         </div>
         <div class="quiz-stats">
           <div class="stat"><b id="statQ">1/1</b><span>Question</span></div>
@@ -2559,6 +2562,9 @@ window.addEventListener("DOMContentLoaded", ()=>{
   $("startBtn").addEventListener("click", startSession);
   $("lampBtn").addEventListener("click", useHint);
   $("confirmBtn").addEventListener("click", confirmSelected);
+  $("quizExitBtn").addEventListener("click", ()=>{
+    if(confirm("Exit this quiz? Your progress on this attempt will be lost.")) backToMenu();
+  });
   $("nextBtn").addEventListener("click", nextQuestion);
   $("againBtn").addEventListener("click", playAgain);
   $("menuBtn").addEventListener("click", backToMenu);
