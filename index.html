@@ -975,7 +975,7 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
       <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 11.5a8.5 7 0 01-8.5 7 9.8 9.8 0 01-3-.46L4 19.5l1.2-3.2A6.7 6.7 0 014 11.5a8.5 7 0 0117 0z"/><path d="M8.5 10.5h7M8.5 13h4.5"/></svg></div>
       <div class="tj-tag">Speaking &amp; Writing</div>
       <h2>Collocation KING</h2>
-      <p>Master 2,483 natural collocations across 32 topics &mdash; meanings, examples, flashcards, quizzes and spaced repetition.</p>
+      <p>Master 2,483 natural collocations across 32 topics &mdash; meanings, examples, model articles and quizzes.</p>
       <span class="tj-go">Open Collocation KING <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
     <button class="tj-door writing" data-go="write">
@@ -1185,7 +1185,7 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
       </div>
       <div class="foot-links">
         <div class="foot-col"><h5>Study</h5>
-          <a data-nav="topics">Topics</a><a data-nav="flashcards">Flashcards</a><a data-nav="quiz">Quiz</a><a data-nav="review">Daily Review</a></div>
+          <a data-nav="topics">Topics</a><a data-nav="article">Article</a><a data-nav="quiz">Quiz</a></div>
         <div class="foot-col"><h5>Track</h5>
           <a data-nav="progress">Progress</a><a data-nav="favourites">Favourites</a><span data-search>Search</span></div>
         <div class="foot-col"><h5>Premium English</h5>
@@ -1409,7 +1409,7 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
   var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root'};
-  var navHist=[]; var curView=null;
+  var navHist=[]; var curView=null; window.__tjUserNavigated=false;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
     if(window.__tjGuard){ var r=window.__tjGuard(name); if(r) name=r; }
@@ -1423,12 +1423,18 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
     updateBackBtn();
     window.scrollTo({top:0,behavior:'auto'});
   }
-  function goBack(){ if(navHist.length){ showPanel(navHist.pop(), true); } else { showPanel('home', true); } }
+  function goBack(){
+    var h=(location.hash||'').replace(/^#\/?/,'');
+    var parts=h.split('/');
+    var hasDeepArg = parts.length>1 && parts[1];
+    if(hasDeepArg && window.history.length>1){ history.back(); return; }
+    if(navHist.length){ showPanel(navHist.pop(), true); } else { showPanel('home', true); }
+  }
   window.tjShowPanel=showPanel;
   window.tjGoBack=goBack;
   document.addEventListener('click',function(e){
     var bk=e.target.closest('[data-back]'); if(bk){ goBack(); return; }
-    var g=e.target.closest('[data-go]'); if(g){ showPanel(g.getAttribute('data-go')); return; }
+    var g=e.target.closest('[data-go]'); if(g){ window.__tjUserNavigated=true; showPanel(g.getAttribute('data-go')); return; }
     var f=e.target.closest('[data-fs]'); if(f){ fs+= (f.getAttribute('data-fs')==='+'?FS_STEP:-FS_STEP); applyFs(); return; }
     var t=e.target.closest('[data-theme-toggle]'); if(t){ theme=(theme==='light'?'dark':'light'); applyTheme(); return; }
   });
@@ -2735,8 +2741,7 @@ function home(){
   }
   var modes=[
     ['topics','Topics','Explore all 32 realms of IELTS collocations','M4 6h16M4 12h16M4 18h10'],
-    ['review','Daily Review','Revise cards due today with spaced repetition','M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3'],
-    ['flashcards','Flashcards','Flip, recall, and rate yourself','M4 5h16v11H4zM4 9h16'],
+    ['article','Article','Read a model paragraph built from real collocations','M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V4H6.5A2.5 2.5 0 004 6.5v13z'],
     ['quiz','Quiz','Test your mastery, five question types','M9 11l3 3 6-6M12 3a9 9 0 100 18 9 9 0 000-18z'],
     ['favourites','Favourites','Study the collocations you starred','M12 3l2.7 5.8 6.3.7-4.7 4.3 1.3 6.2L12 17.6 6.1 20.3l1.3-6.2L2.7 9.8l6.3-.7z'],
     ['progress','Progress','Track mastery across every topic','M3 3v18h18M7 14l3-3 3 3 5-6']
@@ -2753,7 +2758,7 @@ function home(){
       '<div class="tagline">IELTS Collocations Mastery</div>'+
       '<p class="lede">Rule every IELTS topic with '+D.meta.n_cards.toLocaleString()+' hand-crafted collocations — each with a plain-English meaning and a natural example sentence.</p>'+
       '<div class="cta-row"><a class="btn btn-gold" data-nav="topics">Explore Topics</a>'+
-        '<a class="btn btn-ghost" data-nav="review">Daily Review'+(due?' · '+due:'')+'</a></div>'+
+        '<a class="btn btn-ghost" data-nav="article">Read an Article</a></div>'+
       '<div class="hero-stats">'+
         '<div class="hstat"><div class="n gold-text">'+D.meta.n_topics+'</div><div class="l">Topics</div></div>'+
         '<div class="hstat"><div class="n gold-text">'+D.meta.n_subtopics+'</div><div class="l">Subtopics</div></div>'+
@@ -2796,8 +2801,7 @@ function topicView(id){
     '<div class="crumbs"><a data-nav="topics">Topics</a><span class="sep">›</span><span>'+esc(titleCase(t.name))+'</span></div>'+
     '<div class="page-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap">'+
       '<div><div class="eyebrow">Topic '+t.numeral+'</div><h1 class="page-title">'+esc(titleCase(t.name))+'</h1></div>'+
-      '<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-gold btn-sm" data-nav="study/topic:'+t.id+'">Flashcards</a>'+
-        '<a class="btn btn-ghost btn-sm" data-nav="quiz/topic:'+t.id+'">Quiz</a></div></div>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-ghost btn-sm" data-nav="quiz/topic:'+t.id+'">Quiz</a></div></div>'+
     '<div class="sub-list">'+rows+'</div></div>';
 }
 
@@ -2811,8 +2815,7 @@ function subView(id){
     '<div class="crumbs"><a data-nav="topics">Topics</a><span class="sep">›</span><a data-nav="topic/'+t.id+'">'+esc(titleCase(t.name))+'</a><span class="sep">›</span><span>'+esc(s.name)+'</span></div>'+
     '<div class="page-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap">'+
       '<div><div class="eyebrow">'+uniq.length+' collocations'+(s.focus?' · '+esc(s.focus):'')+'</div><h1 class="page-title">'+esc(s.name)+'</h1></div>'+
-      '<div style="display:flex;gap:10px"><a class="btn btn-gold btn-sm" data-nav="study/sub:'+s.id+'">Flashcards</a>'+
-        '<a class="btn btn-ghost btn-sm" data-nav="quiz/sub:'+s.id+'">Quiz</a></div></div>'+
+      '<div style="display:flex;gap:10px"><a class="btn btn-ghost btn-sm" data-nav="quiz/sub:'+s.id+'">Quiz</a></div></div>'+
     '<div class="col-grid">'+cards+'</div></div>';
 }
 
@@ -2833,13 +2836,12 @@ function cardView(cid){
     '<div class="section"><div class="lbl">Example</div><div class="exam">'+CK.highlight(c.e,c.c)+'</div></div>'+
     '<div class="section"><div class="lbl">Appears in</div><div class="tag-row">'+topicChips+'</div><div class="tag-row">'+subChips+'</div></div>'+
     '<div class="detail-actions">'+
-      '<a class="btn btn-gold" data-nav="study/one:'+cid+'">Practise this card</a>'+
       '<button class="btn btn-ghost" data-mark="master:'+cid+'">Mark as known</button>'+
       '<button class="btn btn-ghost" data-mark="reset:'+cid+'">Reset</button></div>'+
     '</div></div>';
 }
 
-/* ================= SESSION ENGINE (flashcards & review) ================= */
+/* ================= DECK BUILDER (used by Quiz) ================= */
 function buildDeck(scope){
   if(scope==='all') return CARD_IDS.slice();
   if(scope==='due') return CK.dueCards();
@@ -2850,86 +2852,6 @@ function buildDeck(scope){
   if(p[0]==='sub'){ return SUB[p[1]]?Array.from(new Set(SUB[p[1]].c)):[]; }
   if(p[0]==='one'){ return CARD[p[1]]?[p[1]]:[]; }
   return CARD_IDS.slice();
-}
-var sess=null;
-function flashDeckPicker(){
-  var decks=[
-    ['due','Due today',CK.dueCards().length,'Cards scheduled for review'],
-    ['all','All collocations',CARD_IDS.length,'The complete set'],
-    ['new','Unseen',CARD_IDS.filter(function(c){return !S.srs[c]}).length,'Cards you haven\u2019t studied yet'],
-    ['fav','Favourites',CK.favCids().length,'Your starred cards']
-  ].map(function(d){
-    return '<div class="deck-card" data-nav="study/'+d[0]+'"><div class="dn">'+d[2]+'</div><h4>'+d[1]+'</h4><p>'+d[3]+'</p></div>';
-  }).join('');
-  view.innerHTML=CK.goldDefs()+'<div class="wrap page">'+
-    '<div class="page-head"><div class="eyebrow">Study</div><h1 class="page-title">Flashcards</h1></div>'+
-    '<div class="deck-grid">'+decks+'</div>'+
-    '<p class="muted" style="margin-top:22px;font-size:14px">Tip: you can also start flashcards from any topic or subtopic page.</p></div>';
-}
-function startSession(scope){
-  var deck=buildDeck(scope);
-  if(!deck.length){ emptyState('Nothing to study here','This deck has no cards yet. Explore topics to get started.','topics','Browse topics'); return; }
-  sess={deck:CK.shuffle(deck),i:0,flipped:false,scope:scope,requeue:[],done:0,total:deck.length};
-  renderCard();
-}
-function renderCard(){
-  if(sess.i>=sess.deck.length){
-    if(sess.requeue.length){ sess.deck=sess.requeue; sess.requeue=[]; sess.i=0; }
-    else return sessionDone();
-  }
-  var cid=sess.deck[sess.i], c=CARD[cid];
-  var pct=sess.total?Math.round(sess.done/sess.total*100):0;
-  view.innerHTML='<div class="wrap page"><div class="study-wrap">'+
-    '<div class="study-top"><a class="btn btn-ghost btn-sm" data-nav="flashcards">Exit</a>'+
-      '<div class="progbar"><i style="width:'+pct+'%"></i></div>'+
-      '<span class="mono" style="font-size:13px;color:var(--mist)">'+Math.min(sess.done+1,sess.total)+' / '+sess.total+'</span></div>'+
-    '<div class="flip'+(sess.flipped?' flipped':'')+'" id="flip">'+
-      '<div class="face front"><div class="fc">'+esc(c.c)+'</div><div class="hint">Tap to reveal</div></div>'+
-      '<div class="face back"><div class="bm">Meaning</div><div class="bmean">'+esc(c.m)+'</div>'+
-        '<div class="bex">'+CK.highlight(c.e,c.c)+'</div></div></div>'+
-    (sess.flipped?
-      '<div class="rate-row">'+
-        '<button class="rate again" data-rate="again"><div class="rt">Again</div><div class="rs">&lt;10m</div></button>'+
-        '<button class="rate hard" data-rate="hard"><div class="rt">Hard</div><div class="rs">'+ivlLabel(cid,'hard')+'</div></button>'+
-        '<button class="rate good" data-rate="good"><div class="rt">Good</div><div class="rs">'+ivlLabel(cid,'good')+'</div></button>'+
-        '<button class="rate easy" data-rate="easy"><div class="rt">Easy</div><div class="rs">'+ivlLabel(cid,'easy')+'</div></button>'+
-      '</div>'
-      :'<button class="btn btn-gold reveal-btn" id="revealBtn">Show answer</button>')+
-    '</div></div>';
-}
-function ivlLabel(cid,q){
-  var r=S.srs[cid]||{ease:2.5,ivl:0}; var ivl;
-  if(q==='hard')ivl=r.ivl?Math.max(1,Math.round(r.ivl*1.2)):1;
-  else if(q==='good')ivl=r.ivl?Math.round(r.ivl*r.ease):1;
-  else ivl=r.ivl?Math.round(r.ivl*r.ease*1.3):3;
-  return ivl>=1?ivl+'d':'1d';
-}
-function doRate(q){
-  var cid=sess.deck[sess.i];
-  CK.rate(cid,q);
-  if(q==='again') sess.requeue.push(cid); else sess.done++;
-  sess.i++; sess.flipped=false; renderCard();
-}
-function sessionDone(){
-  view.innerHTML='<div class="wrap page"><div class="study-wrap"><div class="result">'+
-    CK.crownSVG('crownbig')+
-    '<div class="big gold-text">'+sess.total+'</div><div class="lbl">cards reviewed</div>'+
-    '<div style="margin-top:26px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
-      '<a class="btn btn-gold" data-nav="flashcards">More flashcards</a>'+
-      '<a class="btn btn-ghost" data-nav="progress">View progress</a></div>'+
-    '</div></div></div>';
-  sess=null;
-}
-
-/* ================= REVIEW (due queue) ================= */
-function review(){
-  var due=CK.dueCards();
-  if(!due.length){
-    var next=CARD_IDS.map(function(c){return S.srs[c]}).filter(Boolean).sort(function(a,b){return a.due-b.due})[0];
-    var msg=next? 'You\u2019re all caught up. Next cards are due later — come back soon.' : 'No cards are scheduled yet. Study some flashcards to build your review queue.';
-    emptyState('Nothing due right now',msg,'flashcards','Study flashcards'); return;
-  }
-  startSession('due');
 }
 
 /* ================= QUIZ ================= */
@@ -3058,8 +2980,7 @@ function favourites(){
   view.innerHTML=CK.goldDefs()+'<div class="wrap page">'+
     '<div class="page-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap">'+
       '<div><div class="eyebrow">'+cids.length+' saved</div><h1 class="page-title">Favourites</h1></div>'+
-      '<div style="display:flex;gap:10px"><a class="btn btn-gold btn-sm" data-nav="study/fav">Flashcards</a>'+
-        '<a class="btn btn-ghost btn-sm" data-nav="quiz/fav">Quiz</a></div></div>'+
+      '<div style="display:flex;gap:10px"><a class="btn btn-ghost btn-sm" data-nav="quiz/fav">Quiz</a></div></div>'+
     '<div class="col-grid">'+cids.map(colCard).join('')+'</div></div>';
 }
 
@@ -3382,9 +3303,6 @@ function route(){
     case 'topic': topicView(arg); break;
     case 'sub': subView(arg); break;
     case 'card': cardView(arg); break;
-    case 'flashcards': flashDeckPicker(); break;
-    case 'study': startSession(arg); break;
-    case 'review': review(); break;
     case 'quiz': arg?startQuiz(arg):quizPicker(); break;
     case 'favourites': favourites(); break;
     case 'progress': progress(); break;
@@ -3395,7 +3313,7 @@ function route(){
 }
 function setActiveNav(head){
   var map={home:'home',topics:'topics',topic:'topics',sub:'topics',card:'topics',
-    flashcards:'flashcards',study:'flashcards',review:'review',quiz:'quiz',favourites:'favourites',progress:'progress',article:'article'};
+    quiz:'quiz',favourites:'favourites',progress:'progress',article:'article'};
   var key=map[head]||'home';
   $$('nav.main a, .mobnav a').forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-navkey')===key); });
 }
@@ -3407,15 +3325,10 @@ document.addEventListener('click',function(e){
   if(fav){ e.stopPropagation(); var cid=fav.getAttribute('data-fav'); var on=CK.toggleFav(cid);
     fav.classList.toggle('on',on); var svg=fav.querySelector('svg'); if(svg)svg.setAttribute('fill',on?'currentColor':'none');
     CK.toast(on?'Added to favourites':'Removed from favourites'); return; }
-  var rate=e.target.closest('[data-rate]');
-  if(rate){ doRate(rate.getAttribute('data-rate')); return; }
   var opt=e.target.closest('[data-opt]');
   if(opt && quiz && !quiz.answered){ selectOpt(parseInt(opt.getAttribute('data-opt'),10)); return; }
   if(e.target.id==='qconfirm'){ confirmAnswer(); return; }
   if(e.target.id==='qnext'){ nextQuestion(); return; }
-  if(e.target.id==='revealBtn'){ sess.flipped=true; renderCard(); return; }
-  var flip=e.target.closest('#flip');
-  if(flip && sess){ if(!sess.flipped){sess.flipped=true; renderCard();} return; }
   var mark=e.target.closest('[data-mark]');
   if(mark){ var mp=mark.getAttribute('data-mark').split(':'); if(mp[0]==='master'){var r=S.srs[mp[1]]||{ease:2.5,reps:0,lapses:0};r.ivl=30;r.reps=(r.reps||0)+1;r.due=Date.now()+30*86400000;r.last=Date.now();S.srs[mp[1]]=r;CK.save();CK.toast('Marked as known');} else {delete S.srs[mp[1]];CK.save();CK.toast('Reset');} route(); return; }
   if(e.target.id==='resetAll'){ if(confirm('Reset all progress, favourites and streak? This cannot be undone.')){ S.srs={};S.fav={};S.stats={lastActive:'',streak:0,quizzes:[],studied:0};CK.save();CK.toast('Progress reset');route(); } return; }
@@ -3427,8 +3340,6 @@ document.addEventListener('keydown',function(e){
   if(quiz && !quiz.answered && /^[1-4]$/.test(e.key)){ var k=parseInt(e.key,10)-1; var o=$$('.opt')[k]; if(o)selectOpt(k); }
   else if(quiz && !quiz.answered && quiz.selected!=null && e.key==='Enter'){ e.preventDefault(); confirmAnswer(); }
   else if(quiz && quiz.answered && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); nextQuestion(); }
-  else if(sess){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); if(!sess.flipped){sess.flipped=true;renderCard();} }
-    else if(sess.flipped){ var m={'1':'again','2':'hard','3':'good','4':'easy'}; if(m[e.key])doRate(m[e.key]); } }
 });
 window.addEventListener('hashchange',route);
 window.CKROUTE=route;
@@ -3603,12 +3514,12 @@ async function boot(){
   var shareId=new URLSearchParams(location.search).get("share");
   if(shareId){ loadSharedResult(shareId); }
 
-  if(!configOk){ renderAcct(); nav(shareId?"share":"home"); removeBootLoader(); return; }
+  if(!configOk){ renderAcct(); if(!window.__tjUserNavigated) nav(shareId?"share":"home"); removeBootLoader(); return; }
 
   var s=await sb.auth.getSession();
   if(s.data.session){ user=s.data.session.user; }
   renderAcct();
-  nav(shareId ? "share" : (user?"home":"auth"));
+  if(!window.__tjUserNavigated){ nav(shareId ? "share" : (user?"home":"auth")); }
   removeBootLoader();
   if(user){ await onSignedIn(!!shareId); }
 
