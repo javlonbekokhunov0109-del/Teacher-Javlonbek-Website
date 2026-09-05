@@ -280,6 +280,7 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 #lexup-root .opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
     font-family:Georgia,serif;font-size:14px;color:var(--gold);border:1px solid var(--line);background:rgba(217,178,74,.06);}
 #lexup-root .opt.locked{cursor:default}
+#lexup-root .opt.selected{border-color:var(--gold,#E9C46A); box-shadow:0 0 0 2px rgba(233,196,106,.25)}
 #lexup-root .opt.correct{border-color:var(--ok);background:var(--ok-bg)}
 #lexup-root .opt.correct .key{border-color:var(--ok);color:#bff2cf;background:rgba(63,185,107,.12)}
 #lexup-root .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
@@ -541,6 +542,7 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 #ck-root .opt.wrong{border-color:var(--crimson); background:rgba(229,100,110,.12)}
 #ck-root .opt.wrong .kbd{background:var(--crimson); color:#fff}
 #ck-root .opt.done{cursor:default}
+#ck-root .opt.selected{border-color:var(--gold); box-shadow:0 0 0 2px rgba(233,196,106,.25)}
 #ck-root .qfoot{display:flex; align-items:center; justify-content:space-between; margin-top:22px; gap:14px}
 #ck-root .qscore{font-family:'Space Grotesk',monospace; font-size:13px; color:var(--mist)}
 #ck-root .qscore b{color:var(--gold)}
@@ -648,6 +650,11 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 .tw-incorrect{color:#e5484d; text-decoration:underline; text-decoration-color:#e5484d}
 .tw-current{background:rgba(120,120,255,.25); border-radius:2px}
 .tw-word{display:inline-flex; white-space:nowrap}
+.wc-pass-wrap{position:relative}
+.wc-pass-wrap .wc-input{padding-right:44px}
+.wc-eye{position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:0; cursor:pointer;
+  width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; color:var(--tj-fg-soft,#6F6A58)}
+.wc-eye:hover{background:rgba(127,127,127,.12); color:var(--tj-fg)}
 .tw-caret{display:inline-block; width:2px; height:1.05em; background:var(--tj-gold,#c9a24b); vertical-align:-0.15em; margin:0 -1px; animation:twblink 1s steps(1) infinite}
 @keyframes twblink{0%,50%{opacity:1} 51%,100%{opacity:0}}
 /* ---- daily goal celebration ---- */
@@ -1085,6 +1092,7 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
 
       <div class="feedback">
         <div class="fb-text" id="fbText"></div>
+        <button class="btn btn-primary hidden" id="confirmBtn">Confirm answer</button>
         <button class="btn btn-primary hidden" id="nextBtn">Next</button>
       </div>
     </div>
@@ -1224,7 +1232,7 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
     <div id="auMsg"></div>
     <div class="wc-row" id="auNameRow" hidden>
       <label class="wc-label" for="auName">Full name</label>
-      <input class="wc-input" id="auName" type="text" autocomplete="name" placeholder="e.g. Dilnoza Karimova">
+      <input class="wc-input" id="auName" type="text" autocomplete="name" placeholder="e.g. Javlonbek Okhunov">
     </div>
     <div class="wc-row">
       <label class="wc-label" for="auEmail">Email</label>
@@ -1232,11 +1240,23 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
     </div>
     <div class="wc-row">
       <label class="wc-label" for="auPass">Password</label>
-      <input class="wc-input" id="auPass" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+      <div class="wc-pass-wrap">
+        <input class="wc-input" id="auPass" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+        <button type="button" class="wc-eye" id="auPassEye" aria-label="Show password" data-target="auPass">
+          <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 004.2 4.2M6.6 6.7C4.2 8.3 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1.1M17.5 6.1C16.2 5.4 14.7 5 12 5c-.6 0-1.2.03-1.8.1"/></svg>
+        </button>
+      </div>
     </div>
     <div class="wc-row" id="auConfirmRow" hidden>
       <label class="wc-label" for="auConfirm">Confirm password</label>
-      <input class="wc-input" id="auConfirm" type="password" autocomplete="new-password" placeholder="Re-enter your password">
+      <div class="wc-pass-wrap">
+        <input class="wc-input" id="auConfirm" type="password" autocomplete="new-password" placeholder="Re-enter your password">
+        <button type="button" class="wc-eye" id="auConfirmEye" aria-label="Show password" data-target="auConfirm">
+          <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 004.2 4.2M6.6 6.7C4.2 8.3 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1.1M17.5 6.1C16.2 5.4 14.7 5 12 5c-.6 0-1.2.03-1.8.1"/></svg>
+        </button>
+      </div>
     </div>
     <button class="wc-btn" id="auSubmit" style="width:100%">Sign in</button>
     <p class="wc-note" style="margin-top:16px" id="auHint">New here? Switch to <b>Create account</b> to register.</p>
@@ -1301,7 +1321,11 @@ body[data-view="share"] .tj-home-btn{display:inline-flex}
 <section id="leaderboard-root" class="tj-panel" hidden>
   <div class="wc-eyebrow">Premium English &middot; Practice</div>
   <h1 class="wc-h1">Leaderboard</h1>
-  <p class="wc-sub">Ranked by time spent practising today. Every minute you're actively on the site counts.</p>
+  <p class="wc-sub">Ranked by time spent practising. Every minute you're actively on the site counts.</p>
+  <div class="au-tabs" id="lbTabs" style="max-width:280px">
+    <button class="on" data-lbmode="today">Today</button>
+    <button data-lbmode="month">This month</button>
+  </div>
   <div id="lbRoot"><div class="wc-loading"><span class="d"></span> Loading leaderboard…</div></div>
 </section>
 
@@ -2258,6 +2282,7 @@ function startTimer(){
 function renderQuestion(){
   const q = state.questions[state.idx];
   state.locked = false;
+  state.selected = null;
 
   $("statQ").textContent = (state.idx+1)+"/"+state.questions.length;
   $("statScore").textContent = currentPoints();
@@ -2270,6 +2295,7 @@ function renderQuestion(){
 
   $("fbText").innerHTML = "";
   $("nextBtn").classList.add("hidden");
+  $("confirmBtn").classList.add("hidden");
 
   const box = $("options");
   box.innerHTML = "";
@@ -2279,9 +2305,23 @@ function renderQuestion(){
     b.className = "opt";
     b.dataset.index = i;
     b.innerHTML = '<span class="key">'+keys[i]+'</span><span class="txt">'+val+'</span><span class="mark"></span>';
-    b.addEventListener("click", ()=>answer(i));
+    b.addEventListener("click", ()=>selectOption(i));
     box.appendChild(b);
   });
+}
+
+function selectOption(i){
+  if(state.locked) return;
+  state.selected = i;
+  document.querySelectorAll("#options .opt").forEach(o=>{
+    o.classList.toggle("selected", Number(o.dataset.index)===i);
+  });
+  $("confirmBtn").classList.remove("hidden");
+}
+
+function confirmSelected(){
+  if(state.locked || state.selected===null) return;
+  answer(state.selected);
 }
 
 /* ---------------- Points ---------------- */
@@ -2317,6 +2357,7 @@ function answer(i){
   const q = state.questions[state.idx];
   q.answeredIndex = i;
 
+  $("confirmBtn").classList.add("hidden");
   const opts = document.querySelectorAll("#options .opt");
   opts.forEach(o=>{
     o.classList.add("locked");
@@ -2511,6 +2552,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
 
   $("startBtn").addEventListener("click", startSession);
   $("lampBtn").addEventListener("click", useHint);
+  $("confirmBtn").addEventListener("click", confirmSelected);
   $("nextBtn").addEventListener("click", nextQuestion);
   $("againBtn").addEventListener("click", playAgain);
   $("menuBtn").addEventListener("click", backToMenu);
@@ -2519,13 +2561,15 @@ window.addEventListener("DOMContentLoaded", ()=>{
     $("reviewToggle").textContent = hidden ? "Show answer review ▾" : "Hide answer review ▴";
   });
 
-  // Keyboard: 1-4 to answer, Enter/Space to advance
+  // Keyboard: 1-4 to select, Enter to confirm/advance, Space to advance
   document.addEventListener("keydown", (e)=>{
     if($("screen-quiz").classList.contains("hidden")) return;
     if(["1","2","3","4"].includes(e.key)){
       const i=Number(e.key)-1;
       const opts=document.querySelectorAll("#options .opt");
-      if(opts[i] && !state.locked) answer(i);
+      if(opts[i] && !state.locked) selectOption(i);
+    } else if(e.key==="Enter" && !$("confirmBtn").classList.contains("hidden")){
+      e.preventDefault(); confirmSelected();
     } else if((e.key==="Enter"||e.key===" ") && !$("nextBtn").classList.contains("hidden")){
       e.preventDefault(); nextQuestion();
     } else if(e.key.toLowerCase()==="h" && !state.locked){
@@ -2911,7 +2955,7 @@ function nextQuestion(){
   var pool=quiz.pool, cid=pool[Math.floor(Math.random()*pool.length)], c=CARD[cid];
   var types=['meaning','reverse','gap','topic']; if(canOdd(cid)) types.push('odd');
   var type=types[Math.floor(Math.random()*types.length)];
-  quiz.answered=false; quiz.cur=cid;
+  quiz.answered=false; quiz.cur=cid; quiz.selected=null;
   var q=buildQuestion(type,cid);
   quiz.correct=q.correct;
   var pct=Math.round(quiz.i/quiz.n*100);
@@ -2924,6 +2968,7 @@ function nextQuestion(){
         return '<div class="opt" data-opt="'+k+'"><span class="kbd">'+(k+1)+'</span><span>'+o.html+'</span></div>';
       }).join('')+'</div>'+
       '<div class="qfoot"><span class="qscore mono" style="color:var(--faint)">Question '+(quiz.i+1)+' of '+quiz.n+'</span>'+
+        '<button class="btn btn-gold btn-sm" id="qconfirm" style="display:none">Confirm answer</button>'+
         '<button class="btn btn-gold btn-sm" id="qnext" style="display:none">Next →</button></div>'+
     '</div></div></div>';
   quiz.opts=q.opts;
@@ -2974,8 +3019,19 @@ function blankOut(ex,col){
   if(i<0){var base=col.replace(/\s*\(.*?\)\s*/g,'').replace(/\s*\/\s*.*$/,'').replace(/\s*\+\s*verb.*$/i,'').trim();i=ex.toLowerCase().indexOf(base.toLowerCase());if(i>=0)return esc(ex.slice(0,i))+'<span class="blank"></span>'+esc(ex.slice(i+base.length));return esc(ex)+' <span class="blank"></span>';}
   return esc(ex.slice(0,i))+'<span class="blank"></span>'+esc(ex.slice(i+col.length));
 }
+function selectOpt(k){
+  if(!quiz || quiz.answered) return;
+  quiz.selected=k;
+  $$('.opt').forEach(function(o,idx){ o.classList.toggle('selected', idx===k); });
+  var cb=$('#qconfirm'); if(cb) cb.style.display='inline-flex';
+}
+function confirmAnswer(){
+  if(!quiz || quiz.answered || quiz.selected==null) return;
+  answerQuiz(quiz.selected);
+}
 function answerQuiz(k){
   if(quiz.answered)return; quiz.answered=true;
+  var cb=$('#qconfirm'); if(cb) cb.style.display='none';
   var opts=$$('.opt'); var chosen=opts[k]; var ok=quiz.opts[k].ok;
   opts.forEach(function(o,idx){ o.classList.add('done'); if(quiz.opts[idx].ok)o.classList.add('correct'); });
   if(ok){ quiz.score++; CK.touchStreak(); } else { chosen.classList.add('wrong'); }
@@ -3354,7 +3410,8 @@ document.addEventListener('click',function(e){
   var rate=e.target.closest('[data-rate]');
   if(rate){ doRate(rate.getAttribute('data-rate')); return; }
   var opt=e.target.closest('[data-opt]');
-  if(opt && quiz && !quiz.answered){ answerQuiz(parseInt(opt.getAttribute('data-opt'),10)); return; }
+  if(opt && quiz && !quiz.answered){ selectOpt(parseInt(opt.getAttribute('data-opt'),10)); return; }
+  if(e.target.id==='qconfirm'){ confirmAnswer(); return; }
   if(e.target.id==='qnext'){ nextQuestion(); return; }
   if(e.target.id==='revealBtn'){ sess.flipped=true; renderCard(); return; }
   var flip=e.target.closest('#flip');
@@ -3367,7 +3424,8 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('keydown',function(e){
   if($('#search').classList.contains('open')){ return; } // handled by search module
-  if(quiz && !quiz.answered && /^[1-4]$/.test(e.key)){ var k=parseInt(e.key,10)-1; var o=$$('.opt')[k]; if(o)answerQuiz(k); }
+  if(quiz && !quiz.answered && /^[1-4]$/.test(e.key)){ var k=parseInt(e.key,10)-1; var o=$$('.opt')[k]; if(o)selectOpt(k); }
+  else if(quiz && !quiz.answered && quiz.selected!=null && e.key==='Enter'){ e.preventDefault(); confirmAnswer(); }
   else if(quiz && quiz.answered && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); nextQuestion(); }
   else if(sess){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); if(!sess.flipped){sess.flipped=true;renderCard();} }
     else if(sess.flipped){ var m={'1':'again','2':'hard','3':'good','4':'easy'}; if(m[e.key])doRate(m[e.key]); } }
@@ -3672,6 +3730,16 @@ function renderAcct(){
 /* ---------- auth form ---------- */
 function wireAuthForm(){
   var mode="in";
+  document.querySelectorAll(".wc-eye").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var input=$(btn.getAttribute("data-target"));
+      var showing = input.type==="text";
+      input.type = showing ? "password" : "text";
+      btn.querySelector(".eye-open").hidden = showing ? false : true;
+      btn.querySelector(".eye-closed").hidden = showing ? true : false;
+      btn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+    });
+  });
   function setMode(m){
     mode=m;
     $("auTabIn").classList.toggle("on",m==="in");
@@ -3997,6 +4065,29 @@ function fmtDur(sec){
   return sec+"s";
 }
 
+var lbMode="today", lbRowsCache=null;
+
+function renderLbRows(rows,mode){
+  var root=$("lbRoot");
+  if(!rows.length){ root.innerHTML='<div class="wc-empty">No activity yet '+(mode==="today"?"today":"this month")+'. Be the first!</div>'; return; }
+  var sorted=rows.slice().sort(function(a,b){
+    return mode==="today" ? (b.today_seconds-a.today_seconds) : (b.month_seconds-a.month_seconds);
+  });
+  var html='<div class="wc-card" style="padding:0;overflow:hidden">';
+  sorted.forEach(function(r,i){
+    var rank=i+1;
+    var val = mode==="today" ? r.today_seconds : r.month_seconds;
+    var crown=(rank===1 && val>0) ? '<span title="Leader" style="margin-right:6px">\uD83D\uDC51</span>' : '';
+    html+='<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;'+(i>0?'border-top:1px solid var(--tj-border,rgba(127,127,127,.18));':'')+'">'+
+      '<div style="font-weight:700;min-width:28px;opacity:.6">#'+rank+'</div>'+
+      '<div style="flex:1;font-weight:600">'+crown+esc(r.name)+'</div>'+
+      '<div style="text-align:right;min-width:100px"><div style="font-weight:700">'+fmtDur(val)+'</div><div style="font-size:12px;opacity:.6">'+(mode==="today"?"today":"this month")+'</div></div>'+
+    '</div>';
+  });
+  html+='</div>';
+  root.innerHTML=html;
+}
+
 async function loadLeaderboard(){
   var root=$("lbRoot"); if(!root) return;
   if(!configOk){ root.innerHTML='<div class="wc-err">Backend not configured yet.</div>'; return; }
@@ -4006,23 +4097,17 @@ async function loadLeaderboard(){
     var res=await fetch(FN+"leaderboard",{headers:{Authorization:"Bearer "+t}});
     var data=await res.json();
     if(!res.ok){ root.innerHTML='<div class="wc-err">'+esc(data.error||"Could not load leaderboard.")+'</div>'; return; }
-    var rows=data.leaderboard||[];
-    if(!rows.length){ root.innerHTML='<div class="wc-empty">No activity yet today. Be the first!</div>'; return; }
-    var html='<div class="wc-card" style="padding:0;overflow:hidden">';
-    rows.forEach(function(r,i){
-      var rank=i+1;
-      var crown=(rank===1 && r.today_seconds>0) ? '<span title="Today\'s leader" style="margin-right:6px">\uD83D\uDC51</span>' : '';
-      html+='<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;'+(i>0?'border-top:1px solid var(--tj-border,rgba(127,127,127,.18));':'')+'">'+
-        '<div style="font-weight:700;min-width:28px;opacity:.6">#'+rank+'</div>'+
-        '<div style="flex:1;font-weight:600">'+crown+esc(r.name)+'</div>'+
-        '<div style="text-align:right;min-width:90px"><div style="font-weight:700">'+fmtDur(r.today_seconds)+'</div><div style="font-size:12px;opacity:.6">today</div></div>'+
-        '<div style="text-align:right;min-width:90px"><div style="font-weight:700">'+fmtDur(r.month_seconds)+'</div><div style="font-size:12px;opacity:.6">this month</div></div>'+
-      '</div>';
-    });
-    html+='</div>';
-    root.innerHTML=html;
+    lbRowsCache=data.leaderboard||[];
+    renderLbRows(lbRowsCache,lbMode);
   }catch(e){ root.innerHTML='<div class="wc-err">Network error. Please try again.</div>'; }
 }
+document.addEventListener("click",function(e){
+  var b=e.target.closest("#lbTabs button");
+  if(!b) return;
+  lbMode=b.getAttribute("data-lbmode");
+  document.querySelectorAll("#lbTabs button").forEach(function(x){ x.classList.toggle("on",x===b); });
+  if(lbRowsCache) renderLbRows(lbRowsCache,lbMode);
+});
 
 window.TJ={
   getSb:function(){return sb;},
