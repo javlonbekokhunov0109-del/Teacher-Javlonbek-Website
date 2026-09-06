@@ -1369,34 +1369,64 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
 <section id="multilevel-root" class="tj-panel" hidden>
   <div class="wc-eyebrow">AI Multilevel CEFR Examiner</div>
   <h1 class="wc-h1">Multilevel Writing Checker</h1>
-  <p class="wc-sub">Choose your task, paste the prompt and your response. The AI examiner scores Task Achievement, Organisation &amp; Cohesion, Vocabulary and Grammar out of 17, converts it to the official 75-point scale, and estimates your CEFR level.</p>
+  <p class="wc-sub">Each task is scored on its own official band scale (Task 1.1: 0-5, Task 1.2: 0-6, Task 2: 0-6). Check one task quickly, or do all three together for the official raw score out of 17, converted to /75, with your CEFR level.</p>
 
-  <div class="wc-card">
-    <div class="wc-row">
-      <label class="wc-label">Task type</label>
-      <div class="au-tabs" id="mlTaskTabs" style="max-width:420px">
-        <button class="on" data-mltask="1.1">Task 1.1</button>
-        <button data-mltask="1.2">Task 1.2</button>
-        <button data-mltask="2">Task 2</button>
-      </div>
-    </div>
-    <div class="wc-row">
-      <label class="wc-label" for="mlQuestion">Task prompt</label>
-      <textarea class="wc-area" id="mlQuestion" placeholder="Paste the exact task prompt / instructions…"></textarea>
-    </div>
-    <div class="wc-row">
-      <label class="wc-label" for="mlEssay">Your response</label>
-      <textarea class="wc-area essay" id="mlEssay" placeholder="Write or paste your response here…"></textarea>
-      <div class="wc-meta">
-        <span id="mlWords">0 words</span>
-        <span id="mlRec">Task 1.1 target: ~50 words</span>
-      </div>
-    </div>
-    <div id="mlErr"></div>
-    <button class="wc-btn" id="mlCheck">Check my writing</button>
+  <div class="au-tabs" id="mlModeTabs">
+    <button class="on" data-mlmode="single">Single Task</button>
+    <button data-mlmode="full">Full Writing Section (all 3 tasks)</button>
   </div>
 
-  <div id="mlResult" class="wc-result"></div>
+  <div id="mlSinglePanel">
+    <div class="wc-card">
+      <div class="wc-row">
+        <label class="wc-label">Task type</label>
+        <div class="au-tabs" id="mlTaskTabs" style="max-width:420px">
+          <button class="on" data-mltask="1.1">Task 1.1</button>
+          <button data-mltask="1.2">Task 1.2</button>
+          <button data-mltask="2">Task 2</button>
+        </div>
+      </div>
+      <div class="wc-row">
+        <label class="wc-label" for="mlQuestion">Task prompt</label>
+        <textarea class="wc-area" id="mlQuestion" placeholder="Paste the exact task prompt / instructions…"></textarea>
+      </div>
+      <div class="wc-row">
+        <label class="wc-label" for="mlEssay">Your response</label>
+        <textarea class="wc-area essay" id="mlEssay" placeholder="Write or paste your response here…"></textarea>
+        <div class="wc-meta">
+          <span id="mlWords">0 words</span>
+          <span id="mlRec">Task 1.1 target: ~50 words</span>
+        </div>
+      </div>
+      <div id="mlErr"></div>
+      <button class="wc-btn" id="mlCheck">Check my writing</button>
+    </div>
+    <div id="mlResult" class="wc-result"></div>
+  </div>
+
+  <div id="mlFullPanel" hidden>
+    <div class="wc-card">
+      <div class="wc-eyebrow" style="margin-bottom:6px">Task 1.1 &middot; informal reply (~50 words)</div>
+      <div class="wc-row"><label class="wc-label">Task prompt</label><textarea class="wc-area" id="mlfQ11" placeholder="Paste the Task 1.1 prompt…"></textarea></div>
+      <div class="wc-row"><label class="wc-label">Your response</label><textarea class="wc-area" id="mlfE11" placeholder="Write or paste your Task 1.1 response…"></textarea>
+        <div class="wc-meta"><span id="mlfW11">0 words</span></div></div>
+    </div>
+    <div class="wc-card">
+      <div class="wc-eyebrow" style="margin-bottom:6px">Task 1.2 &middot; formal reply (120-150 words)</div>
+      <div class="wc-row"><label class="wc-label">Task prompt</label><textarea class="wc-area" id="mlfQ12" placeholder="Paste the Task 1.2 prompt…"></textarea></div>
+      <div class="wc-row"><label class="wc-label">Your response</label><textarea class="wc-area" id="mlfE12" placeholder="Write or paste your Task 1.2 response…"></textarea>
+        <div class="wc-meta"><span id="mlfW12">0 words</span></div></div>
+    </div>
+    <div class="wc-card">
+      <div class="wc-eyebrow" style="margin-bottom:6px">Task 2 &middot; discussion post (180-200 words)</div>
+      <div class="wc-row"><label class="wc-label">Task prompt</label><textarea class="wc-area" id="mlfQ2" placeholder="Paste the Task 2 prompt…"></textarea></div>
+      <div class="wc-row"><label class="wc-label">Your response</label><textarea class="wc-area essay" id="mlfE2" placeholder="Write or paste your Task 2 response…"></textarea>
+        <div class="wc-meta"><span id="mlfW2">0 words</span></div></div>
+      <div id="mlfErr"></div>
+      <button class="wc-btn" id="mlfCheck">Check full section</button>
+    </div>
+    <div id="mlfResult" class="wc-result"></div>
+  </div>
 </section>
 
 <!-- ================= ADMIN DASHBOARD ================= -->
@@ -3899,7 +3929,7 @@ function wireChecker(){
 }
 
 /* ---------- Multilevel CEFR Writing Checker ---------- */
-var mlTaskType="1.1";
+var mlTaskType="1.1", mlMode="single";
 var ML_TARGETS={"1.1":"~50 words (informal reply)","1.2":"120-150 words (formal reply)","2":"180-200 words (essay)"};
 
 function wireMlChecker(){
@@ -3907,12 +3937,26 @@ function wireMlChecker(){
   function wc(){ var m=(es.value.trim().match(/\b[\w'-]+\b/g)||[]).length; $("mlWords").textContent=m+" word"+(m===1?"":"s"); }
   es.addEventListener("input",wc); wc();
 
+  document.querySelectorAll("#mlModeTabs button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#mlModeTabs button").forEach(function(x){ x.classList.toggle("on",x===b); });
+      mlMode=b.getAttribute("data-mlmode");
+      $("mlSinglePanel").hidden = mlMode!=="single";
+      $("mlFullPanel").hidden = mlMode!=="full";
+    });
+  });
+
   document.querySelectorAll("#mlTaskTabs button").forEach(function(b){
     b.addEventListener("click",function(){
       document.querySelectorAll("#mlTaskTabs button").forEach(function(x){ x.classList.toggle("on",x===b); });
       mlTaskType=b.getAttribute("data-mltask");
       $("mlRec").textContent="Task "+mlTaskType+" target: "+ML_TARGETS[mlTaskType];
     });
+  });
+
+  [["mlfE11","mlfW11"],["mlfE12","mlfW12"],["mlfE2","mlfW2"]].forEach(function(pair){
+    var ta=$(pair[0]), lbl=$(pair[1]);
+    ta.addEventListener("input",function(){ var m=(ta.value.trim().match(/\b[\w'-]+\b/g)||[]).length; lbl.textContent=m+" word"+(m===1?"":"s"); });
   });
 
   $("mlCheck").addEventListener("click",async function(){
@@ -3927,32 +3971,68 @@ function wireMlChecker(){
     $("mlResult").innerHTML='<div class="wc-card"><div class="wc-loading"><span class="d"></span> The AI examiner is reading your response…</div></div>';
     try{
       var t=await token();
-      var res=await fetch(FN+"check-writing-multilevel",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({taskType:mlTaskType,question:question,essay:essay})});
+      var res=await fetch(FN+"check-writing-multilevel",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({mode:"single",taskType:mlTaskType,question:question,essay:essay})});
       var data=await res.json();
       if(!res.ok){ $("mlResult").innerHTML=""; $("mlErr").innerHTML='<div class="wc-err">'+esc(data.error||"Could not check your writing.")+'</div>'; }
-      else { renderMlResult(data); }
+      else { renderMlSingleResult(data); }
     }catch(e){ $("mlResult").innerHTML=""; $("mlErr").innerHTML='<div class="wc-err">Network error. Please try again.</div>'; }
     btn.disabled=false; btn.textContent=old;
     $("mlResult").scrollIntoView({behavior:"smooth",block:"start"});
   });
+
+  $("mlfCheck").addEventListener("click",async function(){
+    $("mlfErr").innerHTML="";
+    if(!configOk){ $("mlfErr").innerHTML='<div class="wc-err">Backend not configured yet.</div>'; return; }
+    if(!user){ pendingView="multilevel"; nav("auth"); return; }
+    var tasks={
+      "1.1":{question:$("mlfQ11").value.trim(), essay:$("mlfE11").value.trim()},
+      "1.2":{question:$("mlfQ12").value.trim(), essay:$("mlfE12").value.trim()},
+      "2":{question:$("mlfQ2").value.trim(), essay:$("mlfE2").value.trim()}
+    };
+    for(var k in tasks){ if(!tasks[k].question||!tasks[k].essay){ $("mlfErr").innerHTML='<div class="wc-err">Please fill in the prompt and response for all three tasks.</div>'; return; } }
+
+    var btn=$("mlfCheck"); btn.disabled=true; var old=btn.textContent; btn.innerHTML='<span class="wc-spin"></span>Assessing all three tasks…';
+    $("mlfResult").innerHTML='<div class="wc-card"><div class="wc-loading"><span class="d"></span> The AI examiner is reading all three responses…</div></div>';
+    try{
+      var t=await token();
+      var res=await fetch(FN+"check-writing-multilevel",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({mode:"full",tasks:tasks})});
+      var data=await res.json();
+      if(!res.ok){ $("mlfResult").innerHTML=""; $("mlfErr").innerHTML='<div class="wc-err">'+esc(data.error||"Could not check your writing.")+'</div>'; }
+      else { renderMlFullResult(data); }
+    }catch(e){ $("mlfResult").innerHTML=""; $("mlfErr").innerHTML='<div class="wc-err">Network error. Please try again.</div>'; }
+    btn.disabled=false; btn.textContent=old;
+    $("mlfResult").scrollIntoView({behavior:"smooth",block:"start"});
+  });
 }
 
-function mlCritRow(name,obj){
-  var pct=obj.max? Math.max(0,Math.min(100,(obj.score/obj.max)*100)) : 0;
-  return '<div class="wc-crit"><div class="top"><span class="name">'+esc(name)+'</span><span class="wc-pill">'+obj.score+'/'+obj.max+'</span></div>'+
-    '<div class="wc-bar"><i style="width:'+pct+'%"></i></div><div class="cmt">'+esc(obj.comment||"")+'</div></div>';
+function mlTaskCardHtml(d){
+  var pct=d.max_band? Math.max(0,Math.min(100,(d.band/d.max_band)*100)) : 0;
+  var html='<div class="wc-crit"><div class="top"><span class="name">'+esc(d.task_type)+'</span><span class="wc-pill">'+d.band+'/'+d.max_band+' &middot; '+esc(d.band_label)+'</span></div>'+
+    '<div class="wc-bar"><i style="width:'+pct+'%"></i></div><div class="cmt">'+esc(d.comment||"")+'</div></div>';
+  if(d.corrections&&d.corrections.length){
+    html+='<div class="wc-sec"><h4>'+esc(d.task_type)+' — Corrections</h4>';
+    d.corrections.forEach(function(cr){
+      html+='<div class="wc-fix"><span class="o">'+esc(cr.original)+'</span><span class="arrow">→</span><span class="c">'+esc(cr.correction)+'</span>'+
+        (cr.explanation?'<span class="why">'+esc(cr.explanation)+'</span>':'')+'</div>';
+    });
+    html+='</div>';
+  }
+  if(d.weaknesses&&d.weaknesses.length){
+    html+='<div class="wc-sec"><h4>'+esc(d.task_type)+' — Weaknesses</h4><ul class="wc-list warn">';
+    d.weaknesses.forEach(function(w){ html+='<li>'+esc(w)+'</li>'; }); html+='</ul></div>';
+  }
+  if(d.improvements&&d.improvements.length){
+    html+='<div class="wc-sec"><h4>'+esc(d.task_type)+' — How to improve</h4><ul class="wc-list tip">';
+    d.improvements.forEach(function(w){ html+='<li>'+esc(w)+'</li>'; }); html+='</ul></div>';
+  }
+  html+='<p class="wc-note" style="margin-top:10px">Word count: '+d.word_count+'</p>';
+  return html;
 }
 
-function renderMlResult(d){
-  var c=d.criteria||{};
+function renderMlSingleResult(d){
   var html='<div class="wc-card">';
-  html+='<div class="wc-overall"><div class="wc-band"><div class="n">'+d.converted_score+'</div><div class="l">/ 75</div></div>'+
-        '<div><h3>'+esc(d.task_type)+' &mdash; Raw '+d.raw_score+'/17 &middot; CEFR '+esc(d.cefr_level)+'</h3><p>'+esc(d.summary||"")+'</p></div></div>';
-  html+='<div class="wc-crits">'+
-    mlCritRow("Task Achievement",c.task_achievement||{score:0,max:5})+
-    mlCritRow("Organisation & Cohesion",c.organisation_cohesion||{score:0,max:4})+
-    mlCritRow("Vocabulary",c.vocabulary||{score:0,max:4})+
-    mlCritRow("Grammar",c.grammar||{score:0,max:4})+'</div>';
+  html+='<div class="wc-overall"><div class="wc-band"><div class="n">'+d.band+'</div><div class="l">/ '+d.max_band+'</div></div>'+
+        '<div><h3>'+esc(d.task_type)+' &mdash; '+esc(d.band_label)+'</h3><p>'+esc(d.comment||"")+'</p></div></div>';
   if(d.corrections&&d.corrections.length){
     html+='<div class="wc-sec"><h4>Corrections</h4>';
     d.corrections.forEach(function(cr){
@@ -3972,6 +4052,17 @@ function renderMlResult(d){
   html+='<p class="wc-note" style="margin-top:16px">Word count: '+d.word_count+'</p>';
   html+='</div>';
   $("mlResult").innerHTML=html;
+}
+
+function renderMlFullResult(d){
+  var html='<div class="wc-card">';
+  html+='<div class="wc-overall"><div class="wc-band"><div class="n">'+d.converted_score+'</div><div class="l">/ 75</div></div>'+
+        '<div><h3>Raw '+d.raw_score+'/17 &middot; CEFR '+esc(d.cefr_level)+'</h3><p>Combined score across Task 1.1, Task 1.2 and Task 2.</p></div></div>';
+  html+='</div>';
+  ["1.1","1.2","2"].forEach(function(k){
+    html+='<div class="wc-card">'+mlTaskCardHtml(d.tasks[k])+'</div>';
+  });
+  $("mlfResult").innerHTML=html;
 }
 
 function critRow(name,obj){

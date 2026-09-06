@@ -1,20 +1,31 @@
 // POST /.netlify/functions/check-writing-multilevel
-// Body: { taskType: "1.1"|"1.2"|"2", question, essay }
+// Body EITHER:
+//   { mode: "single", taskType: "1.1"|"1.2"|"2", question, essay }
+// OR:
+//   { mode: "full", tasks: { "1.1": {question,essay}, "1.2": {...}, "2": {...} } }
+//
 // Auth: Bearer <supabase access token>
 //
-// Assesses a Multilevel CEFR writing task (Task 1.1, Task 1.2, or Task 2)
-// using Gemini for the qualitative judgement (raw score /17, criteria
-// breakdown, corrections, weaknesses, tips), then converts that raw score
-// to /75 and a CEFR level using fixed lookup tables in THIS file — never
-// via the model's own arithmetic — so the conversion always exactly
-// matches the official table.
+// Each Multilevel task (1.1, 1.2, 2) is graded on its OWN single holistic
+// band scale (not four analytic sub-scores) using the real descriptor
+// tables below, transcribed from the images embedded in the teacher's
+// uploaded "CEFR_MARKING_.docx". Max bands: Task 1.1 = 5, Task 1.2 = 6,
+// Task 2 = 6. Those three maxima sum to exactly 17 — that IS the official
+// "17-point" writing raw score, achieved only when all three tasks from
+// one sitting are combined (mode "full"). A single task alone never
+// reaches 17, so single-task mode reports that task's own band (out of 5
+// or 6) and does NOT force a fake /75 conversion.
 //
-// IMPORTANT — read before changing scoring behaviour:
-// The per-criterion point split below (Task Achievement/Organisation/
-// Vocabulary/Grammar out of 17) is NOT from an official document — the
-// official Multilevel criteria descriptors for Task 1.1/1.2/2 were not
-// supplied. It's a reasonable placeholder split. If Javlonbek provides the
-// real official criteria, replace SYSTEM_PROMPT's rubric section with it.
+// The 17->75 conversion table and CEFR band thresholds are applied by
+// THIS code (not trusted to the AI's arithmetic) so they always exactly
+// match the official values.
+//
+// KNOWN GAP (told to the user): the source images did not fully show
+// Task 1.2's bottom two bands (1 and 0). Those two entries below are
+// reconstructed by pattern-matching against Task 1.1's and Task 2's
+// equivalent bottom bands, which share near-identical wording at every
+// other level — flagged here and in the site's chat reply, not silently
+// presented as directly-sourced.
 
 const { json, missingEnv, getUserFromRequest } = require("./_shared");
 
@@ -25,7 +36,7 @@ function countWords(str) {
   return m ? m.length : 0;
 }
 
-// Exact 17 -> 75 conversion table, as supplied (0.5-point steps).
+// Exact 17 -> 75 conversion table (0.5-point steps), as supplied by the user.
 const CONVERSION_TABLE = [
   [17, 75], [16.5, 74], [16, 72], [15.5, 69], [15, 67], [14.5, 65], [14, 63],
   [13.5, 62], [13, 61], [12.5, 59], [12, 57], [11.5, 56], [11, 54], [10.5, 53],
@@ -33,18 +44,15 @@ const CONVERSION_TABLE = [
   [6.5, 40], [6, 38], [5.5, 35], [5, 32], [4.5, 29], [4, 26], [3.5, 23],
   [3, 21], [2.5, 18], [2, 15], [1.5, 13], [1, 11], [0.5, 10], [0, 0],
 ];
-
 function convertRawTo75(raw) {
-  // Snap to nearest 0.5 step in range, then look up the exact table value.
   let r = Math.round(Number(raw) * 2) / 2;
   r = Math.max(0, Math.min(17, isFinite(r) ? r : 0));
   const hit = CONVERSION_TABLE.find((row) => row[0] === r);
   return hit ? hit[1] : 0;
 }
-
-// CEFR bands sourced from Uzbekistan's official National Testing Center
-// document (uzbmb.uz) for the /75 scale, since the uploaded materials for
-// this tool didn't include CEFR thresholds themselves.
+// CEFR bands for the /75 scale, from Uzbekistan's official National
+// Testing Center document (uzbmb.uz) — the uploaded materials for this
+// tool didn't include CEFR thresholds themselves.
 function cefrFor75(score75) {
   if (score75 >= 65) return "C1";
   if (score75 >= 51) return "B2";
@@ -52,54 +60,146 @@ function cefrFor75(score75) {
   return "Below B1";
 }
 
-const TASK_GUIDANCE = {
-  "1.1":
-    "Task 1.1: an informal reply to a friend's message. Typical length ~50 words. Register: informal/friendly. Every requested point in the prompt must be addressed.",
-  "1.2":
-    "Task 1.2: a formal or semi-formal reply to the sender of the original message, reusing and expanding the same content for a different, more formal audience. Typical length ~120-150 words. Register: formal/semi-formal, consistent throughout.",
-  "2":
-    "Task 2: a discursive essay with a clear personal stance, developed reasons and concrete examples, organised into clear paragraphs. Typical length ~180-200 words.",
+// ---- Real band-descriptor tables (transcribed from the docx's images) ----
+const BANDS = {
+  "1.1": {
+    max: 5,
+    prompt: "Task 1.1 is an informal reply to a friend's message (~50 words).",
+    table: [
+      [5, "B2 or above", "Performance is likely to be above B1 level."],
+      [4, "Higher B1", "Response is on topic and shows the following features: Register may not be consistently appropriate. Good control of simple grammatical structures, errors occur when attempting complex structures. Punctuation and spelling are mostly accurate; errors do not cause misunderstanding. Vocabulary is sufficient to respond to the task. Uses simple cohesive devices to organize the response as a linear sequence of sentences."],
+      [3, "Lower B1", "Response is partially on topic and shows the following features: Register may not be consistently appropriate. Good control of simple grammatical structures, errors occur when attempting complex structures. Punctuation and spelling are mostly accurate; errors do not cause misunderstanding. Vocabulary is sufficient to respond to the task. Uses simple cohesive devices to organize the response as a linear sequence of sentences."],
+      [2, "A2", "Response may be partially on topic and shows the following features: Uses simple grammatical structures to produce writing at the sentence level. Errors with simple structures are common and sometimes impede understanding. Punctuation and spelling mistakes are noticeable. Vocabulary is not sufficient to respond to the task. Inappropriate lexical choices are noticeable and sometimes impede understanding. Response may not be organized as a cohesive text."],
+      [1, "A1 or lower", "Performance is below A2, or substantial use of L1, or no meaningful language, or the response is completely off-topic (e.g. memorized script, guessing)."],
+      [0, "—", "No attempt (answer sheet is blank)."],
+    ],
+  },
+  "1.2": {
+    max: 6,
+    prompt: "Task 1.2 is a formal/semi-formal reply to the sender of the original message, reusing and expanding the same content for a different, more formal audience (~120-150 words).",
+    table: [
+      [6, "C2", "Performance is likely to be above C1 level."],
+      [5, "C1", "Response is on topic and shows the following features: Register is consistently appropriate. A range of complex grammar constructions is used accurately; some minor errors occur, but do not impede understanding. No errors in spelling and punctuation. A range of vocabulary is used to discuss the topics required by the task; some awkward usage or slightly inappropriate lexical choices. A range of cohesive devices is used to indicate the links between ideas."],
+      [4, "Higher B2", "Response is on topic and shows the following features: Register is consistently appropriate. Some complex grammar constructions are used accurately; errors do not lead to misunderstanding. Minor errors in punctuation and spelling occur but do not impede understanding. Sufficient range of vocabulary to discuss the topics required by the task; inappropriate lexical choices do not lead to misunderstanding. A limited number of cohesive devices are used to indicate the links between ideas."],
+      [3, "Lower B2", "Response may be partially on topic and shows the following features: Register may not be consistently appropriate. Some complex grammar constructions are used accurately; errors do not lead to misunderstanding. Minor errors in punctuation and spelling occur but do not impede understanding. Sufficient range of vocabulary to discuss the topics required by the task; inappropriate lexical choices do not lead to misunderstanding. A limited number of cohesive devices are used to indicate the links between ideas."],
+      [2, "B1", "Response may be partially on topic and shows the following features: Register may not be consistently appropriate. Good control of simple grammatical structures, errors occur when attempting complex structures. Punctuation and spelling are mostly accurate; errors do not cause misunderstanding. Vocabulary is sufficient to respond to the task. Uses simple cohesive devices to organize the response as a linear sequence of sentences. [Reconstructed by pattern-match with Task 1.1's band 4 — the source image was cut off here.]"],
+      [1, "A2", "Response may be partially on topic and shows the following features: uses simple grammatical structures with errors that are common and sometimes impede understanding; punctuation and spelling mistakes are noticeable; vocabulary is not sufficient and inappropriate lexical choices sometimes impede understanding; response may not be organized as a cohesive text. [Reconstructed by analogy with Task 1.1's band 2 — not directly captured in the source images.]"],
+      [0, "—", "No meaningful language, substantial use of L1, completely off-topic (e.g. memorized script, guessing), or no attempt. [Reconstructed by analogy — not directly captured in the source images.]"],
+    ],
+  },
+  "2": {
+    max: 6,
+    prompt: "Task 2 (Part 2) is a discursive online-discussion post with a clear personal stance, developed reasons and concrete examples (180-200 words).",
+    table: [
+      [6, "C2", "Performance is likely to be above C1 level."],
+      [5, "C1", "Response shows the following features: Fully addresses the question with clear stance and relevant arguments. A range of complex grammar constructions is used accurately; some minor errors occur, but do not impede understanding. A range of vocabulary is used to discuss the topics required by the task; some awkward usage or slightly inappropriate lexical choices. Well-structured post or article with clear paragraphs; smooth flow of ideas and use of linking expressions."],
+      [4, "Higher B2", "Response shows the following features: Addresses the question clearly with minor digressions; stance is evident. Some complex grammar constructions are used accurately; errors do not lead to misunderstanding. Minor errors in punctuation and spelling occur but do not impede understanding. Sufficient range of vocabulary to discuss the topics required by the task; inappropriate lexical choices do not lead to misunderstanding. Clear structure with some use of connectors and logical flow."],
+      [3, "Lower B2", "Response shows the following features: Mostly relevant but may lack clarity in stance or have minor off-topic parts. Some complex grammar constructions are used accurately; errors do not lead to misunderstanding. Minor errors in punctuation and spelling occur but do not impede understanding. Sufficient range of vocabulary to discuss the topics required by the task; inappropriate lexical choices do not lead to misunderstanding. Some organization; transitions may be unclear or mechanical."],
+      [2, "B1", "Response shows the following features: Mostly relevant but may lack clarity in stance or have minor off-topic parts. Good control of simple grammatical structures, errors occur when attempting complex structures. Punctuation and spelling are mostly accurate; errors do not cause misunderstanding. Vocabulary is sufficient to respond to the task. Uses simple cohesive devices to organize the response as a linear sequence of sentences. [The vocabulary/cohesion bullets were reconstructed by pattern-match — the source image was cut off here.]"],
+      [1, "A2", "Response shows the following features: Limited focus on task; ideas may be unclear or partly off-topic. Uses simple grammatical structures to produce writing at the sentence level; errors with simple structures are common and sometimes impede understanding. Punctuation and spelling mistakes are noticeable. Vocabulary is not sufficient to respond to the task; inappropriate lexical choices are noticeable and sometimes impede understanding. Response may not be organized as a cohesive text."],
+      [0, "—", "No meaningful language, or substantial use of L1, or the response is completely off-topic (e.g. memorized script, guessing), or no attempt (answer sheet is blank)."],
+    ],
+  },
 };
 
-const SYSTEM_PROMPT = `You are a strict, experienced Multilevel CEFR Writing examiner (the Uzbekistan national English proficiency exam), assessing one of: Task 1.1, Task 1.2, or Task 2.
+function descriptorBlock(taskType) {
+  const b = BANDS[taskType];
+  return b.table
+    .map((row) => `Band ${row[0]} (${row[1]}): ${row[2]}`)
+    .join("\n");
+}
 
-Score using FOUR criteria that must sum to a raw score out of 17:
-- Task Achievement (0-5): does the response fulfil the task, address every required point, use the right register/audience for this specific task type, and stay on topic?
-- Organisation & Cohesion (0-4): paragraphing, logical progression, linking, clarity of relationships between ideas.
-- Vocabulary (0-4): range, precision, appropriacy, collocation, word formation, repetition, lexical errors.
-- Grammar (0-4): range and accuracy of structures, whether errors interfere with communication.
+function systemPromptFor(taskType) {
+  const b = BANDS[taskType];
+  return `You are a strict, experienced Multilevel CEFR Writing examiner (the Uzbekistan national English proficiency exam), assessing Task ${taskType}.
 
-Be objective and consistent, not a cheerleader. Do not inflate scores. Do not reward length, difficult vocabulary, or many linking words for their own sake — reward accurate, appropriate, task-fulfilling writing. A raw score may use 0.5 steps per criterion if needed, but the four criteria must sum to a value between 0 and 17.
+${b.prompt}
+
+Score the response using ONLY this official holistic band scale (0 to ${b.max} — an INTEGER, these are NOT sub-criteria to add up, pick the ONE band whose description best matches the response as a whole):
+
+${descriptorBlock(taskType)}
+
+Be objective, consistent, and evidence-based — not a cheerleader. Do not inflate scores. Do not reward length, difficult vocabulary, or many linking words for their own sake. Judge the response against the band descriptions above, choosing the closest match even if it doesn't match every bullet perfectly.
 
 Return ONLY a valid JSON object (no markdown, no commentary) with EXACTLY this shape:
 {
-  "task_achievement": { "score": <number 0-5>, "comment": "<1-2 sentences, evidence-based>" },
-  "organisation_cohesion": { "score": <number 0-4>, "comment": "<1-2 sentences>" },
-  "vocabulary": { "score": <number 0-4>, "comment": "<1-2 sentences>" },
-  "grammar": { "score": <number 0-4>, "comment": "<1-2 sentences>" },
-  "raw_score": <number 0-17, the exact sum of the four scores above>,
+  "band": <integer, 0 to ${b.max}>,
+  "band_label": "<the label from the table for that exact band, e.g. 'Higher B2'>",
+  "comment": "<2-3 sentences, evidence-based, citing what the student actually wrote and which descriptor features justify this band>",
   "corrections": [
-    { "original": "<exact phrase from the essay>", "correction": "<improved version>", "explanation": "<why, short>" }
+    { "original": "<exact phrase from the response>", "correction": "<improved version>", "explanation": "<why, short>" }
   ],
-  "weaknesses": [ "<specific weakness, what's wrong, why it matters, how to fix>", "..." ],
-  "improvements": [ "<concrete, actionable advice>", "..." ],
-  "summary": "<2-3 sentence overall verdict, objective and evidence-based>"
+  "weaknesses": [ "<specific weakness: what's wrong, why it matters, how to fix>", "..." ],
+  "improvements": [ "<concrete, actionable advice>", "..." ]
 }
 
 Rules:
-- Provide 4 to 8 of the most useful corrections. "original" must be copied verbatim from the essay.
-- Provide 3 to 5 weaknesses and 3 to 5 improvements.
-- If the response is off-topic, far too short, memorised, or otherwise clearly deficient, reflect that honestly and strictly in the scores — do not award points for merely writing in English.
-- Keep every string concise, specific, and evidence-based (quote or paraphrase what the student actually wrote).`;
+- Provide 3 to 6 of the most useful corrections. "original" must be copied verbatim from the response.
+- Provide 2 to 4 weaknesses and 2 to 4 improvements.
+- If the response is off-topic, far too short, memorised, or blank, reflect that honestly and strictly in the band — do not award points for merely writing in English.`;
+}
+
+async function gradeOneTask(taskType, question, essay) {
+  const words = countWords(essay);
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
+
+  const resp = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": process.env.GEMINI_API_KEY,
+    },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: systemPromptFor(taskType) }] },
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `TASK PROMPT:\n${question}\n\nSTUDENT RESPONSE (${words} words):\n${essay}`,
+            },
+          ],
+        },
+      ],
+      generationConfig: { temperature: 0.2, responseMimeType: "application/json" },
+    }),
+  });
+
+  if (!resp.ok) {
+    const detail = await resp.text().catch(() => "");
+    console.error("Gemini error", resp.status, detail);
+    throw new Error("gemini_unavailable");
+  }
+
+  const data = await resp.json();
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  let content = parts.map((p) => (p && p.text) || "").join("").trim();
+  content = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+  if (!content) throw new Error("gemini_empty");
+
+  const evaluation = JSON.parse(content);
+  const max = BANDS[taskType].max;
+  const band = Math.max(0, Math.min(max, Math.round(Number(evaluation.band) || 0)));
+  const tableRow = BANDS[taskType].table.find((r) => r[0] === band);
+
+  return {
+    task_type: `Task ${taskType}`,
+    word_count: words,
+    band,
+    max_band: max,
+    band_label: tableRow ? tableRow[1] : String(evaluation.band_label || ""),
+    comment: String(evaluation.comment || ""),
+    corrections: Array.isArray(evaluation.corrections) ? evaluation.corrections.slice(0, 6) : [],
+    weaknesses: Array.isArray(evaluation.weaknesses) ? evaluation.weaknesses.slice(0, 4) : [],
+    improvements: Array.isArray(evaluation.improvements) ? evaluation.improvements.slice(0, 4) : [],
+  };
+}
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return json(405, { error: "Method not allowed." });
-  }
+  if (event.httpMethod !== "POST") return json(405, { error: "Method not allowed." });
   if (missingEnv() || !process.env.GEMINI_API_KEY) {
     return json(500, {
-      error:
-        "Backend not fully configured. Check SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY and GEMINI_API_KEY in Netlify.",
+      error: "Backend not fully configured. Check SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY and GEMINI_API_KEY in Netlify.",
     });
   }
 
@@ -113,118 +213,51 @@ exports.handler = async (event) => {
     return json(400, { error: "Invalid request." });
   }
 
-  const taskType = String(body.taskType || "").trim();
-  const question = String(body.question || "").trim();
-  const essay = String(body.essay || "").trim();
+  const mode = body.mode === "full" ? "full" : "single";
 
-  if (!["1.1", "1.2", "2"].includes(taskType)) {
-    return json(400, { error: "Please choose a task type: 1.1, 1.2, or 2." });
-  }
-  if (!question) return json(400, { error: "Please paste the task prompt." });
-  if (!essay) return json(400, { error: "Please paste your response." });
-
-  const words = countWords(essay);
-  if (words < 5) {
-    return json(400, { error: "Your response is too short to assess." });
-  }
-  if (words > 1200) {
-    return json(400, { error: "That response is unusually long (over 1200 words). Please trim it." });
-  }
-  if (question.length > 2000) {
-    return json(400, { error: "The task prompt is too long." });
-  }
-
-  let evaluation;
   try {
-    const endpoint =
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
-        GEMINI_MODEL
-      )}:generateContent`;
+    if (mode === "single") {
+      const taskType = String(body.taskType || "").trim();
+      const question = String(body.question || "").trim();
+      const essay = String(body.essay || "").trim();
+      if (!BANDS[taskType]) return json(400, { error: "Please choose a task type: 1.1, 1.2, or 2." });
+      if (!question) return json(400, { error: "Please paste the task prompt." });
+      if (!essay) return json(400, { error: "Please paste your response." });
+      if (countWords(essay) < 3) return json(400, { error: "Your response is too short to assess." });
+      if (countWords(essay) > 800) return json(400, { error: "That response is unusually long. Please trim it." });
 
-    const resp = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": process.env.GEMINI_API_KEY,
-      },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                text:
-                  `TASK TYPE: Task ${taskType}\n` +
-                  `TASK GUIDANCE: ${TASK_GUIDANCE[taskType]}\n\n` +
-                  `TASK PROMPT:\n${question}\n\n` +
-                  `STUDENT RESPONSE (${words} words):\n${essay}`,
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          responseMimeType: "application/json",
-        },
-      }),
+      const result = await gradeOneTask(taskType, question, essay);
+      return json(200, { mode: "single", ...result });
+    }
+
+    const tasks = body.tasks || {};
+    const order = ["1.1", "1.2", "2"];
+    for (const t of order) {
+      if (!tasks[t] || !String(tasks[t].question || "").trim() || !String(tasks[t].essay || "").trim()) {
+        return json(400, { error: `Please fill in both the prompt and response for Task ${t}.` });
+      }
+    }
+
+    const results = {};
+    for (const t of order) {
+      results[t] = await gradeOneTask(t, tasks[t].question, tasks[t].essay);
+    }
+
+    const rawScore = results["1.1"].band + results["1.2"].band + results["2"].band;
+    const converted = convertRawTo75(rawScore);
+    const cefr = cefrFor75(converted);
+
+    return json(200, {
+      mode: "full",
+      raw_score: rawScore,
+      max_raw_score: 17,
+      converted_score: converted,
+      max_converted_score: 75,
+      cefr_level: cefr,
+      tasks: results,
     });
-
-    if (!resp.ok) {
-      const detail = await resp.text().catch(() => "");
-      console.error("Gemini error", resp.status, detail);
-      return json(502, {
-        error: "The AI examiner is unavailable right now. Please try again shortly.",
-      });
-    }
-
-    const data = await resp.json();
-    const parts = data?.candidates?.[0]?.content?.parts || [];
-    let content = parts.map((p) => (p && p.text) || "").join("").trim();
-    content = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
-    if (!content) {
-      console.error("Gemini empty response", JSON.stringify(data).slice(0, 500));
-      return json(502, {
-        error: "The AI examiner returned an empty result. Please try again shortly.",
-      });
-    }
-    evaluation = JSON.parse(content);
   } catch (err) {
-    console.error("check-writing-multilevel Gemini failure", err);
-    return json(502, {
-      error: "Could not evaluate the response. Please try again shortly.",
-    });
+    console.error("check-writing-multilevel failure", err);
+    return json(502, { error: "Could not evaluate the writing. Please try again shortly." });
   }
-
-  // The AI's own raw_score is only a sanity fallback — recompute from the
-  // four criteria ourselves so the total is always exactly consistent.
-  const ta = Math.max(0, Math.min(5, Number(evaluation.task_achievement?.score) || 0));
-  const oc = Math.max(0, Math.min(4, Number(evaluation.organisation_cohesion?.score) || 0));
-  const vo = Math.max(0, Math.min(4, Number(evaluation.vocabulary?.score) || 0));
-  const gr = Math.max(0, Math.min(4, Number(evaluation.grammar?.score) || 0));
-  const rawScore = Math.round((ta + oc + vo + gr) * 2) / 2;
-  const converted = convertRawTo75(rawScore);
-  const cefr = cefrFor75(converted);
-
-  const clean = {
-    task_type: `Task ${taskType}`,
-    word_count: words,
-    raw_score: rawScore,
-    max_raw_score: 17,
-    converted_score: converted,
-    max_converted_score: 75,
-    cefr_level: cefr,
-    criteria: {
-      task_achievement: { score: ta, max: 5, comment: String(evaluation.task_achievement?.comment || "") },
-      organisation_cohesion: { score: oc, max: 4, comment: String(evaluation.organisation_cohesion?.comment || "") },
-      vocabulary: { score: vo, max: 4, comment: String(evaluation.vocabulary?.comment || "") },
-      grammar: { score: gr, max: 4, comment: String(evaluation.grammar?.comment || "") },
-    },
-    corrections: Array.isArray(evaluation.corrections) ? evaluation.corrections.slice(0, 8) : [],
-    weaknesses: Array.isArray(evaluation.weaknesses) ? evaluation.weaknesses.slice(0, 5) : [],
-    improvements: Array.isArray(evaluation.improvements) ? evaluation.improvements.slice(0, 5) : [],
-    summary: String(evaluation.summary || ""),
-  };
-
-  return json(200, clean);
 };
