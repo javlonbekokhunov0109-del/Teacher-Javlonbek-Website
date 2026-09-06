@@ -1387,8 +1387,8 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
         </div>
       </div>
       <div class="wc-row">
-        <label class="wc-label" for="mlQuestion">Task prompt</label>
-        <textarea class="wc-area" id="mlQuestion" placeholder="Paste the exact task prompt / instructions…"></textarea>
+        <label class="wc-label" for="mlQuestion">Task question</label>
+        <textarea class="wc-area" id="mlQuestion" placeholder="Paste the task question…"></textarea>
       </div>
       <div class="wc-row">
         <label class="wc-label" for="mlEssay">Your response</label>
@@ -1407,19 +1407,19 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   <div id="mlFullPanel" hidden>
     <div class="wc-card">
       <div class="wc-eyebrow" style="margin-bottom:6px">Task 1.1 &middot; informal reply (~50 words)</div>
-      <div class="wc-row"><label class="wc-label">Task prompt</label><textarea class="wc-area" id="mlfQ11" placeholder="Paste the Task 1.1 prompt…"></textarea></div>
+      <div class="wc-row"><label class="wc-label">Task question</label><textarea class="wc-area" id="mlfQ11" placeholder="Paste the Task 1.1 question…"></textarea></div>
       <div class="wc-row"><label class="wc-label">Your response</label><textarea class="wc-area" id="mlfE11" placeholder="Write or paste your Task 1.1 response…"></textarea>
         <div class="wc-meta"><span id="mlfW11">0 words</span></div></div>
     </div>
     <div class="wc-card">
       <div class="wc-eyebrow" style="margin-bottom:6px">Task 1.2 &middot; formal reply (120-150 words)</div>
-      <div class="wc-row"><label class="wc-label">Task prompt</label><textarea class="wc-area" id="mlfQ12" placeholder="Paste the Task 1.2 prompt…"></textarea></div>
+      <div class="wc-row"><label class="wc-label">Task question</label><textarea class="wc-area" id="mlfQ12" placeholder="Paste the Task 1.2 question…"></textarea></div>
       <div class="wc-row"><label class="wc-label">Your response</label><textarea class="wc-area" id="mlfE12" placeholder="Write or paste your Task 1.2 response…"></textarea>
         <div class="wc-meta"><span id="mlfW12">0 words</span></div></div>
     </div>
     <div class="wc-card">
       <div class="wc-eyebrow" style="margin-bottom:6px">Task 2 &middot; discussion post (180-200 words)</div>
-      <div class="wc-row"><label class="wc-label">Task prompt</label><textarea class="wc-area" id="mlfQ2" placeholder="Paste the Task 2 prompt…"></textarea></div>
+      <div class="wc-row"><label class="wc-label">Task question</label><textarea class="wc-area" id="mlfQ2" placeholder="Paste the Task 2 question…"></textarea></div>
       <div class="wc-row"><label class="wc-label">Your response</label><textarea class="wc-area essay" id="mlfE2" placeholder="Write or paste your Task 2 response…"></textarea>
         <div class="wc-meta"><span id="mlfW2">0 words</span></div></div>
       <div id="mlfErr"></div>
@@ -3964,7 +3964,7 @@ function wireMlChecker(){
     if(!configOk){ $("mlErr").innerHTML='<div class="wc-err">Backend not configured yet.</div>'; return; }
     if(!user){ pendingView="multilevel"; nav("auth"); return; }
     var question=q.value.trim(), essay=es.value.trim();
-    if(!question){ $("mlErr").innerHTML='<div class="wc-err">Please paste the task prompt.</div>'; return; }
+    if(!question){ $("mlErr").innerHTML='<div class="wc-err">Please paste the task question.</div>'; return; }
     if(!essay){ $("mlErr").innerHTML='<div class="wc-err">Please paste your response.</div>'; return; }
 
     var btn=$("mlCheck"); btn.disabled=true; var old=btn.textContent; btn.innerHTML='<span class="wc-spin"></span>Assessing…';
@@ -3989,7 +3989,7 @@ function wireMlChecker(){
       "1.2":{question:$("mlfQ12").value.trim(), essay:$("mlfE12").value.trim()},
       "2":{question:$("mlfQ2").value.trim(), essay:$("mlfE2").value.trim()}
     };
-    for(var k in tasks){ if(!tasks[k].question||!tasks[k].essay){ $("mlfErr").innerHTML='<div class="wc-err">Please fill in the prompt and response for all three tasks.</div>'; return; } }
+    for(var k in tasks){ if(!tasks[k].question||!tasks[k].essay){ $("mlfErr").innerHTML='<div class="wc-err">Please fill in the task question and response for all three tasks.</div>'; return; } }
 
     var btn=$("mlfCheck"); btn.disabled=true; var old=btn.textContent; btn.innerHTML='<span class="wc-spin"></span>Assessing all three tasks…';
     $("mlfResult").innerHTML='<div class="wc-card"><div class="wc-loading"><span class="d"></span> The AI examiner is reading all three responses…</div></div>';

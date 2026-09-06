@@ -221,7 +221,7 @@ exports.handler = async (event) => {
       const question = String(body.question || "").trim();
       const essay = String(body.essay || "").trim();
       if (!BANDS[taskType]) return json(400, { error: "Please choose a task type: 1.1, 1.2, or 2." });
-      if (!question) return json(400, { error: "Please paste the task prompt." });
+      if (!question) return json(400, { error: "Please paste the task question." });
       if (!essay) return json(400, { error: "Please paste your response." });
       if (countWords(essay) < 3) return json(400, { error: "Your response is too short to assess." });
       if (countWords(essay) > 800) return json(400, { error: "That response is unusually long. Please trim it." });
@@ -234,7 +234,7 @@ exports.handler = async (event) => {
     const order = ["1.1", "1.2", "2"];
     for (const t of order) {
       if (!tasks[t] || !String(tasks[t].question || "").trim() || !String(tasks[t].essay || "").trim()) {
-        return json(400, { error: `Please fill in both the prompt and response for Task ${t}.` });
+        return json(400, { error: `Please fill in the task question and response for Task ${t}.` });
       }
     }
 
