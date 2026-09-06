@@ -3718,7 +3718,8 @@ async function boot(){
 
   var savedView=null;
   try{ savedView=localStorage.getItem("tj_last_view"); }catch(e){}
-  if(savedView && !PANELMAP[savedView]) savedView=null;
+  // (showPanel() already falls back to 'home' for any name it doesn't recognise,
+  // so no need to pre-validate savedView against PANELMAP here.)
 
   if(!configOk){ renderAcct(); if(!window.__tjUserNavigated) nav(shareId?"share":(savedView||"home")); removeBootLoader(); return; }
 
