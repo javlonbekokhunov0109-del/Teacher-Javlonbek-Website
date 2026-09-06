@@ -3722,12 +3722,18 @@ async function boot(){
 
   if(!configOk){ renderAcct(); if(!window.__tjUserNavigated) nav(shareId?"share":(savedView||"home")); removeBootLoader(); return; }
 
-  var s=await sb.auth.getSession();
-  if(s.data.session){ user=s.data.session.user; }
-  renderAcct();
-  if(user){ await onSignedIn(true); } // resolves isAdmin before we decide the restored view, so the guard judges "admin" correctly
-  if(!window.__tjUserNavigated){ nav(shareId ? "share" : (savedView||(user?"home":"auth"))); }
-  removeBootLoader();
+  try{
+    var s={data:{session:null}};
+    try{ s=await sb.auth.getSession(); }catch(e){ /* treat as no session rather than halting boot */ }
+    if(s.data.session){ user=s.data.session.user; }
+    renderAcct();
+    if(user){ await onSignedIn(true); } // resolves isAdmin before we decide the restored view, so the guard judges "admin" correctly
+  }catch(e){
+    console.error("boot sequence error", e);
+  }finally{
+    if(!window.__tjUserNavigated){ nav(shareId ? "share" : (savedView||(user?"home":"auth"))); }
+    removeBootLoader();
+  }
 
   sb.auth.onAuthStateChange(function(_e,session){
     user = session? session.user : null;
