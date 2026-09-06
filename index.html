@@ -1617,6 +1617,9 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
     body.setAttribute('data-view',name);
     updateBackBtn();
     window.scrollTo({top:0,behavior:'auto'});
+    if(name!=='auth' && name!=='share'){
+      try{ localStorage.setItem('tj_last_view', name); }catch(e){}
+    }
   }
   function goBack(){
     var h=(location.hash||'').replace(/^#\/?/,'');
@@ -3713,12 +3716,16 @@ async function boot(){
   var shareId=new URLSearchParams(location.search).get("share");
   if(shareId){ loadSharedResult(shareId); }
 
-  if(!configOk){ renderAcct(); if(!window.__tjUserNavigated) nav(shareId?"share":"home"); removeBootLoader(); return; }
+  var savedView=null;
+  try{ savedView=localStorage.getItem("tj_last_view"); }catch(e){}
+  if(savedView && !PANELMAP[savedView]) savedView=null;
+
+  if(!configOk){ renderAcct(); if(!window.__tjUserNavigated) nav(shareId?"share":(savedView||"home")); removeBootLoader(); return; }
 
   var s=await sb.auth.getSession();
   if(s.data.session){ user=s.data.session.user; }
   renderAcct();
-  if(!window.__tjUserNavigated){ nav(shareId ? "share" : (user?"home":"auth")); }
+  if(!window.__tjUserNavigated){ nav(shareId ? "share" : (savedView||(user?"home":"auth"))); }
   removeBootLoader();
   if(user){ await onSignedIn(!!shareId); }
 
@@ -5578,6 +5585,48 @@ function initBoom(){
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initBoom); else initBoom();
 
+})();
+</script>
+<script>
+(function(){
+"use strict";
+// ---- Persist typed text-field/textarea values across page reloads ----
+// Excludes password fields entirely for security. Keyed by element id, so
+// only applies to elements that already have one (all the site's real
+// form fields do).
+var KEY_PREFIX="tj_field_";
+function isRestorable(el){
+  if(!el || !el.id) return false;
+  if(el.tagName==="TEXTAREA") return true;
+  if(el.tagName==="INPUT"){
+    var t=(el.type||"text").toLowerCase();
+    return ["text","email","search","number","tel","url"].indexOf(t)>=0;
+  }
+  return false;
+}
+document.addEventListener("input",function(e){
+  var el=e.target;
+  if(!isRestorable(el)) return;
+  try{ localStorage.setItem(KEY_PREFIX+el.id, el.value); }catch(err){}
+});
+function restoreFields(){
+  document.querySelectorAll("textarea[id], input[id]").forEach(function(el){
+    if(!isRestorable(el)) return;
+    if(el.value) return; // don't clobber something already filled in
+    var saved;
+    try{ saved=localStorage.getItem(KEY_PREFIX+el.id); }catch(err){ saved=null; }
+    if(saved){
+      el.value=saved;
+      el.dispatchEvent(new Event("input",{bubbles:true}));
+    }
+  });
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", restoreFields); else restoreFields();
+// A couple of follow-up passes catch panels whose fields render slightly
+// after first load (nothing on this site is this slow, but it's cheap
+// insurance and harmless if the fields already exist).
+setTimeout(restoreFields, 400);
+setTimeout(restoreFields, 1200);
 })();
 </script>
 </body>
