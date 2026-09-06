@@ -100,6 +100,8 @@ main{display:block; zoom:var(--tj-zoom,1)}
 html[data-theme="dark"] .tj-door.typing{--accent:var(--tj-gold)}
 .tj-door.boom{--accent:#B23A48}
 html[data-theme="dark"] .tj-door.boom{--accent:#E6707D}
+.tj-door.multilevel{--accent:#3E6B8B}
+html[data-theme="dark"] .tj-door.multilevel{--accent:#7FB0D0}
 .tj-foot{max-width:1080px; margin:10px auto 0; padding:26px clamp(18px,4vw,28px) 40px; border-top:1px solid var(--tj-line);
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; color:var(--tj-fg-soft); font-size:13px}
 .tj-foot a{color:var(--tj-gold-deep); text-decoration:none; font-weight:600} .tj-foot a:hover{text-decoration:underline}
@@ -751,7 +753,7 @@ body[data-view="auth"]  .tj-home-btn{display:inline-flex}
 .tj-menu .who b{display:block; color:var(--tj-fg); font-size:13.5px; font-weight:600; margin-top:2px}
 
 /* ---- shared new-panel shell ---- */
-#auth-root, #writing-root, #admin-root, #lessons-root, #leaderboard-root, #typing-root, #share-root, #boom-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
+#auth-root, #writing-root, #admin-root, #lessons-root, #leaderboard-root, #typing-root, #share-root, #boom-root, #multilevel-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
 #boom-root{max-width:1200px}
 .wc-eyebrow{font-family:'Space Grotesk',monospace; font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--tj-gold-deep); margin-bottom:12px}
 .wc-h1{font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:clamp(30px,5vw,50px); line-height:1.03; margin:0 0 10px; color:var(--tj-fg)}
@@ -889,6 +891,7 @@ body[data-view="typing"] .tj-home-btn{display:inline-flex}
 body[data-view="share"] .tj-home-btn{display:inline-flex}
 body[data-view="boom"] .tj-home-btn{display:inline-flex}
 body[data-view="about"] .tj-home-btn{display:inline-flex}
+body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
 
 /* admin sub-tabs */
 .ad-tabs{display:inline-flex; gap:5px; background:var(--tj-bg2); border:1px solid var(--tj-line); border-radius:12px; padding:5px; margin-bottom:24px; flex-wrap:wrap}
@@ -1056,6 +1059,13 @@ body[data-view="about"] .tj-home-btn{display:inline-flex}
       <h2>Beginner BOOM</h2>
       <p>Top 100 verbs and adjectives, plus a live team quiz game with bonus and punishment cards &mdash; perfect for beginner classes.</p>
       <span class="tj-go">Open Beginner BOOM <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="tj-door multilevel" data-go="multilevel">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+      <div class="tj-tag">Multilevel &middot; Writing</div>
+      <h2>Multilevel Writing Checker</h2>
+      <p>AI-scored feedback for Task 1.1, Task 1.2 and Task 2 of the Multilevel CEFR exam &mdash; raw score, converted score, CEFR level, corrections and tips.</p>
+      <span class="tj-go">Open Multilevel Checker <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
   </div>
   <div class="tj-foot">
@@ -1355,6 +1365,40 @@ body[data-view="about"] .tj-home-btn{display:inline-flex}
   </div>
 </section>
 
+<!-- ================= MULTILEVEL WRITING CHECKER ================= -->
+<section id="multilevel-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">AI Multilevel CEFR Examiner</div>
+  <h1 class="wc-h1">Multilevel Writing Checker</h1>
+  <p class="wc-sub">Choose your task, paste the prompt and your response. The AI examiner scores Task Achievement, Organisation &amp; Cohesion, Vocabulary and Grammar out of 17, converts it to the official 75-point scale, and estimates your CEFR level.</p>
+
+  <div class="wc-card">
+    <div class="wc-row">
+      <label class="wc-label">Task type</label>
+      <div class="au-tabs" id="mlTaskTabs" style="max-width:420px">
+        <button class="on" data-mltask="1.1">Task 1.1</button>
+        <button data-mltask="1.2">Task 1.2</button>
+        <button data-mltask="2">Task 2</button>
+      </div>
+    </div>
+    <div class="wc-row">
+      <label class="wc-label" for="mlQuestion">Task prompt</label>
+      <textarea class="wc-area" id="mlQuestion" placeholder="Paste the exact task prompt / instructions…"></textarea>
+    </div>
+    <div class="wc-row">
+      <label class="wc-label" for="mlEssay">Your response</label>
+      <textarea class="wc-area essay" id="mlEssay" placeholder="Write or paste your response here…"></textarea>
+      <div class="wc-meta">
+        <span id="mlWords">0 words</span>
+        <span id="mlRec">Task 1.1 target: ~50 words</span>
+      </div>
+    </div>
+    <div id="mlErr"></div>
+    <button class="wc-btn" id="mlCheck">Check my writing</button>
+  </div>
+
+  <div id="mlResult" class="wc-result"></div>
+</section>
+
 <!-- ================= ADMIN DASHBOARD ================= -->
 <section id="admin-root" class="tj-panel" hidden>
   <div class="wc-eyebrow">Teacher &middot; Premium English</div>
@@ -1530,7 +1574,7 @@ body[data-view="about"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',lessons:'lessons-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root',multilevel:'multilevel-root'};
   var navHist=[]; var curView=null; window.__tjUserNavigated=false;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -3633,6 +3677,7 @@ async function boot(){
 
   wireAuthForm();
   wireChecker();
+  wireMlChecker();
   document.addEventListener("click",function(){ var m=$("tjMenu"); if(m) m.classList.remove("open"); });
 
   // a shared writing result is public — show it regardless of sign-in state
@@ -3851,6 +3896,82 @@ function wireChecker(){
     btn.disabled=false; btn.textContent=old;
     $("wcResult").scrollIntoView({behavior:"smooth",block:"start"});
   });
+}
+
+/* ---------- Multilevel CEFR Writing Checker ---------- */
+var mlTaskType="1.1";
+var ML_TARGETS={"1.1":"~50 words (informal reply)","1.2":"120-150 words (formal reply)","2":"180-200 words (essay)"};
+
+function wireMlChecker(){
+  var q=$("mlQuestion"), es=$("mlEssay");
+  function wc(){ var m=(es.value.trim().match(/\b[\w'-]+\b/g)||[]).length; $("mlWords").textContent=m+" word"+(m===1?"":"s"); }
+  es.addEventListener("input",wc); wc();
+
+  document.querySelectorAll("#mlTaskTabs button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#mlTaskTabs button").forEach(function(x){ x.classList.toggle("on",x===b); });
+      mlTaskType=b.getAttribute("data-mltask");
+      $("mlRec").textContent="Task "+mlTaskType+" target: "+ML_TARGETS[mlTaskType];
+    });
+  });
+
+  $("mlCheck").addEventListener("click",async function(){
+    $("mlErr").innerHTML="";
+    if(!configOk){ $("mlErr").innerHTML='<div class="wc-err">Backend not configured yet.</div>'; return; }
+    if(!user){ pendingView="multilevel"; nav("auth"); return; }
+    var question=q.value.trim(), essay=es.value.trim();
+    if(!question){ $("mlErr").innerHTML='<div class="wc-err">Please paste the task prompt.</div>'; return; }
+    if(!essay){ $("mlErr").innerHTML='<div class="wc-err">Please paste your response.</div>'; return; }
+
+    var btn=$("mlCheck"); btn.disabled=true; var old=btn.textContent; btn.innerHTML='<span class="wc-spin"></span>Assessing…';
+    $("mlResult").innerHTML='<div class="wc-card"><div class="wc-loading"><span class="d"></span> The AI examiner is reading your response…</div></div>';
+    try{
+      var t=await token();
+      var res=await fetch(FN+"check-writing-multilevel",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({taskType:mlTaskType,question:question,essay:essay})});
+      var data=await res.json();
+      if(!res.ok){ $("mlResult").innerHTML=""; $("mlErr").innerHTML='<div class="wc-err">'+esc(data.error||"Could not check your writing.")+'</div>'; }
+      else { renderMlResult(data); }
+    }catch(e){ $("mlResult").innerHTML=""; $("mlErr").innerHTML='<div class="wc-err">Network error. Please try again.</div>'; }
+    btn.disabled=false; btn.textContent=old;
+    $("mlResult").scrollIntoView({behavior:"smooth",block:"start"});
+  });
+}
+
+function mlCritRow(name,obj){
+  var pct=obj.max? Math.max(0,Math.min(100,(obj.score/obj.max)*100)) : 0;
+  return '<div class="wc-crit"><div class="top"><span class="name">'+esc(name)+'</span><span class="wc-pill">'+obj.score+'/'+obj.max+'</span></div>'+
+    '<div class="wc-bar"><i style="width:'+pct+'%"></i></div><div class="cmt">'+esc(obj.comment||"")+'</div></div>';
+}
+
+function renderMlResult(d){
+  var c=d.criteria||{};
+  var html='<div class="wc-card">';
+  html+='<div class="wc-overall"><div class="wc-band"><div class="n">'+d.converted_score+'</div><div class="l">/ 75</div></div>'+
+        '<div><h3>'+esc(d.task_type)+' &mdash; Raw '+d.raw_score+'/17 &middot; CEFR '+esc(d.cefr_level)+'</h3><p>'+esc(d.summary||"")+'</p></div></div>';
+  html+='<div class="wc-crits">'+
+    mlCritRow("Task Achievement",c.task_achievement||{score:0,max:5})+
+    mlCritRow("Organisation & Cohesion",c.organisation_cohesion||{score:0,max:4})+
+    mlCritRow("Vocabulary",c.vocabulary||{score:0,max:4})+
+    mlCritRow("Grammar",c.grammar||{score:0,max:4})+'</div>';
+  if(d.corrections&&d.corrections.length){
+    html+='<div class="wc-sec"><h4>Corrections</h4>';
+    d.corrections.forEach(function(cr){
+      html+='<div class="wc-fix"><span class="o">'+esc(cr.original)+'</span><span class="arrow">→</span><span class="c">'+esc(cr.correction)+'</span>'+
+        (cr.explanation?'<span class="why">'+esc(cr.explanation)+'</span>':'')+'</div>';
+    });
+    html+='</div>';
+  }
+  if(d.weaknesses&&d.weaknesses.length){
+    html+='<div class="wc-sec"><h4>Weaknesses</h4><ul class="wc-list warn">';
+    d.weaknesses.forEach(function(w){ html+='<li>'+esc(w)+'</li>'; }); html+='</ul></div>';
+  }
+  if(d.improvements&&d.improvements.length){
+    html+='<div class="wc-sec"><h4>How to improve</h4><ul class="wc-list tip">';
+    d.improvements.forEach(function(w){ html+='<li>'+esc(w)+'</li>'; }); html+='</ul></div>';
+  }
+  html+='<p class="wc-note" style="margin-top:16px">Word count: '+d.word_count+'</p>';
+  html+='</div>';
+  $("mlResult").innerHTML=html;
 }
 
 function critRow(name,obj){
