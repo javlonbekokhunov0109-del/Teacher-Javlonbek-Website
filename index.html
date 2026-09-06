@@ -1251,7 +1251,7 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   <footer class="site"><div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <div class="fb"><svg class="crown" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7DE96"/><stop offset="1" stop-color="#C9A227"/></linearGradient></defs><path d="M8 34h32l2 6H6l2-6z" fill="url(#hc)"/><path d="M6 12l8 9 10-15 10 15 8-9-4 22H10L6 12z" fill="url(#hc)"/><circle cx="6" cy="12" r="2.6" fill="#F7DE96"/><circle cx="42" cy="12" r="2.6" fill="#F7DE96"/><circle cx="24" cy="4" r="2.8" fill="#F7DE96"/></svg><div><div class="bt gold-text" style="font-family:Cormorant Garamond,serif;font-weight:700;font-size:22px">Collocation KING</div><div class="bs" style="font-family:Space Grotesk,monospace;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-deep)">IELTS Collocations Mastery</div></div></div>
+        <div class="fb"><svg class="crown" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hc2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7DE96"/><stop offset="1" stop-color="#C9A227"/></linearGradient></defs><path d="M8 34h32l2 6H6l2-6z" fill="url(#hc2)"/><path d="M6 12l8 9 10-15 10 15 8-9-4 22H10L6 12z" fill="url(#hc2)"/><circle cx="6" cy="12" r="2.6" fill="#F7DE96"/><circle cx="42" cy="12" r="2.6" fill="#F7DE96"/><circle cx="24" cy="4" r="2.8" fill="#F7DE96"/></svg><div><div class="bt gold-text" style="font-family:Cormorant Garamond,serif;font-weight:700;font-size:22px">Collocation KING</div><div class="bs" style="font-family:Space Grotesk,monospace;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-deep)">IELTS Collocations Mastery</div></div></div>
         <p>A premium vocabulary trainer built for serious IELTS candidates — 2,483 collocations across 32 topics, each with a clear meaning and a natural example sentence.</p>
       </div>
       <div class="foot-links">
@@ -3725,9 +3725,9 @@ async function boot(){
   var s=await sb.auth.getSession();
   if(s.data.session){ user=s.data.session.user; }
   renderAcct();
+  if(user){ await onSignedIn(true); } // resolves isAdmin before we decide the restored view, so the guard judges "admin" correctly
   if(!window.__tjUserNavigated){ nav(shareId ? "share" : (savedView||(user?"home":"auth"))); }
   removeBootLoader();
-  if(user){ await onSignedIn(!!shareId); }
 
   sb.auth.onAuthStateChange(function(_e,session){
     user = session? session.user : null;
