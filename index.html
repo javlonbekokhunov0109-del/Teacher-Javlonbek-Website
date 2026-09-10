@@ -1437,10 +1437,12 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
     <button class="on" data-adtab="overview">Overview</button>
     <button data-adtab="content">Content Manager</button>
     <button data-adtab="classes">Classes</button>
+    <button data-adtab="writing">Writing Checks</button>
   </div>
   <div id="adTabOverview"><div id="adBody"><div class="wc-loading"><span class="d"></span> Loading dashboard…</div></div></div>
   <div id="adTabContent" hidden><div id="cmRoot"><div class="wc-loading"><span class="d"></span> Loading content…</div></div></div>
   <div id="adTabClasses" hidden><div id="clRoot"><div class="wc-loading"><span class="d"></span> Loading classes…</div></div></div>
+  <div id="adTabWriting" hidden><div id="wdRoot"><div class="wc-loading"><span class="d"></span> Loading writing checks…</div></div></div>
 </section>
 
 <!-- ================= STUDENT · MY LESSONS ================= -->
@@ -4177,6 +4179,117 @@ async function loadAdmin(){
   }catch(e){ body.innerHTML='<div class="wc-err">Could not load the dashboard.</div>'; }
 }
 
+var wdMode="ielts", wdData=null;
+async function loadWritingDash(){
+  var root=$("wdRoot"); if(!root) return;
+  root.innerHTML='<div class="wc-loading"><span class="d"></span> Loading writing checks…</div>';
+  try{
+    var t=await token();
+    var res=await fetch(FN+"admin-writing-dashboard",{headers:{Authorization:"Bearer "+t}});
+    var data=await res.json();
+    if(!res.ok){ root.innerHTML='<div class="wc-err">'+esc(data.error||"Could not load writing checks.")+'</div>'; return; }
+    wdData=data;
+    renderWritingDash();
+  }catch(e){ root.innerHTML='<div class="wc-err">Network error. Please try again.</div>'; }
+}
+
+function fmtWhen(iso){
+  try{ return new Date(iso).toLocaleString(); }catch(e){ return iso; }
+}
+
+function renderWritingDash(){
+  var root=$("wdRoot");
+  var ieltsN=(wdData.ielts||[]).length, mlN=(wdData.multilevel||[]).length;
+  var html='<div class="au-tabs" id="wdTabs" style="max-width:420px">'+
+    '<button class="'+(wdMode==="ielts"?"on":"")+'" data-wdmode="ielts">IELTS ('+ieltsN+')</button>'+
+    '<button class="'+(wdMode==="multilevel"?"on":"")+'" data-wdmode="multilevel">Multilevel ('+mlN+')</button>'+
+  '</div><div id="wdList"></div>';
+  root.innerHTML=html;
+  document.querySelectorAll("#wdTabs button").forEach(function(b){
+    b.addEventListener("click",function(){ wdMode=b.getAttribute("data-wdmode"); renderWritingDash(); });
+  });
+  renderWdList();
+}
+
+function wdMistakesHtml(corrections){
+  if(!corrections||!corrections.length) return "";
+  var html='<div class="wc-sec"><h4>Corrections</h4>';
+  corrections.forEach(function(cr){
+    html+='<div class="wc-fix"><span class="o">'+esc(cr.original||"")+'</span><span class="arrow">→</span><span class="c">'+esc(cr.correction||"")+'</span>'+
+      (cr.explanation?'<span class="why">'+esc(cr.explanation)+'</span>':'')+'</div>';
+  });
+  return html+'</div>';
+}
+function wdListHtml(title,items){
+  if(!items||!items.length) return '';
+  var html='<div class="wc-sec"><h4>'+esc(title)+'</h4><ul class="wc-list">';
+  items.forEach(function(w){ html+='<li>'+esc(w)+'</li>'; });
+  return html+'</ul></div>';
+}
+
+function renderWdList(){
+  var list=$("wdList");
+  var rows=wdMode==="ielts"?(wdData.ielts||[]):(wdData.multilevel||[]);
+  if(!rows.length){ list.innerHTML='<div class="wc-empty" style="margin-top:16px">No '+(wdMode==="ielts"?"IELTS":"Multilevel")+' checks yet.</div>'; return; }
+  var html='';
+  rows.forEach(function(r,i){
+    var headScore = wdMode==="ielts"
+      ? 'Band '+band(r.overall_band)
+      : (r.mode==="full" ? r.converted_score+'/75 · CEFR '+esc(r.cefr_level||'') : (r.task_type?('Task '+esc(r.task_type)+' · '):'')+r.raw_score+'/'+r.max_score);
+    html+='<div class="wc-card" style="margin-top:14px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;cursor:pointer" data-wdtoggle="'+i+'">'+
+        '<div><b>'+esc(r.student_name)+'</b> <span class="wc-sub" style="display:inline">'+esc(r.student_email||'')+'</span><div class="wc-sub" style="margin-top:2px">'+fmtWhen(r.created_at)+'</div></div>'+
+        '<div class="wc-pill">'+headScore+'</div>'+
+      '</div>'+
+      '<div id="wdDetail'+i+'" hidden style="margin-top:14px"></div>'+
+    '</div>';
+  });
+  list.innerHTML=html;
+  document.querySelectorAll('[data-wdtoggle]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var i=el.getAttribute('data-wdtoggle');
+      var d=$('wdDetail'+i);
+      if(d.hidden){ d.hidden=false; d.innerHTML=wdDetailHtml(rows[i]); } else { d.hidden=true; }
+    });
+  });
+}
+
+function wdDetailHtml(r){
+  if(wdMode==="ielts"){
+    return '<div class="wc-sec"><h4>Task question</h4><p class="wc-sub">'+esc(r.question||"")+'</p></div>'+
+      '<div class="wc-sec"><h4>Essay ('+ (r.word_count||0) +' words)</h4><p style="white-space:pre-wrap;line-height:1.7">'+esc(r.essay||"")+'</p></div>'+
+      '<div class="wc-crits">'+
+        critRow("Task Response",{band:r.task_response})+
+        critRow("Coherence & Cohesion",{band:r.coherence_cohesion})+
+        critRow("Lexical Resource",{band:r.lexical_resource})+
+        critRow("Grammar",{band:r.grammatical_range_accuracy})+
+      '</div>'+
+      (r.summary?'<div class="wc-sec"><h4>Summary</h4><p class="wc-sub">'+esc(r.summary)+'</p></div>':'')+
+      wdMistakesHtml(r.corrections)+
+      wdListHtml("Weaknesses",r.weaknesses)+
+      wdListHtml("How to improve",r.improvements);
+  }
+  // multilevel
+  if(r.mode==="full"){
+    var html='';
+    ["1.1","1.2","2"].forEach(function(k){
+      var t=r.payload && r.payload.tasks && r.payload.tasks[k]; if(!t) return;
+      html+='<div class="wc-sec"><h4>Task '+esc(k)+' — '+t.band+'/'+t.max_band+' ('+esc(t.band_label||"")+')</h4>'+
+        '<p class="wc-sub">'+esc(t.question||"")+'</p>'+
+        '<p style="white-space:pre-wrap;line-height:1.6">'+esc(t.essay||"")+'</p>'+
+        (t.comment?'<p class="wc-sub">'+esc(t.comment)+'</p>':'')+'</div>'+
+        wdMistakesHtml(t.corrections)+wdListHtml("Weaknesses",t.weaknesses)+wdListHtml("How to improve",t.improvements);
+    });
+    return html;
+  }
+  var p=r.payload||{};
+  return '<div class="wc-sec"><h4>Task '+esc(r.task_type||"")+' — '+p.band+'/'+p.max_band+' ('+esc(p.band_label||"")+')</h4>'+
+    '<p class="wc-sub">'+esc(p.question||"")+'</p>'+
+    '<p style="white-space:pre-wrap;line-height:1.7">'+esc(p.essay||"")+'</p>'+
+    (p.comment?'<p class="wc-sub">'+esc(p.comment)+'</p>':'')+'</div>'+
+    wdMistakesHtml(p.corrections)+wdListHtml("Weaknesses",p.weaknesses)+wdListHtml("How to improve",p.improvements);
+}
+
 function renderAdmin(data){
   var s=data.stats||{};
   var html='<div class="ad-stats">'+
@@ -4424,8 +4537,10 @@ function wireTabs(){
     $("adTabOverview").hidden=(t!=="overview");
     $("adTabContent").hidden=(t!=="content");
     $("adTabClasses").hidden=(t!=="classes");
+    $("adTabWriting").hidden=(t!=="writing");
     if(t==="content") loadContent();
     if(t==="classes") loadClasses();
+    if(t==="writing") loadWritingDash();
   });
 }
 
@@ -5345,7 +5460,7 @@ function wireTabs(){
 var G = null;
 
 function setupScreen(){
-  var opts = G && G.opts ? G.opts : {teams:2, grid:16, bonus:true, punish:true, wordQ:true, sentQ:true};
+  var opts = G && G.opts ? G.opts : {teams:2, grid:16, bonus:true, punish:true, wordQ:true, sentQ:true, verbs:true, adjs:true};
   var html = ''
    + '<div class="wc-card">'
    + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Teams</label>'
@@ -5356,6 +5471,8 @@ function setupScreen(){
    +   '<div class="boom-pill-group" id="bGrid">'
    +     [16,24].map(function(n){ return '<button class="boom-pill'+(opts.grid===n?' on':'')+'" data-grid="'+n+'">'+n+' cards</button>'; }).join('')
    +   '</div></div>'
+   + '<div class="boom-toggle-row"><span>Verbs</span><button class="boom-switch'+(opts.verbs?' on':'')+'" data-tg="verbs"><i></i></button></div>'
+   + '<div class="boom-toggle-row"><span>Adjectives</span><button class="boom-switch'+(opts.adjs?' on':'')+'" data-tg="adjs"><i></i></button></div>'
    + '<div class="boom-toggle-row"><span>Word translation cards (Uzbek &rarr; English, 15 pts)</span><button class="boom-switch'+(opts.wordQ?' on':'')+'" data-tg="wordQ"><i></i></button></div>'
    + '<div class="boom-toggle-row"><span>Sentence translation cards (Uzbek &rarr; English, 25 pts)</span><button class="boom-switch'+(opts.sentQ?' on':'')+'" data-tg="sentQ"><i></i></button></div>'
    + '<div class="boom-toggle-row"><span>Bonus cards (double, +30, steal, swap)</span><button class="boom-switch'+(opts.bonus?' on':'')+'" data-tg="bonus"><i></i></button></div>'
@@ -5388,7 +5505,9 @@ function weightedPick(weighted){
 
 function startGame(opts){
   if(!opts.wordQ && !opts.sentQ){ alert('Turn on at least one question type (word or sentence translation).'); return; }
-  var pool = shuffle(BOOM_VERBS.concat(BOOM_ADJS));
+  if(!opts.verbs && !opts.adjs){ alert('Turn on at least one word category (Verbs or Adjectives).'); return; }
+  var basePool=[].concat(opts.verbs?BOOM_VERBS:[]).concat(opts.adjs?BOOM_ADJS:[]);
+  var pool = shuffle(basePool);
 
   var specialCount = opts.grid===16 ? 3 : 4;
   var bonusN = opts.bonus ? specialCount : 0;

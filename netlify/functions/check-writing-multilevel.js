@@ -27,7 +27,7 @@
 // other level — flagged here and in the site's chat reply, not silently
 // presented as directly-sourced.
 
-const { json, missingEnv, getUserFromRequest } = require("./_shared");
+const { json, missingEnv, getUserFromRequest, serviceClient } = require("./_shared");
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
@@ -227,6 +227,19 @@ exports.handler = async (event) => {
       if (countWords(essay) > 800) return json(400, { error: "That response is unusually long. Please trim it." });
 
       const result = await gradeOneTask(taskType, question, essay);
+      try{
+        const db = serviceClient();
+        await db.from("multilevel_submissions").insert({
+          user_id: user.id,
+          mode: "single",
+          task_type: taskType,
+          raw_score: result.band,
+          max_score: result.max_band,
+          converted_score: null,
+          cefr_level: null,
+          payload: { question, ...result },
+        });
+      }catch(e){ console.error("multilevel save (single) failed", e); }
       return json(200, { mode: "single", ...result });
     }
 
@@ -246,6 +259,20 @@ exports.handler = async (event) => {
     const rawScore = results["1.1"].band + results["1.2"].band + results["2"].band;
     const converted = convertRawTo75(rawScore);
     const cefr = cefrFor75(converted);
+
+    try{
+      const db = serviceClient();
+      await db.from("multilevel_submissions").insert({
+        user_id: user.id,
+        mode: "full",
+        task_type: null,
+        raw_score: rawScore,
+        max_score: 17,
+        converted_score: converted,
+        cefr_level: cefr,
+        payload: { tasks: Object.fromEntries(order.map((t) => [t, { question: tasks[t].question, ...results[t] }])) },
+      });
+    }catch(e){ console.error("multilevel save (full) failed", e); }
 
     return json(200, {
       mode: "full",
