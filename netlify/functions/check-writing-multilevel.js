@@ -184,6 +184,7 @@ async function gradeOneTask(taskType, question, essay) {
 
   return {
     task_type: `Task ${taskType}`,
+    essay,
     word_count: words,
     band,
     max_band: max,
