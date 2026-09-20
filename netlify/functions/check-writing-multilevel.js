@@ -229,7 +229,7 @@ exports.handler = async (event) => {
       const result = await gradeOneTask(taskType, question, essay);
       try{
         const db = serviceClient();
-        await db.from("multilevel_submissions").insert({
+        const { error: insErr } = await db.from("multilevel_submissions").insert({
           user_id: user.id,
           mode: "single",
           task_type: taskType,
@@ -239,7 +239,8 @@ exports.handler = async (event) => {
           cefr_level: null,
           payload: { question, ...result },
         });
-      }catch(e){ console.error("multilevel save (single) failed", e); }
+        if (insErr) console.error("multilevel save (single) DB error", insErr);
+      }catch(e){ console.error("multilevel save (single) threw", e); }
       return json(200, { mode: "single", ...result });
     }
 
@@ -262,7 +263,7 @@ exports.handler = async (event) => {
 
     try{
       const db = serviceClient();
-      await db.from("multilevel_submissions").insert({
+      const { error: insErr } = await db.from("multilevel_submissions").insert({
         user_id: user.id,
         mode: "full",
         task_type: null,
@@ -272,7 +273,8 @@ exports.handler = async (event) => {
         cefr_level: cefr,
         payload: { tasks: Object.fromEntries(order.map((t) => [t, { question: tasks[t].question, ...results[t] }])) },
       });
-    }catch(e){ console.error("multilevel save (full) failed", e); }
+      if (insErr) console.error("multilevel save (full) DB error", insErr);
+    }catch(e){ console.error("multilevel save (full) threw", e); }
 
     return json(200, {
       mode: "full",
