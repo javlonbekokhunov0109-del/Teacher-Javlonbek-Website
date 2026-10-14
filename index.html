@@ -706,6 +706,36 @@ html[data-theme="light"] #ck-root .hero .crownbig{filter:drop-shadow(0 6px 20px 
 .boom-judge-row .no{background:#d9534f; color:#fff}
 .boom-winner-banner{font-size:34px; font-weight:800; margin:14px 0; animation:boomPulse 1.2s ease-in-out infinite}
 @keyframes boomPulse{0%,100%{transform:scale(1)} 50%{transform:scale(1.05)}}
+/* ---- Baraban (random drum) ---- */
+.drum-range{display:flex; align-items:center; gap:10px; margin:0 0 10px}
+.drum-range input{width:96px; text-align:center}
+.drum-note{font-size:13px; opacity:.78; margin-top:8px; min-height:1em}
+.drum-note.err{color:#e5484d; opacity:1; font-weight:600}
+.drum-play{max-width:760px; margin:0 auto}
+.drum-score{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; max-height:132px; overflow:auto}
+.drum-chip{border:1px solid var(--tj-border,rgba(127,127,127,.3)); border-radius:99px; padding:5px 12px; font-size:13px; font-weight:600}
+.drum-chip.hot{background:var(--tj-gold,#c9a24b); color:#1a1408; border-color:transparent}
+.drum-names-stage{text-align:center; margin-bottom:10px}
+.drum-wheel{position:relative; width:min(330px,84vw); margin:14px auto 0}
+.drum-wheel-rot{width:100%; will-change:transform}
+.drum-wheel svg{width:100%; height:auto; display:block}
+.drum-pointer{position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:30px solid #e5484d; filter:drop-shadow(0 2px 3px rgba(0,0,0,.4)); z-index:2}
+.drum-ticker{font-size:clamp(24px,7vw,40px); font-weight:800; padding:18px 12px; border:2px solid var(--tj-gold,#c9a24b); border-radius:14px; margin-bottom:6px; word-break:break-word}
+.drum-nameout{font-size:clamp(22px,6vw,34px); font-weight:800; margin-top:12px; min-height:1.3em; word-break:break-word}
+.drum-word{min-height:176px; border:2px dashed var(--tj-border,rgba(127,127,127,.35)); border-radius:16px; padding:22px 16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; margin:12px 0}
+.drum-word.spin{border-style:solid; border-color:var(--tj-gold,#c9a24b)}
+.drum-word .lbl{font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.62}
+.drum-word .big{font-size:clamp(30px,8.5vw,54px); font-weight:800; line-height:1.1; word-break:break-word}
+.drum-word .ans{font-size:clamp(24px,6.5vw,38px); font-weight:700; color:var(--tj-gold-deep,#8C7A3E); word-break:break-word}
+.drum-word .ex{font-size:14px; opacity:.82; font-style:italic}
+.drum-controls{display:flex; gap:10px; flex-wrap:wrap}
+.drum-controls .wc-btn{flex:1; min-width:130px; font-size:18px; padding:16px}
+.drum-controls .drum-ok{background:#3fb96b; color:#fff}
+.drum-controls .drum-bad{background:#e5484d; color:#fff}
+.drum-foot{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-top:16px; font-size:13px}
+.drum-foot-btns{display:flex; gap:8px; flex-wrap:wrap}
+.drum-foot .boom-pill{padding:6px 12px; font-size:13px}
+@media(prefers-reduced-motion:reduce){.drum-wheel-rot{transition:none!important}}
 /* ---- daily goal celebration ---- */
 #tjConfettiLayer{position:fixed; inset:0; pointer-events:none; z-index:9998; overflow:hidden}
 .tj-confetti{position:absolute; top:-40px; font-size:24px; animation:tjfall linear forwards}
@@ -1530,12 +1560,13 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
 <section id="boom-root" class="tj-panel" hidden>
   <div class="wc-eyebrow">Premium English &middot; Beginner</div>
   <h1 class="wc-h1">Beginner BOOM</h1>
-  <p class="wc-sub">Top 100 verbs, top 100 adjectives, and a live team quiz game built from both lists.</p>
+  <p class="wc-sub">Top 100 verbs, top 100 adjectives, a live team quiz game built from both lists, and a random Baraban drum for the classroom.</p>
 
   <div class="au-tabs" id="boomTabs">
     <button class="on" data-boomtab="verbs">Most Common Verbs</button>
     <button data-boomtab="adjs">Most Common Adjectives</button>
     <button data-boomtab="quiz">Quiz</button>
+    <button data-boomtab="drum">Baraban</button>
   </div>
 
   <div id="boomVerbsPanel">
@@ -1548,6 +1579,10 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
 
   <div id="boomQuizPanel" hidden>
     <div id="boomQuizRoot"></div>
+  </div>
+
+  <div id="boomDrumPanel" hidden>
+    <div id="boomDrumRoot"></div>
   </div>
 </section>
 
@@ -5452,6 +5487,8 @@ function wireTabs(){
       $('boomVerbsPanel').hidden = m!=='verbs';
       $('boomAdjsPanel').hidden = m!=='adjs';
       $('boomQuizPanel').hidden = m!=='quiz';
+      $('boomDrumPanel').hidden = m!=='drum';
+      if(m!=='drum') drumCancel();
     });
   });
 }
@@ -5697,6 +5734,370 @@ function endGame(){
   fireConfetti();
 }
 
+/* ---- Baraban (random drum): names wheel + word drum ---- */
+var DRUM_KEY='tj_baraban_v1', DRUM_NAMES_KEY='tj_baraban_names';
+var DRUM_WHEEL_MAX=16, DRUM_MAX_NAMES=60;
+var DRUM_COLORS=['#c9a24b','#3b6fb6','#d94f5c','#3fb96b','#8b5cf6','#f08c2e'];
+var DM=null;      /* running game (null on the setup screen) */
+var DOPTS=null;   /* setup options */
+
+function drumSpeed(){ var s=window.__drumSpeed; return (typeof s==='number' && s>0) ? s : 1; }
+function drumReduced(){ try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; } }
+function drumMs(ms){ return Math.max(1, Math.round((drumReduced() ? Math.min(ms,600) : ms) * drumSpeed())); }
+function drumInt(v,lo,hi,def){ v=parseInt(v,10); if(isNaN(v)) return def; return Math.min(hi,Math.max(lo,v)); }
+function drumRange(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return a; }
+
+/* ---------- saved settings ---------- */
+function drumLoadOpts(){
+  var o={verbs:true, adjs:true, from:1, to:100, dir:'en2uz', noRepeat:true, sound:true}, s={};
+  try{ s=JSON.parse(localStorage.getItem(DRUM_KEY)||'{}')||{}; }catch(e){ s={}; }
+  if(typeof s.verbs==='boolean') o.verbs=s.verbs;
+  if(typeof s.adjs==='boolean') o.adjs=s.adjs;
+  if(!o.verbs && !o.adjs){ o.verbs=true; o.adjs=true; }
+  o.from=drumInt(s.from,1,100,1); o.to=drumInt(s.to,1,100,100);
+  if(o.from>o.to){ o.from=1; o.to=100; }
+  if(s.dir==='en2uz' || s.dir==='uz2en' || s.dir==='mix') o.dir=s.dir;
+  if(typeof s.noRepeat==='boolean') o.noRepeat=s.noRepeat;
+  if(typeof s.sound==='boolean') o.sound=s.sound;
+  return o;
+}
+function drumSaveOpts(){ try{ localStorage.setItem(DRUM_KEY, JSON.stringify(DOPTS)); }catch(e){} }
+function drumLoadNames(){ try{ return localStorage.getItem(DRUM_NAMES_KEY)||''; }catch(e){ return ''; } }
+function drumSaveNames(t){ try{ localStorage.setItem(DRUM_NAMES_KEY, t); }catch(e){} }
+function drumParseNames(text){
+  var out=[];
+  String(text||'').split(/[\n,;]+/).forEach(function(s){ s=s.replace(/\s+/g,' ').trim(); if(s) out.push(s.slice(0,40)); });
+  return out;
+}
+
+/* ---------- word pool ---------- */
+function drumPool(o){
+  var out=[], a=o.from-1, b=o.to;
+  if(o.verbs) BOOM_VERBS.slice(a,b).forEach(function(w,i){ out.push({w:w, cat:'Verb', n:a+i+1}); });
+  if(o.adjs)  BOOM_ADJS.slice(a,b).forEach(function(w,i){ out.push({w:w, cat:'Adjective', n:a+i+1}); });
+  return out;
+}
+function drumReadRange(){
+  var a=parseInt($('dFrom').value,10), b=parseInt($('dTo').value,10);
+  if(isNaN(a) || isNaN(b)) return {ok:false, msg:'Enter both numbers.'};
+  if(a<1 || b<1 || a>100 || b>100) return {ok:false, msg:'Use numbers from 1 to 100.'};
+  if(a>b) return {ok:false, msg:'\u201CFrom\u201D must not be bigger than \u201CTo\u201D.'};
+  return {ok:true, from:a, to:b};
+}
+
+/* ---------- setup screen ---------- */
+function drumSetup(){
+  DM=null;
+  if(!DOPTS) DOPTS=drumLoadOpts();
+  var o=DOPTS;
+  var html=''
+   + '<div class="wc-card">'
+   + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Word lists</label>'
+   +   '<div class="boom-pill-group"><button class="boom-pill" data-dl="verbs">Verbs</button><button class="boom-pill" data-dl="adjs">Adjectives</button></div></div>'
+   + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Words from # to # <span style="text-transform:none;opacity:.7">(in each selected list, 1&ndash;100)</span></label>'
+   +   '<div class="drum-range"><input type="number" id="dFrom" class="wc-input" min="1" max="100" inputmode="numeric" value="'+o.from+'"><span>to</span><input type="number" id="dTo" class="wc-input" min="1" max="100" inputmode="numeric" value="'+o.to+'"></div>'
+   +   '<div class="boom-pill-group"><button class="boom-pill" data-dr="1-25">1&ndash;25</button><button class="boom-pill" data-dr="26-50">26&ndash;50</button><button class="boom-pill" data-dr="51-75">51&ndash;75</button><button class="boom-pill" data-dr="76-100">76&ndash;100</button><button class="boom-pill" data-dr="1-100">All</button></div>'
+   +   '<div class="drum-note" id="dPoolInfo" style="width:100%"></div></div>'
+   + '<div class="boom-setup-row"><label class="wc-label" style="width:100%">Ask</label>'
+   +   '<div class="boom-pill-group"><button class="boom-pill" data-dm="en2uz">English &rarr; Uzbek</button><button class="boom-pill" data-dm="uz2en">Uzbek &rarr; English</button><button class="boom-pill" data-dm="mix">Mixed</button></div></div>'
+   + '<div class="boom-setup-row"><label class="wc-label" style="width:100%" for="dNames">Students (optional) &mdash; one name per line</label>'
+   +   '<textarea id="dNames" class="wc-area" rows="6" placeholder="Ali&#10;Vali&#10;Gulnora"></textarea>'
+   +   '<div class="drum-note" id="dNamesInfo" style="width:100%"></div></div>'
+   + '<div class="boom-toggle-row"><span>No repeats until every word and student has had a turn</span><button class="boom-switch" data-dt="noRepeat"><i></i></button></div>'
+   + '<div class="boom-toggle-row" style="border-bottom:none"><span>Sound</span><button class="boom-switch" data-dt="sound"><i></i></button></div>'
+   + '<div class="drum-note err" id="dSetupErr" hidden></div>'
+   + '<button class="wc-btn" id="dStart" data-da="start" style="margin-top:20px">Start Baraban</button>'
+   + '</div>';
+  $('boomDrumRoot').innerHTML=html;
+  $('dNames').value=drumLoadNames();
+  drumRefreshSetup();
+}
+function drumRefreshSetup(){
+  var o=DOPTS, root=$('boomDrumRoot'), i;
+  var q=function(s){ return root.querySelectorAll(s); };
+  for(i=0;i<q('[data-dl]').length;i++){ var b=q('[data-dl]')[i]; b.classList.toggle('on', !!o[b.getAttribute('data-dl')]); }
+  for(i=0;i<q('[data-dm]').length;i++){ var d=q('[data-dm]')[i]; d.classList.toggle('on', d.getAttribute('data-dm')===o.dir); }
+  for(i=0;i<q('[data-dt]').length;i++){ var t=q('[data-dt]')[i]; t.classList.toggle('on', !!o[t.getAttribute('data-dt')]); }
+  var rg=drumReadRange(), info=$('dPoolInfo'), start=$('dStart');
+  for(i=0;i<q('[data-dr]').length;i++){ var r=q('[data-dr]')[i]; r.classList.toggle('on', rg.ok && r.getAttribute('data-dr')===(rg.from+'-'+rg.to)); }
+  if(rg.ok){
+    var per=rg.to-rg.from+1, nv=o.verbs?per:0, na=o.adjs?per:0;
+    info.className='drum-note'; info.textContent='Pool: '+(nv+na)+' words'+(o.verbs&&o.adjs ? ' ('+nv+' verbs + '+na+' adjectives)' : '');
+    start.disabled=false;
+  } else { info.className='drum-note err'; info.textContent=rg.msg; start.disabled=true; }
+  var names=drumParseNames($('dNames').value), ni=$('dNamesInfo');
+  if(!names.length) ni.textContent='No names \u2014 the drum picks words only (solo mode).';
+  else {
+    var extra=names.length>DRUM_MAX_NAMES ? ' \u2014 only the first '+DRUM_MAX_NAMES+' are used' : '';
+    var n=Math.min(names.length,DRUM_MAX_NAMES);
+    ni.textContent=n+' student'+(n===1?'':'s')+extra+' \u2014 '+(n<=DRUM_WHEEL_MAX ? 'spinning wheel' : 'rolling name display (more than '+DRUM_WHEEL_MAX+' names)');
+  }
+  var err=$('dSetupErr'); err.hidden=true; err.textContent='';
+}
+
+/* ---------- starting / bags ---------- */
+function drumStart(){
+  var rg=drumReadRange();
+  if(!rg.ok){ drumRefreshSetup(); return; }
+  if(!DOPTS.verbs && !DOPTS.adjs){ var e=$('dSetupErr'); e.hidden=false; e.textContent='Turn on at least one word list.'; return; }
+  DOPTS.from=rg.from; DOPTS.to=rg.to; drumSaveOpts();
+  var text=$('dNames').value; drumSaveNames(text);
+  var names=drumParseNames(text).slice(0,DRUM_MAX_NAMES);
+  drumBegin(names);
+}
+function drumBegin(names){
+  var o={}; for(var k in DOPTS) o[k]=DOPTS[k];
+  var pool=drumPool(o);
+  DM={opts:o, names:names, pool:pool, bagW:[], bagN:[], filledW:false, filledN:false, lastW:null, lastN:null,
+      scores:names.map(function(){ return 0; }), stats:{ok:0,bad:0,skip:0}, state:'idle', spinId:0, cur:null, note:'', timers:[], rot:0, spins:0};
+  drumPlayHtml();
+  drumRenderStage(); drumRenderScore();
+}
+function drumDrawFrom(m,key,total){
+  var bag=m['bag'+key], last=m['last'+key], refill=false, idx;
+  if(m.opts.noRepeat){
+    if(!bag.length){
+      bag=m['bag'+key]=shuffle(drumRange(total));
+      if(total>1 && m['filled'+key]) refill=true;
+      m['filled'+key]=true;
+      if(bag.length>1 && bag[bag.length-1]===last){ var t=bag[0]; bag[0]=bag[bag.length-1]; bag[bag.length-1]=t; }
+    }
+    idx=bag.pop();
+  } else {
+    if(total===1) idx=0; else { do{ idx=Math.floor(Math.random()*total); }while(idx===last); }
+  }
+  m['last'+key]=idx;
+  return {idx:idx, refill:refill};
+}
+
+/* ---------- play screen ---------- */
+function drumWheelSvg(names){
+  var n=names.length, r=146, cx=150, cy=150, seg=360/n, out='', i;
+  var fs=n<=6?16:(n<=10?14:12), maxc=n<=6?14:(n<=10?11:9);
+  if(n===1){ out+='<circle cx="150" cy="150" r="146" fill="'+DRUM_COLORS[0]+'"/>'; }
+  else for(i=0;i<n;i++){
+    var a0=(-90+i*seg)*Math.PI/180, a1=(-90+(i+1)*seg)*Math.PI/180;
+    var x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0), x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+    var ci=i%DRUM_COLORS.length; if(i===n-1 && ci===0) ci=3;
+    out+='<path d="M150 150 L'+x0.toFixed(2)+' '+y0.toFixed(2)+' A146 146 0 '+(seg>180?1:0)+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+' Z" fill="'+DRUM_COLORS[ci]+'" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/>';
+  }
+  for(i=0;i<n;i++){
+    var mid=n===1 ? 0 : -90+(i+0.5)*seg, lab=names[i];
+    if(lab.length>maxc) lab=lab.slice(0,maxc-1)+'\u2026';
+    out+='<text x="'+(cx+r-12)+'" y="'+cy+'" transform="rotate('+mid.toFixed(2)+' 150 150)" text-anchor="end" dominant-baseline="central" font-size="'+fs+'" font-weight="700" fill="#fff" stroke="rgba(0,0,0,.45)" stroke-width="2.4" paint-order="stroke" font-family="inherit">'+esc(lab)+'</text>';
+  }
+  out+='<circle cx="150" cy="150" r="146" fill="none" stroke="#1a1408" stroke-opacity=".25" stroke-width="3"/><circle cx="150" cy="150" r="15" fill="#1a1408"/><circle cx="150" cy="150" r="6" fill="#c9a24b"/>';
+  return '<svg viewBox="0 0 300 300" role="img" aria-label="Names wheel">'+out+'</svg>';
+}
+function drumPlayHtml(){
+  var m=DM, n=m.names.length, stage='';
+  if(n>0 && n<=DRUM_WHEEL_MAX) stage='<div class="drum-wheel"><div class="drum-wheel-rot" id="dWheelRot" data-n="'+n+'" data-rot="0">'+drumWheelSvg(m.names)+'</div><div class="drum-pointer"></div></div>';
+  else if(n>DRUM_WHEEL_MAX) stage='<div class="drum-ticker" id="dNameTicker">&mdash;</div>';
+  var html='<div class="wc-card drum-play">'
+   + '<div class="drum-score" id="dScore"></div>'
+   + (n>0 ? '<div class="drum-names-stage">'+stage+'<div class="drum-nameout" id="dNameOut">&mdash;</div></div>' : '')
+   + '<div class="drum-word" id="dWordStage" aria-live="polite"></div>'
+   + '<div class="drum-controls" id="dControls"></div>'
+   + '<div class="drum-note" id="dNote"></div>'
+   + '<div class="drum-foot"><span id="dLeft"></span><span class="drum-foot-btns">'
+   +   '<button class="boom-pill" data-da="sound" id="dSound"></button>'
+   +   '<button class="boom-pill" data-da="reset">Reset</button>'
+   +   '<button class="boom-pill" data-da="back">Setup</button></span></div>'
+   + '</div>';
+  $('boomDrumRoot').innerHTML=html;
+}
+function drumQA(m){
+  var it=m.pool[m.cur.wi].w, en2uz=m.cur.dir==='en2uz';
+  return {q:en2uz?it[0]:it[1], a:en2uz?it[1]:it[0], label:en2uz?'Translate to Uzbek':'Translate to English', en:it[2], uz:it[3], cat:m.pool[m.cur.wi].cat, n:m.pool[m.cur.wi].n};
+}
+function drumRenderStage(){
+  var m=DM; if(!m) return;
+  var ws=$('dWordStage'), ctl=$('dControls'); if(!ws||!ctl) return;
+  var html='', btns='';
+  if(m.state==='idle'){
+    ws.className='drum-word';
+    html='<div class="lbl">Ready</div><div class="big">Press SPIN</div>';
+    btns='<button class="wc-btn" data-da="spin" id="dSpin">'+(m.spins? 'SPIN AGAIN':'SPIN')+'</button>';
+  } else if(m.state==='spinning'){
+    ws.className='drum-word spin';
+    html='<div class="big">&hellip;</div>';
+    btns='<button class="wc-btn" disabled>Spinning&hellip;</button>';
+  } else {
+    var qa=drumQA(m);
+    ws.className='drum-word';
+    html='<div class="lbl">'+qa.cat+' #'+qa.n+' &middot; '+qa.label+'</div><div class="big">'+esc(qa.q)+'</div>';
+    if(m.state==='asked') btns='<button class="wc-btn" data-da="reveal" id="dReveal">Show answer</button>';
+    else {
+      html+='<div class="ans">'+esc(qa.a)+'</div><div class="ex">'+esc(qa.en)+'<br>'+esc(qa.uz)+'</div>';
+      btns='<button class="wc-btn drum-ok" data-da="ok" id="dOk">&#10003; Correct</button><button class="wc-btn drum-bad" data-da="bad" id="dBad">&#10007; Wrong</button><button class="wc-btn ghost" data-da="skip" id="dSkip">Skip</button>';
+    }
+  }
+  ws.innerHTML=html; ctl.innerHTML=btns;
+  $('dNote').textContent=m.note||'';
+  var wl=m.opts.noRepeat ? (m.filledW ? m.bagW.length : m.pool.length) : null, nl=m.opts.noRepeat && m.names.length ? (m.filledN ? m.bagN.length : m.names.length) : null;
+  $('dLeft').textContent=(wl===null ? m.pool.length+' words in play' : 'Words left: '+wl+'/'+m.pool.length) + (nl===null ? '' : ' \u00B7 Students left this round: '+nl+'/'+m.names.length);
+  $('dSound').textContent=m.opts.sound ? '\uD83D\uDD0A Sound on' : '\uD83D\uDD07 Sound off';
+}
+function drumRenderScore(){
+  var m=DM; if(!m) return; var box=$('dScore'); if(!box) return;
+  if(m.names.length){
+    box.innerHTML=m.names.map(function(nm,i){
+      var hot=m.cur && m.cur.ni===i && m.state!=='spinning';
+      return '<span class="drum-chip'+(hot?' hot':'')+'">'+esc(nm)+(m.scores[i]?' &middot; &#9733;'+m.scores[i]:'')+'</span>';
+    }).join('');
+  } else {
+    box.innerHTML='<span class="drum-chip">&#10003; '+m.stats.ok+'</span><span class="drum-chip">&#10007; '+m.stats.bad+'</span>';
+  }
+}
+
+/* ---------- spinning ---------- */
+function drumTick(){ if(DM && DM.opts.sound) boomTone(900,0,0.03,'square',0.04); }
+function drumSchedule(fn,ms){ if(!DM) return; DM.timers.push(setTimeout(fn,ms)); }
+function drumClearTimers(){ if(!DM) return; DM.timers.forEach(clearTimeout); DM.timers=[]; }
+function drumCancel(){
+  var m=DM; if(!m) return;
+  m.spinId++; drumClearTimers();
+  if(m.state==='spinning'){
+    if(m.cur){
+      if(m.opts.noRepeat){ m.bagW.push(m.cur.wi); if(m.cur.ni!==null) m.bagN.push(m.cur.ni); }
+      m.cur=null;
+    }
+    m.state='idle'; m.note='';
+    var no=$('dNameOut'); if(no) no.innerHTML='&mdash;';
+    drumRenderStage(); drumRenderScore();
+  }
+}
+function drumTickLoop(m,id,dur){
+  var t=0, iv=45;
+  (function step(){
+    if(DM!==m || m.spinId!==id) return;
+    drumTick(); iv*=1.13; t+=iv;
+    if(t<dur-80) drumSchedule(step,iv);
+  })();
+}
+function drumRoll(m,id,count,target,steps,show,done){
+  var i=0, last=-1;
+  (function step(){
+    if(DM!==m || m.spinId!==id) return;
+    if(i>=steps){ done(); return; }
+    var cand=[], k;
+    for(k=0;k<count;k++) if(k!==target) cand.push(k);
+    if(!cand.length) cand.push(target);
+    if(cand.length>1) cand=cand.filter(function(x){ return x!==last; });
+    var pick=cand[Math.floor(Math.random()*cand.length)]; last=pick;
+    show(pick); drumTick();
+    var delay=drumMs(40+Math.pow(i/steps,2)*320); i++;
+    drumSchedule(step,delay);
+  })();
+}
+function drumSpinName(m,id,idx,done){
+  var out=$('dNameOut'), n=m.names.length;
+  if(out) out.textContent='\u2026';
+  var landed=function(){
+    if(DM!==m || m.spinId!==id) return;
+    var o=$('dNameOut'); if(o) o.textContent=m.names[idx];
+    drumRenderScore(); done();
+  };
+  if(n<=DRUM_WHEEL_MAX){
+    var rot=$('dWheelRot'); if(!rot){ landed(); return; }
+    var dur=drumMs(2800), seg=360/n, jitter=(Math.random()-0.5)*seg*0.6;
+    var target=(((360-((idx+0.5)*seg+jitter))%360)+360)%360;
+    var curMod=(((m.rot||0)%360)+360)%360;
+    var fin=(m.rot||0)+5*360+(((target-curMod)+360)%360);
+    m.rot=fin;
+    rot.style.transition='transform '+dur+'ms cubic-bezier(.12,.7,.1,1)';
+    void rot.offsetWidth;
+    rot.style.transform='rotate('+fin+'deg)';
+    rot.setAttribute('data-rot',String(fin));
+    drumTickLoop(m,id,dur);
+    drumSchedule(landed,dur+60);
+  } else {
+    var tk=$('dNameTicker');
+    drumRoll(m,id,n,idx,drumReduced()?3:22,function(k){ if(tk) tk.textContent=m.names[k]; },function(){ if(tk) tk.textContent=m.names[idx]; landed(); });
+  }
+}
+function drumSpinWord(m,id,done){
+  var ws=$('dWordStage'), target=m.cur.wi, en2uz=m.cur.dir==='en2uz';
+  drumRoll(m,id,m.pool.length,target,drumReduced()?3:12,
+    function(k){ var it=m.pool[k].w; if(ws) ws.innerHTML='<div class="big">'+esc(en2uz?it[0]:it[1])+'</div>'; },
+    done);
+}
+function drumSpin(){
+  var m=DM; if(!m || m.state!=='idle') return;
+  boomAudioCtx();
+  var id=++m.spinId; m.state='spinning'; m.note=''; m.spins++;
+  var w=drumDrawFrom(m,'W',m.pool.length);
+  var nm=m.names.length ? drumDrawFrom(m,'N',m.names.length) : null;
+  var dir=m.opts.dir==='mix' ? (Math.random()<0.5 ? 'en2uz':'uz2en') : m.opts.dir;
+  m.cur={wi:w.idx, ni:nm?nm.idx:null, dir:dir};
+  if(w.refill) m.note='All '+m.pool.length+' words have been used \u2014 reshuffled.';
+  if(nm && nm.refill) m.note=(m.note?m.note+' ':'')+'Everyone has had a turn \u2014 new round.';
+  drumRenderStage(); drumRenderScore();
+  var words=function(){
+    if(DM!==m || m.spinId!==id) return;
+    drumSpinWord(m,id,function(){
+      if(DM!==m || m.spinId!==id) return;
+      m.state='asked'; drumRenderStage(); drumRenderScore();
+    });
+  };
+  if(nm) drumSpinName(m,id,nm.idx,function(){ drumSchedule(words,drumMs(350)); });
+  else words();
+}
+function drumReveal(){ var m=DM; if(!m || m.state!=='asked') return; m.state='revealed'; drumRenderStage(); }
+function drumScore(kind){
+  var m=DM; if(!m || m.state!=='revealed') return;
+  var who=m.cur.ni!==null ? m.names[m.cur.ni] : null;
+  if(kind==='ok'){
+    m.stats.ok++; if(who!==null) m.scores[m.cur.ni]++;
+    m.note=who!==null ? '\u2713 '+who+' +1 \u2605' : '\u2713 Correct';
+    if(m.opts.sound) playCorrectSound();
+  } else if(kind==='bad'){
+    m.stats.bad++; m.note=who!==null ? '\u2717 '+who : '\u2717 Wrong';
+    if(m.opts.sound) playWrongSound();
+  } else { m.stats.skip++; m.note='Skipped'; }
+  m.state='idle'; m.cur=null;
+  drumRenderStage(); drumRenderScore();
+}
+
+/* ---------- wiring (one delegated listener set, survives re-renders) ---------- */
+function drumInit(){
+  var root=$('boomDrumRoot'); if(!root) return;
+  drumSetup();
+  root.addEventListener('click', function(e){
+    var t=e.target.closest ? e.target.closest('button') : null; if(!t || !root.contains(t)) return;
+    var a=t.getAttribute('data-da');
+    if(a==='start') return drumStart();
+    if(a==='spin') return drumSpin();
+    if(a==='reveal') return drumReveal();
+    if(a==='ok' || a==='bad' || a==='skip') return drumScore(a);
+    if(a==='sound'){ if(DM){ DM.opts.sound=!DM.opts.sound; DOPTS.sound=DM.opts.sound; drumSaveOpts(); drumRenderStage(); } return; }
+    if(a==='reset'){ if(DM && confirm('Reset all scores and start over?')){ drumCancel(); drumBegin(DM.names); } return; }
+    if(a==='back'){ drumCancel(); drumSetup(); return; }
+    if(DM) return;   /* the setup controls below only exist on the setup screen */
+    var dl=t.getAttribute('data-dl'), dr=t.getAttribute('data-dr'), dm=t.getAttribute('data-dm'), dt=t.getAttribute('data-dt');
+    if(dl){
+      DOPTS[dl]=!DOPTS[dl];
+      if(!DOPTS.verbs && !DOPTS.adjs){ DOPTS[dl]=true; drumRefreshSetup(); var er=$('dSetupErr'); er.hidden=false; er.textContent='Keep at least one word list on.'; drumSaveOpts(); return; }
+      drumSaveOpts(); drumRefreshSetup();
+    } else if(dr){ var p=dr.split('-'); $('dFrom').value=p[0]; $('dTo').value=p[1]; drumRefreshSetup(); var r=drumReadRange(); if(r.ok){ DOPTS.from=r.from; DOPTS.to=r.to; drumSaveOpts(); } }
+    else if(dm){ DOPTS.dir=dm; drumSaveOpts(); drumRefreshSetup(); }
+    else if(dt){ DOPTS[dt]=!DOPTS[dt]; drumSaveOpts(); drumRefreshSetup(); }
+  });
+  root.addEventListener('input', function(e){
+    var id=e.target.id;
+    if(id==='dNames'){ drumSaveNames(e.target.value); drumRefreshSetup(); }
+    else if(id==='dFrom' || id==='dTo'){ drumRefreshSetup(); var r=drumReadRange(); if(r.ok){ DOPTS.from=r.from; DOPTS.to=r.to; drumSaveOpts(); } }
+  });
+  root.addEventListener('change', function(e){
+    var id=e.target.id;
+    if(id==='dFrom' || id==='dTo'){   /* tidy the numbers once the teacher leaves the field */
+      var v=parseInt(e.target.value,10); if(!isNaN(v)) e.target.value=Math.min(100,Math.max(1,v));
+      drumRefreshSetup();
+    }
+  });
+  new MutationObserver(function(){ if(document.body.getAttribute('data-view')!=='boom') drumCancel(); }).observe(document.body,{attributes:true,attributeFilter:['data-view']});
+}
+
 /* ---- init ---- */
 function initBoom(){
   var vl = document.getElementById('boomVerbsList');
@@ -5705,6 +6106,7 @@ function initBoom(){
   if(al) renderWordList(al, BOOM_ADJS);
   wireTabs();
   setupScreen();
+  drumInit();
   new MutationObserver(function(){
     if(document.body.getAttribute('data-view')==='boom' && !G){ setupScreen(); }
   }).observe(document.body,{attributes:true,attributeFilter:['data-view']});
