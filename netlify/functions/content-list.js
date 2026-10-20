@@ -10,6 +10,7 @@ const {
   serviceClient,
   getUserFromRequest,
 } = require("./_shared");
+const { getAccess } = require("./_access");
 
 exports.handler = async (event) => {
   if (missingEnv()) return json(500, { error: "Backend not configured." });
@@ -18,15 +19,15 @@ exports.handler = async (event) => {
 
   const db = serviceClient();
   try {
-    const [itemsRes, accessRes, myClassesRes] = await Promise.all([
+    const [itemsRes, accessRes, access] = await Promise.all([
       db.from("content_items")
         .select("id, course, lesson, title, description, kind, mime_type, file_name, size_bytes, is_free, created_at")
         .eq("ready", true),
       db.from("content_access").select("content_id, student_id, class_id"),
-      db.from("class_members").select("class_id").eq("student_id", user.id),
+      getAccess(db, user), // only classes that are still active (end date not passed)
     ]);
 
-    const myClasses = new Set((myClassesRes.data || []).map((r) => r.class_id));
+    const myClasses = access.activeClassIds;
     const allow = new Set();
     (accessRes.data || []).forEach((r) => {
       if (r.student_id === user.id) allow.add(r.content_id);
@@ -37,7 +38,9 @@ exports.handler = async (event) => {
       .filter((it) => it.is_free || allow.has(it.id))
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    return json(200, { items });
+    // Classes whose access has ended (so the page can say "your access ended on ..." instead of showing nothing).
+    const expired = access.expired.map((e) => ({ name: e.name, valid_until: e.valid_until }));
+    return json(200, { items, expired });
   } catch (e) {
     console.error("content-list", e);
     return json(500, { error: "Could not load your lessons." });

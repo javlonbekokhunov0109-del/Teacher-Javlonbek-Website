@@ -11,6 +11,7 @@ const {
   isAdminEmail,
   BUCKET,
 } = require("./_shared");
+const { getAccess, canOpenMock } = require("./_access");
 
 const EXPIRES = 60 * 60 * 3; // 3 hours
 
@@ -38,14 +39,18 @@ exports.handler = async (event) => {
 
     // entitlement check for non-admins
     if (!admin && !item.is_free) {
-      const [accessRes, myClassesRes] = await Promise.all([
+      const [accessRes, access] = await Promise.all([
         db.from("content_access").select("student_id, class_id").eq("content_id", id),
-        db.from("class_members").select("class_id").eq("student_id", user.id),
+        getAccess(db, user), // active classes only (end dates respected)
       ]);
-      const myClasses = new Set((myClassesRes.data || []).map((r) => r.class_id));
-      const ok = (accessRes.data || []).some(
-        (r) => r.student_id === user.id || (r.class_id && myClasses.has(r.class_id))
+      let ok = (accessRes.data || []).some(
+        (r) => r.student_id === user.id || (r.class_id && access.activeClassIds.has(r.class_id))
       );
+      if (!ok) {
+        // A Listening/Reading file attached to a published mock the student is allowed to open.
+        const mk = await db.from("mocks").select("id, is_free, published").eq("published", true).or(`listening_item.eq.${id},reading_item.eq.${id}`);
+        ok = (mk.data || []).some((m) => canOpenMock(access, m));
+      }
       if (!ok) return json(403, { error: "You don't have access to this item." });
     }
 

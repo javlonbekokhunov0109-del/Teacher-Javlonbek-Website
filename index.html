@@ -7,6 +7,15 @@
 <title>Teacher Javlonbek · Premium English</title>
 <meta name="description" content="Premium English Learning Hub by Teacher Javlonbek — vocabulary, collocations, IELTS Writing feedback, typing speed training, quiz games and more, all in one place.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M6 12l8 9 10-15 10 15 8-9-4 22H10L6 12z' fill='%23E9C46A'/%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#FBF8F1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Javlonbek">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="stylesheet" href="/css/features.css?v=20261020">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@400;450;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ---- shell + light overrides ---- */
@@ -1076,6 +1085,20 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
       <p>AI-scored feedback for Task 1.1, Task 1.2 and Task 2 of the Multilevel CEFR exam &mdash; raw score, converted score, CEFR level, corrections and tips.</p>
       <span class="tj-go">Open Multilevel Checker <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
+    <button class="tj-door mocks" data-go="mocks">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 14l2 2 4-4"/></svg></div>
+      <div class="tj-tag">IELTS &middot; Full Mock Tests</div>
+      <h2>Mock Tests</h2>
+      <p>Full IELTS mocks with Listening, Reading, Writing and Speaking. Mock 1 is free; AI marks your Writing and Speaking.</p>
+      <span class="tj-go">Open Mock Tests <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="tj-door synonyms" data-go="synonyms">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></div>
+      <div class="tj-tag">Vocabulary &middot; B2&ndash;C1</div>
+      <h2>Synonym Trainer</h2>
+      <p>Learn linkers, Task 1 language and topic vocabulary as groups of expressions that mean the same &mdash; odd one out, synonym hunt and match pairs.</p>
+      <span class="tj-go">Open Synonym Trainer <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
     <button class="tj-door typing" data-go="typing">
       <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7 14h6M15 14h2"/></svg></div>
       <div class="tj-tag">Speed &middot; Typing</div>
@@ -1089,6 +1112,13 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
       <h2>Beginner BOOM</h2>
       <p>Top 100 verbs and adjectives, plus a live team quiz game with bonus and punishment cards &mdash; perfect for beginner classes.</p>
       <span class="tj-go">Open Beginner BOOM <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="tj-door lessons" data-go="lessons">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v14H6.5A2.5 2.5 0 004 19.5z"/><path d="M4 19.5A2.5 2.5 0 016.5 17H20v4H6.5A2.5 2.5 0 014 18.5"/><path d="M9 8h7M9 11h5"/></svg></div>
+      <div class="tj-tag">Lessons &middot; Videos &amp; Files</div>
+      <h2>My Lessons</h2>
+      <p>Watch the class videos and open the PDFs, slides and worksheets your teacher has shared with you &mdash; organised by course and lesson.</p>
+      <span class="tj-go">Open My Lessons <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
   </div>
   <div class="tj-foot">
@@ -1461,11 +1491,13 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
     <button data-adtab="content">Content Manager</button>
     <button data-adtab="classes">Classes</button>
     <button data-adtab="writing">Writing Checks</button>
+    <button data-adtab="mocks">Mocks</button>
   </div>
   <div id="adTabOverview"><div id="adBody"><div class="wc-loading"><span class="d"></span> Loading dashboard…</div></div></div>
   <div id="adTabContent" hidden><div id="cmRoot"><div class="wc-loading"><span class="d"></span> Loading content…</div></div></div>
   <div id="adTabClasses" hidden><div id="clRoot"><div class="wc-loading"><span class="d"></span> Loading classes…</div></div></div>
   <div id="adTabWriting" hidden><div id="wdRoot"><div class="wc-loading"><span class="d"></span> Loading writing checks…</div></div></div>
+  <div id="adTabMocks" hidden><div id="mkRoot2"></div></div>
 </section>
 
 <!-- ================= STUDENT · MY LESSONS ================= -->
@@ -1474,6 +1506,22 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   <h1 class="wc-h1">My Lessons</h1>
   <p class="wc-sub">Videos and files your teacher has shared with you, organised by course and lesson.</p>
   <div id="lsRoot"><div class="wc-loading"><span class="d"></span> Loading your lessons…</div></div>
+</section>
+
+<!-- ================= MOCK TESTS ================= -->
+<section id="mocks-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">Premium English &middot; IELTS</div>
+  <h1 class="wc-h1">Mock Tests</h1>
+  <p class="wc-sub">Full IELTS mocks &mdash; Listening, Reading, Writing and Speaking. Your Writing and Speaking are marked by AI.</p>
+  <div id="mkRoot"><div class="wc-loading"><span class="d"></span> Loading mock tests&hellip;</div></div>
+</section>
+
+<!-- ================= SYNONYM TRAINER ================= -->
+<section id="synonyms-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">Premium English &middot; Vocabulary</div>
+  <h1 class="wc-h1">Synonym Trainer</h1>
+  <p class="wc-sub">Linkers, Task 1 language, sentence patterns and topic vocabulary &mdash; learned as groups of expressions that mean the same, with notes on tone and grammar.</p>
+  <div id="synRoot"></div>
 </section>
 
 <!-- ================= LEADERBOARD ================= -->
@@ -1633,7 +1681,7 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root',multilevel:'multilevel-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root',multilevel:'multilevel-root',lessons:'lessons-root',mocks:'mocks-root',synonyms:'synonyms-root'};
   var navHist=[]; var curView=null; window.__tjUserNavigated=false;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -3868,7 +3916,10 @@ function renderAcct(){
       '<div class="who">Signed in as<b>'+esc(user.email||"")+'</b></div>'+
       '<div class="sep"></div>'+
       '<button data-go="write">My Writing Checker</button>'+
+      '<button data-go="lessons">My Lessons</button>'+
+      '<button data-go="mocks">Mock Tests</button>'+
       '<button data-go="leaderboard">Leaderboard</button>'+
+      '<button data-install>Install app</button>'+
       (isAdmin?'<button data-go="admin">Admin Dashboard</button>':'')+
       '<div class="sep"></div>'+
       '<button id="tjSignOut">Sign out</button>'+
@@ -4573,9 +4624,11 @@ function wireTabs(){
     $("adTabContent").hidden=(t!=="content");
     $("adTabClasses").hidden=(t!=="classes");
     $("adTabWriting").hidden=(t!=="writing");
+    $("adTabMocks").hidden=(t!=="mocks");
     if(t==="content") loadContent();
     if(t==="classes") loadClasses();
     if(t==="writing") loadWritingDash();
+    if(t==="mocks" && window.TJMocksAdmin) window.TJMocksAdmin.load();
   });
 }
 
@@ -4746,10 +4799,16 @@ function renderClasses(){
   if(!STATE.classes||!STATE.classes.length){ list.innerHTML='<div class="wc-empty" style="padding:14px 2px">No classes yet.</div>'; return; }
   list.innerHTML=STATE.classes.map(function(c){
     return '<div class="cl-item"><div style="flex:1"><div class="nm">'+esc(c.name)+'</div><div class="ct">'+(c.member_ids?c.member_ids.length:0)+' student'+((c.member_ids&&c.member_ids.length===1)?"":"s")+'</div></div>'+
+      '<label class="cl-flag" title="Members of this class can open the paid mock tests"><input type="checkbox" data-mockflag="'+esc(c.id)+'"'+(c.includes_mocks?' checked':'')+'> Includes mock tests</label>'+
       '<button class="wc-btn ghost" data-members="'+esc(c.id)+'">Members</button>'+
       '<button class="cm-icon danger" data-delclass="'+esc(c.id)+'" title="Delete class"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button></div>'+
       '<div class="wc-row" id="clMembers-'+esc(c.id)+'" hidden style="margin-top:-4px;margin-bottom:14px"></div>';
   }).join("");
+  list.onchange=async function(e){
+    var cb=e.target.closest("[data-mockflag]"); if(!cb) return;
+    try{ await api("set-class-flags",{id:cb.getAttribute("data-mockflag"),includes_mocks:cb.checked}); }
+    catch(er){ cb.checked=!cb.checked; alert("Could not save: "+er.message); }
+  };
   list.onclick=function(e){
     var m=e.target.closest("[data-members]"); if(m){ toggleMembers(m.getAttribute("data-members")); return; }
     var d=e.target.closest("[data-delclass]"); if(d){ delClass(d.getAttribute("data-delclass")); return; }
@@ -4758,19 +4817,33 @@ function renderClasses(){
 function toggleMembers(id){
   var box=$("clMembers-"+id); if(!box) return;
   if(!box.hidden){ box.hidden=true; box.innerHTML=""; return; }
-  var cls=(STATE.classes||[]).filter(function(x){return x.id===id;})[0]; var sel=new Set(cls?cls.member_ids:[]);
+  var cls=(STATE.classes||[]).filter(function(x){return x.id===id;})[0]||{};
+  var sel=new Map(); (cls.member_ids||[]).forEach(function(sid){ sel.set(sid,(cls.member_until||{})[sid]||""); });
+  var stu=STATE.students||[], nameOf=function(sid){ var s=stu.filter(function(x){return x.id===sid;})[0]; return s?(s.full_name||s.email):sid; };
+  function ymd(d){ return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+  function addMonths(n){ var d=new Date(); d.setMonth(d.getMonth()+n); return ymd(d); }
   box.hidden=false;
-  box.innerHTML='<label class="wc-label">Students in this class</label><div class="cm-multi">'+
-    (STATE.students||[]).map(function(s){var on=sel.has(s.id);return '<span class="cm-chip'+(on?' on':'')+'" data-sid="'+esc(s.id)+'"><svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg>'+esc(s.full_name||s.email)+'</span>';}).join("")+
-    '</div><div style="margin-top:12px"><button class="wc-btn" data-savemembers="'+esc(id)+'">Save members</button> <span class="cm-status" id="clMsg-'+esc(id)+'"></span></div>';
+  function draw(){
+    box.innerHTML='<label class="wc-label">Students in this class</label><div class="cm-multi">'+
+      stu.map(function(s){var on=sel.has(s.id);return '<span class="cm-chip'+(on?' on':'')+'" data-sid="'+esc(s.id)+'"><svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg>'+esc(s.full_name||s.email)+'</span>';}).join("")+'</div>'+
+      (sel.size?'<label class="wc-label" style="margin-top:14px">Access until (optional)</label><div class="cm-dates">'+Array.from(sel.keys()).map(function(sid){
+        return '<div class="r"><b>'+esc(nameOf(sid))+'</b><input type="date" data-until="'+esc(sid)+'" value="'+esc(sel.get(sid))+'">'+
+          '<button data-addm="1" data-for="'+esc(sid)+'">+1 month</button><button data-addm="3" data-for="'+esc(sid)+'">+3 months</button><button data-addm="12" data-for="'+esc(sid)+'">+1 year</button><button data-nodate="'+esc(sid)+'">No end</button></div>';
+      }).join("")+'<div class="wc-note" style="font-size:12px">Leave a date empty for no end. Access works through the end date. After it, lessons and mocks from this class lock automatically.</div></div>':'')+
+      '<div style="margin-top:12px"><button class="wc-btn" data-savemembers="'+esc(id)+'">Save members</button> <span class="cm-status" id="clMsg-'+esc(id)+'"></span></div>';
+  }
+  draw();
   box.onclick=function(e){
-    var c=e.target.closest("[data-sid]"); if(c){ var sid=c.getAttribute("data-sid"); if(sel.has(sid))sel.delete(sid); else sel.add(sid); c.classList.toggle("on"); return; }
-    var sv=e.target.closest("[data-savemembers]"); if(sv){ saveMembers(id,Array.from(sel)); }
+    var c=e.target.closest("[data-sid]"); if(c){ var sid=c.getAttribute("data-sid"); if(sel.has(sid)) sel.delete(sid); else sel.set(sid,""); draw(); return; }
+    var am=e.target.closest("[data-addm]"); if(am){ sel.set(am.getAttribute("data-for"),addMonths(Number(am.getAttribute("data-addm")))); draw(); return; }
+    var nd=e.target.closest("[data-nodate]"); if(nd){ sel.set(nd.getAttribute("data-nodate"),""); draw(); return; }
+    var sv=e.target.closest("[data-savemembers]"); if(sv){ saveMembers(id,Array.from(sel.entries()).map(function(en){ return {student_id:en[0],valid_until:en[1]||null}; })); }
   };
+  box.onchange=function(e){ var d=e.target.closest("[data-until]"); if(d) sel.set(d.getAttribute("data-until"),d.value||""); };
 }
-async function saveMembers(id,ids){
+async function saveMembers(id,members){
   var msg=$("clMsg-"+id); if(msg) msg.textContent="Saving…";
-  try{ await api("set-class-members",{class_id:id,student_ids:ids}); await loadClasses(); }catch(e){ if(msg) msg.textContent="Error: "+e.message; }
+  try{ await api("set-class-members",{class_id:id,members:members}); await loadClasses(); }catch(e){ if(msg) msg.textContent="Error: "+e.message; }
 }
 async function delClass(id){
   var cls=(STATE.classes||[]).filter(function(x){return x.id===id;})[0];
@@ -4786,6 +4859,7 @@ async function loadLessons(){
     var t=await TJ.token(); var r=await fetch(FN+"content-list",{headers:{Authorization:"Bearer "+t}});
     var d=await r.json(); if(!r.ok) throw new Error(d.error||"error");
     renderLessons(d.items||[]);
+    (d.expired||[]).forEach(function(x){ root.insertAdjacentHTML("afterbegin",'<div class="ls-expired">Your access to <b>'+esc(x.name||"a course")+'</b> ended'+(x.valid_until?' on <b>'+esc(TJ.fmtDate(x.valid_until))+'</b>':"")+'. Message your teacher to renew it.</div>'); });
   }catch(e){ root.innerHTML='<div class="wc-err">Could not load your lessons.</div>'; }
 }
 function renderLessons(items){
@@ -6157,5 +6231,10 @@ setTimeout(restoreFields, 400);
 setTimeout(restoreFields, 1200);
 })();
 </script>
+<script src="/js/pwa.js?v=20261020" defer></script>
+<script src="/js/synonyms-data.js?v=20261020" defer></script>
+<script src="/js/synonyms.js?v=20261020" defer></script>
+<script src="/js/mocks.js?v=20261020" defer></script>
+<script src="/js/mocks-admin.js?v=20261020" defer></script>
 </body>
 </html>

@@ -30,8 +30,8 @@ async function getState(db) {
   const [items, access, classes, members, students] = await Promise.all([
     db.from("content_items").select("*").order("course").order("lesson").order("created_at", { ascending: false }),
     db.from("content_access").select("content_id, student_id, class_id"),
-    db.from("classes").select("id, name, created_at").order("name"),
-    db.from("class_members").select("class_id, student_id"),
+    db.from("classes").select("*").order("name"),
+    db.from("class_members").select("*"),
     db.from("profiles").select("id, full_name, email").order("full_name"),
   ]);
 
@@ -42,9 +42,10 @@ async function getState(db) {
     if (r.class_id) b.class_ids.push(r.class_id);
   });
 
-  const memByClass = {};
+  const memByClass = {}, datesByClass = {};
   (members.data || []).forEach((m) => {
     (memByClass[m.class_id] = memByClass[m.class_id] || []).push(m.student_id);
+    if (m.valid_until) (datesByClass[m.class_id] = datesByClass[m.class_id] || {})[m.student_id] = m.valid_until;
   });
 
   return {
@@ -53,7 +54,7 @@ async function getState(db) {
       student_ids: (accByContent[it.id] || {}).student_ids || [],
       class_ids: (accByContent[it.id] || {}).class_ids || [],
     })),
-    classes: (classes.data || []).map((c) => ({ ...c, member_ids: memByClass[c.id] || [] })),
+    classes: (classes.data || []).map((c) => ({ id: c.id, name: c.name, created_at: c.created_at, includes_mocks: !!c.includes_mocks, member_ids: memByClass[c.id] || [], member_until: datesByClass[c.id] || {} })),
     students: students.data || [],
   };
 }
@@ -194,13 +195,29 @@ exports.handler = async (event) => {
         return json(200, { ok: true });
       }
       case "set-class-members": {
+        // body.members = [{ student_id, valid_until: "YYYY-MM-DD" | null }]  (student_ids kept for old callers)
         const classId = body.class_id;
         if (!classId) return json(400, { error: "Missing class_id." });
-        await db.from("class_members").delete().eq("class_id", classId);
-        const ids = Array.isArray(body.student_ids) ? body.student_ids : [];
-        if (ids.length) {
-          await db.from("class_members").insert(ids.map((s) => ({ class_id: classId, student_id: s })));
+        const list = Array.isArray(body.members)
+          ? body.members.map((m) => ({ student_id: String((m && m.student_id) || ""), valid_until: m && m.valid_until ? String(m.valid_until).slice(0, 10) : null }))
+          : (Array.isArray(body.student_ids) ? body.student_ids : []).map((s) => ({ student_id: s, valid_until: null }));
+        for (const m of list) {
+          if (!m.student_id) return json(400, { error: "Invalid member." });
+          if (m.valid_until && !/^\d{4}-\d{2}-\d{2}$/.test(m.valid_until)) return json(400, { error: "Dates must look like 2026-12-31." });
         }
+        await db.from("class_members").delete().eq("class_id", classId);
+        if (list.length) {
+          let ins = await db.from("class_members").insert(list.map((m) => ({ class_id: classId, student_id: m.student_id, valid_until: m.valid_until })));
+          // SQL not run yet (no valid_until column): save the members without end dates rather than failing.
+          if (ins.error) ins = await db.from("class_members").insert(list.map((m) => ({ class_id: classId, student_id: m.student_id })));
+          if (ins.error) throw ins.error;
+        }
+        return json(200, { ok: true });
+      }
+      case "set-class-flags": {
+        if (!body.id) return json(400, { error: "Missing id." });
+        const r = await db.from("classes").update({ includes_mocks: !!body.includes_mocks }).eq("id", body.id);
+        if (r.error) return json(500, { error: "Could not save. Run the mocks SQL in Supabase first." });
         return json(200, { ok: true });
       }
 

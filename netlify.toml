@@ -22,3 +22,14 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# App install: always re-check the service worker so updates reach students quickly
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
