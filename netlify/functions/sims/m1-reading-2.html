@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IELTS WARRIORS – Reading Passage 2 – Demystifying Yawn</title>
+<style>
+:root{--fs:17px;--ink:#1a1a1a;--muted:#5b5b5b;--line:#d6d6d6;--soft:#f1f1f1;--red:#d0021b;--green:#2e7d32;--bad:#c62828;--blue:#1d6fd6}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff}
+body{font-size:var(--fs);line-height:1.6}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+[hidden]{display:none!important}
+
+/* ---------- header ---------- */
+.top{height:84px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;gap:26px;background:#fff;position:relative;z-index:20}
+.logo{font-weight:800;font-size:40px;letter-spacing:.5px;color:var(--red);line-height:1;display:flex;align-items:flex-start;font-family:Arial,Helvetica,sans-serif}
+.logo sup{font-size:10px;color:#333;margin-left:2px;margin-top:4px;font-weight:700}
+.who{display:flex;flex-direction:column;line-height:1.25}
+.who a{font-weight:700;font-size:17px;text-decoration:none}
+.who a:hover{text-decoration:underline}
+.who span{font-size:16px;color:var(--muted)}
+.icons{margin-left:auto;display:flex;align-items:center;gap:30px}
+.icons .ic{background:none;border:0;padding:4px;display:grid;place-items:center;color:#111}
+.icons svg{width:30px;height:30px}
+.saved{font-size:14px;color:var(--muted);min-width:44px}
+.menu{position:absolute;right:20px;top:78px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.14);padding:14px 16px;width:250px;font-size:15px}
+.menu h4{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:600}
+.sizes{display:flex;gap:6px}
+.sizes button{flex:1;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 0;font-weight:700}
+.sizes button.on{background:#111;color:#fff;border-color:#111}
+
+/* ---------- home ---------- */
+.home{max-width:1060px;margin:34px auto;padding:0 20px}
+.card{border:1px solid var(--line);border-radius:10px;padding:30px 34px;margin-bottom:24px;background:#fff}
+.card h1{margin:0;font-size:28px;display:flex;align-items:center;gap:10px}
+.card h1 .ck{color:var(--green)}
+.card .bigck{float:right;color:var(--green);font-size:46px;line-height:1;margin-top:-6px}
+.card h2{margin:0 0 4px;font-size:28px}
+.status{font-weight:700;color:var(--bad);margin-bottom:12px}
+.status.done{color:var(--green)}
+.info{border:1px solid var(--line);border-radius:4px;padding:12px 18px;margin-bottom:18px}
+.info b{color:var(--green);margin-left:10px}
+.btn{background:#111;color:#fff;border:0;border-radius:5px;padding:12px 26px;font-weight:700;font-size:17px;display:inline-flex;gap:8px;align-items:center}
+.btn:hover{background:#333}
+.btn.ghost{background:#fff;color:#111;border:1px solid #111;margin-left:10px}
+.btn.ghost:hover{background:#f3f3f3}
+
+/* ---------- exam ---------- */
+.exam{position:fixed;inset:84px 0 0 0;display:flex;flex-direction:column}
+.banner{background:var(--soft);padding:12px 34px;line-height:1.4;border-bottom:1px solid #e6e6e6}
+.banner p{margin:0}
+.ws{flex:1;display:flex;min-height:0;position:relative}
+.pane{overflow-y:auto;min-width:0}
+.pane.left{width:50%;padding:28px 48px 60px}
+.pane.right{flex:1;padding:28px 56px 120px 44px}
+.divider{width:14px;flex:0 0 14px;position:relative;cursor:col-resize;background:linear-gradient(#e2e2e2,#e2e2e2) center/2px 100% no-repeat}
+.divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:52px;border:1px solid #c9c9c9;background:#fff;border-radius:6px;display:grid;place-items:center;font-size:18px;color:#333;user-select:none}
+.pane.left h2{text-align:center;font-size:1.55em;line-height:1.3;margin:0 0 18px}
+.pane.left p{margin:0 0 1.1em}
+.letter{font-weight:800;margin-right:8px}
+mark.hl{background:#ffe86b;color:inherit;cursor:pointer;border-radius:2px}
+
+.question-group{margin-bottom:38px}
+.question-group h3{font-size:1.15em;margin:0 0 12px}
+.instruction{margin:0 0 8px}
+.question-group>p{margin:0 0 8px}
+.people-legend{border:1px solid var(--line);padding:12px 16px;margin:12px 0;border-radius:4px}
+.people-legend div{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:6px}
+.people-legend b{margin-right:8px}
+.matching-grid-wrap{overflow-x:auto;margin-top:16px}
+.matching-grid{border-collapse:collapse;width:100%;min-width:520px}
+.matching-grid th,.matching-grid td{border:1px solid var(--line);text-align:center;vertical-align:middle}
+.matching-grid thead th{background:var(--soft);padding:16px 8px;font-weight:700}
+.matching-grid thead th:first-child{text-align:left;padding-left:16px}
+.mg-stmt{text-align:left!important;padding:14px 16px;line-height:1.5;min-width:230px}
+.mg-stmt strong{margin-right:6px}
+.mg-cell{width:46px;padding:0}
+.mg-cell label{display:flex;width:100%;min-height:64px;align-items:center;justify-content:center;cursor:pointer}
+.mg-cell label:hover{background:#f4f8ff}
+.mg-cell input{position:absolute;opacity:0;pointer-events:none}
+.mg-cell .tick{width:22px;height:22px;border-radius:50%;border:2px solid transparent}
+.mg-cell input:checked+.tick{border-color:#111;background:radial-gradient(#111 45%,transparent 50%)}
+.mg-cell input:focus-visible+.tick{outline:2px solid var(--blue);outline-offset:3px}
+.mg-bm{width:44px}
+.bm{background:none;border:0;padding:4px;color:#9a9a9a;vertical-align:middle}
+.bm:hover{color:#333}
+.bm.on{color:var(--red)}
+.bm.on svg{fill:var(--red)}
+
+.question{margin:0 0 26px}
+.q-head{display:flex;gap:10px;align-items:flex-start}
+.q-number{font-weight:800;min-width:28px}
+.q-prompt{flex:1}
+.options{margin:10px 0 0 38px;display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:6px 10px;border-radius:4px;cursor:pointer}
+.opt:hover{background:#f4f8ff}
+.opt input{margin-top:6px;width:17px;height:17px;accent-color:#111;flex:0 0 auto}
+.opt b{margin-right:6px}
+.summary-card{border:1px solid var(--line);padding:18px 20px;border-radius:4px;line-height:2.3}
+.summary-card p{margin:0}
+.inline-answer{white-space:nowrap}
+.inline-answer>strong{margin-right:4px}
+.answer-input{border:1px solid #9a9a9a;border-radius:3px;padding:2px 8px;width:170px;height:34px;font-size:.95em;background:#fff}
+.answer-input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+.answer-input.over{border-color:var(--bad);background:#fff5f5}
+.qitem.cur>.q-head .q-number,.qitem.cur>.mg-stmt strong,.inline-answer.cur>strong{color:var(--blue)}
+
+/* review marks */
+.fb{display:none;font-size:.85em;font-weight:700;margin-left:8px;white-space:normal}
+.reviewing .fb{display:inline}
+.fb.good{color:var(--green)}
+.fb.bad{color:var(--bad)}
+.reviewing .answer-input.good{border-color:var(--green);background:#f1fbf2}
+.reviewing .answer-input.bad{border-color:var(--bad);background:#fff4f4}
+.reviewing .mg-cell.key{background:#e8f6ea}
+.reviewing .mg-cell.wrong{background:#fdeaea}
+.reviewing .opt.key{background:#e8f6ea}
+.reviewing .opt.wrong{background:#fdeaea}
+
+/* arrows + footer */
+.arrows{position:absolute;right:42px;bottom:22px;display:flex;gap:12px;z-index:5}
+.arrows button{width:72px;height:62px;border:0;border-radius:4px;color:#fff;font-size:28px;display:grid;place-items:center}
+.arrows .prev{background:#5b5b5b}.arrows .next{background:#111}
+.arrows button:disabled{opacity:.35;cursor:default}
+.foot{height:80px;border-top:1px solid var(--line);display:flex;align-items:center;padding:0 32px;gap:18px;background:#fff}
+.foot .pl{font-weight:800;font-size:19px}
+.nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.nav button{min-width:40px;height:40px;border:2px solid transparent;background:none;border-radius:3px;font-size:18px;position:relative}
+.nav button:hover{background:#f2f2f2}
+.nav button.ans{text-decoration:underline;text-underline-offset:5px;font-weight:700}
+.nav button.on{border-color:#111;font-weight:800}
+.nav button.flag::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+.nav button.good{color:var(--green);font-weight:800}
+.nav button.bad{color:var(--bad);font-weight:800}
+.count{color:var(--muted);font-size:15px;white-space:nowrap}
+.submit{background:#111;color:#fff;border:0;border-radius:5px;padding:13px 40px;font-weight:700;font-size:18px}
+.submit:hover{background:#333}
+
+/* highlight popup */
+.hlpop{position:fixed;z-index:60;background:#111;color:#fff;border-radius:6px;display:flex;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.hlpop button{background:none;border:0;color:#fff;padding:8px 14px;font-size:14px;font-weight:600}
+.hlpop button:hover{background:#333}
+
+/* modals */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+.modal{background:#fff;border-radius:8px;width:100%;max-width:880px;padding:36px 44px 40px;text-align:center}
+.modal.small{max-width:460px;margin-top:12vh}
+.modal h2{color:var(--red);font-size:30px;margin:0 0 20px}
+.modal.small h2{color:var(--ink);font-size:22px}
+.scorebox{display:inline-block;border:1px solid var(--line);border-radius:10px;padding:16px 40px 12px}
+.scorebox small{display:block;font-size:17px;color:#333}
+.scorebox strong{display:block;font-size:44px;line-height:1.15;color:var(--red)}
+.scorebox strong.pass{color:var(--green)}
+.scorebox span{font-size:16px;color:#333}
+.modal h3{text-align:left;margin:28px 0 10px;font-size:19px}
+.rt-wrap{overflow-x:auto}
+.rt{width:100%;border-collapse:collapse;text-align:left;font-size:16px}
+.rt th{background:var(--soft);font-weight:700}
+.rt th,.rt td{border:1px solid var(--line);padding:8px 10px}
+.rt .y{color:var(--green);font-weight:800}
+.rt .n{color:var(--bad);font-weight:800}
+.quote{font-style:italic;margin:26px 0 12px;font-size:18px}
+.tg{color:#2f52c8;font-weight:700;text-decoration:none;font-size:19px}
+.tg:hover{text-decoration:underline}
+.mbtns{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.mbtns .btn.ghost{margin-left:0}
+
+@media (max-width:860px){
+  .top{height:68px;padding:0 14px;gap:14px}.logo{font-size:30px}.icons{gap:14px}.icons svg{width:24px;height:24px}
+  .exam{inset:68px 0 0 0}.menu{top:62px}
+  .ws{flex-direction:column}.pane.left{width:100%!important;height:45%;padding:18px 18px 30px;border-bottom:2px solid var(--line)}
+  .pane.right{padding:18px 18px 110px}.divider{display:none}
+  .foot{height:auto;padding:10px 12px;flex-wrap:wrap}.count{display:none}
+  .arrows{right:14px;bottom:12px}.arrows button{width:54px;height:48px}
+  .card{padding:22px}.card h1,.card h2{font-size:22px}.modal{padding:26px 16px}
+  .options{margin-left:0}.answer-input{width:140px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">IELTS<sup>TM</sup></div>
+  <div class="who"><a href="https://t.me/Javlonbek_Okhunov" target="_blank" rel="noopener">Teacher Javlonbek</a><span id="whoSub" hidden>Reading</span></div>
+  <div class="icons">
+    <span class="saved" id="saved"></span>
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg></span>
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+    <button class="ic" id="menuBtn" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+  <div class="menu" id="menu" hidden>
+    <h4>Text size</h4>
+    <div class="sizes"><button data-fs="15">Small</button><button data-fs="17" class="on">Standard</button><button data-fs="20">Large</button></div>
+    <h4 style="margin-top:14px">Tip</h4>
+    <div style="font-size:14px;color:#444;line-height:1.45">Select any text in the passage to highlight it. Click a highlight to remove it.</div>
+  </div>
+</header>
+
+<!-- HOME -->
+<main class="home" id="home">
+  <div class="card"><span class="bigck">&#10004;</span><h1>IELTS WARRIORS – Reading Passage 2 <span class="ck">&#10004;</span></h1></div>
+  <div class="card">
+    <h2>Reading Passage 2 — Demystifying Yawn</h2>
+    <div class="status" id="homeStatus">Not completed</div>
+    <div class="info">&#9662; Questions 14–26. There is no time limit on this passage — submit when you are ready.<b>Confirmed</b></div>
+    <button class="btn" id="startBtn">&#10140; Start Reading</button><button class="btn ghost" id="retakeBtn" hidden>&#8635; Retake</button>
+  </div>
+</main>
+
+<!-- EXAM -->
+<section class="exam" id="exam" hidden>
+  <div class="banner"><p><strong>Part 2</strong></p><p>Read the text and answer questions 14–26.</p></div>
+  <div class="ws" id="ws">
+    <article class="pane left" id="passage"><h2>Demystifying Yawn</h2><p><span class="letter">A</span> When a scientist began to study yawning in the 1980s, it was difficult to convince some of his research students of the merits of &quot;yawning science.&quot; Although it may appear quirky, his decision to study yawning was a logical extension to human beings of his research in developmental neuroscience, reported in such papers as &quot;Wing-flapping during Development and Evolution.&quot; As a neurobehavioral problem, there is not much difference between the wing-flapping of birds and the face and body flapping of human yawners.</p><p><span class="letter">B</span> Yawning is an ancient, primitive act. Humans do it even before they are born, opening wide in the womb. Some snakes unhinge their jaws to do it. One species of penguins yawns as part of mating. Only now are researchers beginning to understand why we yawn, when we yawn and why we yawn back. A professor of cognitive neuroscience at Drexel University in Philadelphia, Steven Platek, studies the act of contagious yawning, something done only by people and other primates.</p><p><span class="letter">C</span> In his first experiment, he used a psychological test to rank people on their empathic feelings. He found that participants who did not score high on compassion did not yawn back. &quot;We literally had people saying, &#x27;Why am I looking at people yawning?— Professor Platek said. &quot;It just had no effect.&quot;</p><p><span class="letter">D</span> For his second experiment, he put 10 students in a magnetic resonance imaging machine as they watched video tapes of people yawning. When the students watched the videos, the part of the brain which reacted was the part scientists believe controls empathy — the posterior cingulate, in the brain&#x27;s middle rear.&quot; I don&#x27;t know if it&#x27;s necessarily that nice people yawn more, but I think it&#x27;s a good indicator of a state of mind,&quot; said Professor Platek. &quot;It&#x27;s also a good indicator if you&#x27;re empathizing with me and paying attention.&quot;</p><p><span class="letter">E</span> His third experiment is studying yawning in those with brain disorders, such as autism and schizophrenia, in which victims have difficulty connecting emotionally with others. A psychology professor at the University of Maryland, Robert Provine, is one of the few other researchers into yawning. He found the basic yawn lasts about six seconds and they come in bouts with an interval of about 68 seconds. Men and women yawn or half-yawn equally often, but men are significantly less likely to cover their mouths which may indicate complex distinction in genders.&quot; A watched yawner never yawns,&quot; Professor Provine said. However, the physical root of yawning remains a mystery. Some researchers say it&#x27;s coordinated within the hypothalamus of the brain, the area that also controls breathing.</p><p><span class="letter">F</span> Yawning and stretching also share properties and may be performed together as parts of a global motor complex. But they do not always co-occur, people usually yawn when we stretch, but we don&#x27;t always stretch when we yawn, especially before bedtime. Studies by G.H.A. Visser and H.F. Prechtl in the early 1980s, charting movement In the developing fetus using ultrasound, observed not just yawning but a link between yawning and stretching as early as the end of the first prenatal trimester.</p><p><span class="letter">G</span> The most extraordinary demonstration of the yawn-stretch linkage occurs in many people paralyzed on one side of their body because of brain damage caused by a stroke. The prominent British neurologist Sir Francis Walshe noted in 1923 that when these hemiplegics yawn, they are startled and mystified to observe that their otherwise paralyzed arm rises and flexes automatically in what neurologists term an &quot;associated response.&quot; Yawning apparently activates undamaged, unconsciously controlled connections between the brain and the cord motor system innervating the paralyzed limb. It is not known whether the associated response is a positive prognosis for recovery, nor whether yawning is therapeutic for reinnervation or prevention of muscular atrophy.</p><p><span class="letter">H</span> Clinical neurology offers other surprises. Some patients with &quot;locked-in&quot; syndrome, who are almost totally deprived of the ability to move voluntarily, can yawn normally. The neural circuits for spontaneous yawning must exist in the brain stem near other respiratory and vasomotor centers, because yawning is performed by anencephalic individuals who possess only the medulla oblongata. The multiplicity of stimuli of contagious yawning, by contrast, implicates many higher brain regions.</p></article>
+    <div class="divider" id="divider" title="Drag to resize"><span>&#8596;</span></div>
+    <div class="pane right" id="questions"><section class="question-group"><h3>Questions 14–18</h3><p class="instruction">Complete the Summary paragraph described below. Write <strong>NO MORE THAN THREE WORDS</strong> from the Reading Passage for each answer.</p><div class="summary-card"><p>A psychology professor drew a conclusion that an average yawn lasts about 6 seconds followed by an <span data-q="14" class="inline-answer qitem"><strong>14</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q14" data-maxwords="3" aria-label="Question 14"><span class="fb" data-fb="14"></span><button type="button" class="bm" data-flag="14" aria-label="Bookmark question 14" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> before another yawn. It is almost at the same frequency that males and females yawn or half yawn, but behavior accompanied with yawning shows a <span data-q="15" class="inline-answer qitem"><strong>15</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q15" data-maxwords="3" aria-label="Question 15"><span class="fb" data-fb="15"></span><button type="button" class="bm" data-flag="15" aria-label="Bookmark question 15" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> in genders. Besides, a part of the brain involved in yawning may also be responsible for <span data-q="16" class="inline-answer qitem"><strong>16</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q16" data-maxwords="3" aria-label="Question 16"><span class="fb" data-fb="16"></span><button type="button" class="bm" data-flag="16" aria-label="Bookmark question 16" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span>. Another study found that there is a link between a yawn and <span data-q="17" class="inline-answer qitem"><strong>17</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q17" data-maxwords="3" aria-label="Question 17"><span class="fb" data-fb="17"></span><button type="button" class="bm" data-flag="17" aria-label="Bookmark question 17" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> during the first three months of pregnancy, and yawning was also shown to set off an involuntary movement in people with <span data-q="18" class="inline-answer qitem"><strong>18</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q18" data-maxwords="3" aria-label="Question 18"><span class="fb" data-fb="18"></span><button type="button" class="bm" data-flag="18" aria-label="Bookmark question 18" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span>.</p></div></section><section class="question-group"><h3>Questions 19–23</h3><p class="instruction">Reading Passage 2 has eight paragraphs, <strong>A–H</strong>. Which paragraph contains the following information?</p><p>Choose the correct letter, <strong>A–H</strong>, for questions 19–23.</p><div class="matching-grid-wrap"><table class="matching-grid"><thead><tr><th scope="col">Information</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th><th scope="col">D</th><th scope="col">E</th><th scope="col">F</th><th scope="col">G</th><th scope="col">H</th><th class="mg-bm"></th></tr></thead><tbody><tr data-q="19" class="qitem"><td class="mg-stmt"><strong>19</strong> The rate for yawning shows some regular pattern.<span class="fb" data-fb="19"></span></td><td class="mg-cell"><label><input type="radio" name="q19" value="A" aria-label="Question 19: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q19" value="B" aria-label="Question 19: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q19" value="C" aria-label="Question 19: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q19" value="D" aria-label="Question 19: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q19" value="E" aria-label="Question 19: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q19" value="F" aria-label="Question 19: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q19" value="G" aria-label="Question 19: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q19" value="H" aria-label="Question 19: H"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="19" aria-label="Bookmark question 19" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="20" class="qitem"><td class="mg-stmt"><strong>20</strong> Yawning is an inherent ability that appears in both animals and humans.<span class="fb" data-fb="20"></span></td><td class="mg-cell"><label><input type="radio" name="q20" value="A" aria-label="Question 20: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q20" value="B" aria-label="Question 20: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q20" value="C" aria-label="Question 20: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q20" value="D" aria-label="Question 20: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q20" value="E" aria-label="Question 20: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q20" value="F" aria-label="Question 20: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q20" value="G" aria-label="Question 20: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q20" value="H" aria-label="Question 20: H"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="20" aria-label="Bookmark question 20" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="21" class="qitem"><td class="mg-stmt"><strong>21</strong> Stretching and yawning doesn&#x27;t always occur together.<span class="fb" data-fb="21"></span></td><td class="mg-cell"><label><input type="radio" name="q21" value="A" aria-label="Question 21: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q21" value="B" aria-label="Question 21: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q21" value="C" aria-label="Question 21: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q21" value="D" aria-label="Question 21: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q21" value="E" aria-label="Question 21: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q21" value="F" aria-label="Question 21: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q21" value="G" aria-label="Question 21: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q21" value="H" aria-label="Question 21: H"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="21" aria-label="Bookmark question 21" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="22" class="qitem"><td class="mg-stmt"><strong>22</strong> Yawning may suggest people are empathetic and attentive.<span class="fb" data-fb="22"></span></td><td class="mg-cell"><label><input type="radio" name="q22" value="A" aria-label="Question 22: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q22" value="B" aria-label="Question 22: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q22" value="C" aria-label="Question 22: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q22" value="D" aria-label="Question 22: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q22" value="E" aria-label="Question 22: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q22" value="F" aria-label="Question 22: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q22" value="G" aria-label="Question 22: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q22" value="H" aria-label="Question 22: H"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="22" aria-label="Bookmark question 22" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="23" class="qitem"><td class="mg-stmt"><strong>23</strong> Some superior areas in the brain may underline the infectious feature of yawning.<span class="fb" data-fb="23"></span></td><td class="mg-cell"><label><input type="radio" name="q23" value="A" aria-label="Question 23: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q23" value="B" aria-label="Question 23: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q23" value="C" aria-label="Question 23: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q23" value="D" aria-label="Question 23: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q23" value="E" aria-label="Question 23: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q23" value="F" aria-label="Question 23: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q23" value="G" aria-label="Question 23: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q23" value="H" aria-label="Question 23: H"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="23" aria-label="Bookmark question 23" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr></tbody></table></div></section><section class="question-group"><h3>Questions 24–26</h3><p class="instruction">Choose <strong>TRUE</strong> if the statement agrees with the information given in the text, choose <strong>FALSE</strong> if the statement contradicts the information, or choose <strong>NOT GIVEN</strong> if there is no information on this.</p><div class="question qitem" data-q="24"><div class="q-head"><span class="q-number">24</span><span class="q-prompt">Some participants in Platek&#x27;s first experiment did not understand why they were asked to look at people yawning.</span><button type="button" class="bm" data-flag="24" aria-label="Bookmark question 24" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="24"></span><div class="options"><label class="opt"><input type="radio" name="q24" value="TRUE"><span>TRUE</span></label><label class="opt"><input type="radio" name="q24" value="FALSE"><span>FALSE</span></label><label class="opt"><input type="radio" name="q24" value="NOT GIVEN"><span>NOT GIVEN</span></label></div></div><div class="question qitem" data-q="25"><div class="q-head"><span class="q-number">25</span><span class="q-prompt">The results from the second experiment indicate the link between yawning and empathy.</span><button type="button" class="bm" data-flag="25" aria-label="Bookmark question 25" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="25"></span><div class="options"><label class="opt"><input type="radio" name="q25" value="TRUE"><span>TRUE</span></label><label class="opt"><input type="radio" name="q25" value="FALSE"><span>FALSE</span></label><label class="opt"><input type="radio" name="q25" value="NOT GIVEN"><span>NOT GIVEN</span></label></div></div><div class="question qitem" data-q="26"><div class="q-head"><span class="q-number">26</span><span class="q-prompt">Yawning shows a positive impact on the recovery from brain damage brought by a stroke.</span><button type="button" class="bm" data-flag="26" aria-label="Bookmark question 26" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="26"></span><div class="options"><label class="opt"><input type="radio" name="q26" value="TRUE"><span>TRUE</span></label><label class="opt"><input type="radio" name="q26" value="FALSE"><span>FALSE</span></label><label class="opt"><input type="radio" name="q26" value="NOT GIVEN"><span>NOT GIVEN</span></label></div></div></section></div>
+    <div class="arrows"><button class="prev" id="prevBtn" aria-label="Previous question">&#10229;</button><button class="next" id="nextBtn" aria-label="Next question">&#10230;</button></div>
+  </div>
+  <footer class="foot">
+    <span class="pl">Part 2</span>
+    <div class="nav" id="nav"></div>
+    <span class="count" id="count"></span>
+    <button class="submit" id="submitBtn">Submit</button>
+  </footer>
+</section>
+
+<div class="hlpop" id="hlpop" hidden><button id="hlDo">Highlight</button><button id="hlClear" hidden>Clear</button></div>
+
+<div class="ov" id="confirmOv" hidden><div class="modal small">
+  <h2>Submit your answers?</h2><p id="confirmTxt"></p>
+  <div class="mbtns"><button class="btn ghost" id="cancelBtn">Keep working</button><button class="btn" id="okBtn">Submit</button></div>
+</div></div>
+
+<div class="ov" id="resOv" hidden><div class="modal">
+  <h2>Your Results</h2>
+  <div class="scorebox"><small>Reading</small><strong id="resScore">0 / 13</strong><span id="resPct">0% correct</span></div>
+  <h3>Answers</h3>
+  <div class="rt-wrap"><table class="rt"><thead><tr><th>Q</th><th>Your answer</th><th>Answer key</th><th>Result</th></tr></thead><tbody id="resBody"></tbody></table></div>
+  <p class="quote">“Nothing changes if nothing changes. Start changing now.” — Teacher Javlonbek</p>
+  <a class="tg" href="https://t.me/Javlonbek_Okhunov" target="_blank" rel="noopener">@Javlonbek_Okhunov</a>
+  <div class="mbtns"><button class="btn ghost" id="reviewBtn">Review answers</button><button class="btn" id="homeBtn">Back to home</button></div>
+</div></div>
+
+<script>
+"use strict";
+const CFG={"part": 2, "first": 14, "last": 26, "title": "Demystifying Yawn", "key": {"14": "INTERVAL", "15": "COMPLEX DISTINCTION", "16": "BREATHING", "17": "STRETCHING", "18": "BRAIN DAMAGE", "19": "E", "20": "B", "21": "F", "22": "D", "23": "H", "24": "TRUE", "25": "TRUE", "26": "NOT GIVEN"}, "store": "iw_v10t1_reading_p2"};
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const NUMS=[];for(let n=CFG.first;n<=CFG.last;n++)NUMS.push(n);
+const TOTAL=NUMS.length;
+let S={answers:{},flags:[],submitted:false,results:{},score:0,fs:17,split:50};
+let cur=CFG.first;
+
+function load(){try{const r=localStorage.getItem(CFG.store);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem(CFG.store,JSON.stringify(S));const el=$('#saved');el.textContent='Saved';clearTimeout(save.t);save.t=setTimeout(()=>el.textContent='',1500)}catch(e){}}
+
+function norm(v){return String(v||'').toLowerCase().replace(/[’']/g,"'").replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
+function keyText(n){const k=CFG.key[n];const f=x=>/^[A-I]$|^(TRUE|FALSE|NOT GIVEN|YES|NO)$/.test(x)?x:x.toLowerCase();return Array.isArray(k)?k.map(f).join(' / '):f(k)}
+function isCorrect(n,a){if(!a)return false;const k=CFG.key[n];return(Array.isArray(k)?k:[k]).some(x=>norm(x)===norm(a))}
+function getAns(n){const t=document.getElementById('q'+n);if(t&&t.type==='text')return t.value.trim();const r=$(`input[name="q${n}"]:checked`);return r?r.value:''}
+function item(n){return $(`.qitem[data-q="${n}"]`)}
+
+/* ---------- restore answers into DOM ---------- */
+function applyAnswers(){
+  NUMS.forEach(n=>{const v=S.answers[n];if(!v)return;const t=document.getElementById('q'+n);
+    if(t&&t.type==='text')t.value=v;else{const r=$(`input[name="q${n}"][value="${CSS.escape(v)}"]`);if(r)r.checked=true}});
+}
+
+/* ---------- nav ---------- */
+function buildNav(){$('#nav').innerHTML=NUMS.map(n=>`<button type="button" data-n="${n}" aria-label="Question ${n}">${n}</button>`).join('')}
+function refresh(){
+  let answered=0;
+  NUMS.forEach(n=>{const b=$(`#nav [data-n="${n}"]`),a=!!getAns(n);if(a)answered++;
+    b.classList.toggle('ans',a);b.classList.toggle('on',n===cur);b.classList.toggle('flag',S.flags.includes(n));
+    b.classList.toggle('good',S.submitted&&S.results[n]===true);b.classList.toggle('bad',S.submitted&&S.results[n]===false);
+    const bm=$(`.bm[data-flag="${n}"]`);if(bm)bm.classList.toggle('on',S.flags.includes(n));
+    const it=item(n);if(it)it.classList.toggle('cur',n===cur)});
+  $('#count').textContent=`${answered} of ${TOTAL} answered`;
+  $('#prevBtn').disabled=cur<=CFG.first;$('#nextBtn').disabled=cur>=CFG.last;
+  $('#submitBtn').textContent=S.submitted?'My result':'Submit';
+}
+function goTo(n,focus=true){
+  n=Math.max(CFG.first,Math.min(CFG.last,n));cur=n;refresh();
+  const it=item(n);if(!it)return;
+  it.scrollIntoView({behavior:'smooth',block:'center'});
+  if(focus&&!S.submitted){const t=document.getElementById('q'+n);if(t&&t.type==='text')setTimeout(()=>t.focus({preventScroll:true}),250)}
+}
+
+/* ---------- word limit ---------- */
+function checkWords(t){const max=+t.dataset.maxwords||0;if(!max)return;const w=t.value.trim()?t.value.trim().split(/\s+/).length:0;t.classList.toggle('over',w>max);t.title=w>max?`Maximum ${max} word${max>1?'s':''}`:''}
+
+/* ---------- grading ---------- */
+function grade(){
+  let score=0;S.results={};
+  NUMS.forEach(n=>{const g=isCorrect(n,getAns(n));S.results[n]=g;if(g)score++});
+  S.score=score;S.submitted=true;save();
+}
+function paintReview(){
+  const on=S.submitted;$('#questions').classList.toggle('reviewing',on);
+  $$('#questions input').forEach(i=>i.disabled=on);
+  $$('.mg-cell,.opt').forEach(e=>e.classList.remove('key','wrong'));
+  $$('.answer-input').forEach(e=>e.classList.remove('good','bad'));
+  if(!on){$$('.fb').forEach(f=>{f.textContent='';f.className='fb'});return}
+  NUMS.forEach(n=>{
+    const ok=S.results[n],user=getAns(n),fb=$(`.fb[data-fb="${n}"]`);
+    if(fb){fb.className='fb '+(ok?'good':'bad');fb.textContent=ok?'✔':`✘ Answer: ${keyText(n)}`}
+    const t=document.getElementById('q'+n);
+    if(t&&t.type==='text'){t.classList.add(ok?'good':'bad');return}
+    const k=Array.isArray(CFG.key[n])?CFG.key[n][0]:CFG.key[n];
+    $$(`input[name="q${n}"]`).forEach(r=>{const box=r.closest('.mg-cell')||r.closest('.opt');if(!box)return;
+      if(r.value===k)box.classList.add('key');else if(r.checked)box.classList.add('wrong')});
+  });
+}
+function showResults(){
+  const pct=Math.round(S.score/TOTAL*100);
+  const sc=$('#resScore');sc.textContent=`${S.score} / ${TOTAL}`;sc.classList.toggle('pass',pct>=60);
+  $('#resPct').textContent=`${pct}% correct`;
+  const e=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  $('#resBody').innerHTML=NUMS.map(n=>{const u=S.answers[n]||'';const ok=S.results[n];
+    return `<tr><td>${n}</td><td>${u?e(u):'—'}</td><td>${e(keyText(n))}</td><td class="${ok?'y':'n'}">${ok?'✔':'✘'}</td></tr>`}).join('');
+  $('#resOv').hidden=false;
+}
+
+/* ---------- views ---------- */
+function showHome(){
+  $('#exam').hidden=true;$('#home').hidden=false;$('#whoSub').hidden=true;$('#resOv').hidden=true;
+  const st=$('#homeStatus');
+  if(S.submitted){st.textContent=`Completed — ${S.score} / ${TOTAL} correct`;st.classList.add('done');$('#startBtn').innerHTML='&#10140; Review Answers';$('#retakeBtn').hidden=false}
+  else{const a=Object.values(S.answers).filter(Boolean).length;st.textContent=a?`In progress — ${a} of ${TOTAL} answered`:'Not completed';st.classList.remove('done');$('#startBtn').innerHTML=a?'&#10140; Continue Reading':'&#10140; Start Reading';$('#retakeBtn').hidden=true}
+  window.scrollTo(0,0);
+}
+function showExam(){
+  $('#home').hidden=true;$('#exam').hidden=false;$('#whoSub').hidden=false;
+  applySplit();paintReview();refresh();
+}
+function retake(){
+  if(!confirm('Clear all answers and start this passage again?'))return;
+  S.answers={};S.flags=[];S.submitted=false;S.results={};S.score=0;save();
+  $$('#questions input[type=text]').forEach(i=>{i.value='';i.classList.remove('over')});
+  $$('#questions input[type=radio]').forEach(i=>i.checked=false);
+  $$('mark.hl').forEach(unwrap);
+  cur=CFG.first;paintReview();showHome();
+}
+
+/* ---------- split ---------- */
+function applySplit(){if(window.innerWidth>860)$('#passage').style.width=S.split+'%';else $('#passage').style.width=''}
+(function(){const d=$('#divider');let drag=false;
+  d.addEventListener('pointerdown',e=>{drag=true;d.setPointerCapture(e.pointerId);document.body.style.userSelect='none'});
+  d.addEventListener('pointermove',e=>{if(!drag)return;const r=$('#ws').getBoundingClientRect();S.split=Math.max(25,Math.min(75,(e.clientX-r.left)/r.width*100));applySplit()});
+  d.addEventListener('pointerup',()=>{if(!drag)return;drag=false;document.body.style.userSelect='';save()});
+  d.addEventListener('dblclick',()=>{S.split=50;applySplit();save()});
+})();
+
+/* ---------- highlighting ---------- */
+let hlRange=null,hlMark=null;
+function unwrap(m){const p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()}
+function wrapRange(range){
+  const root=$('#passage'),sc=range.startContainer,so=range.startOffset,ec=range.endContainer,eo=range.endOffset;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];
+  while(w.nextNode()){const n=w.currentNode;if(range.intersectsNode(n)&&n.nodeValue.length)nodes.push(n)}
+  nodes.forEach(n=>{let s=0,e=n.nodeValue.length;if(n===sc&&sc.nodeType===3)s=so;if(n===ec&&ec.nodeType===3)e=eo;if(s>=e)return;
+    if(n.parentNode.closest('mark.hl'))return;
+    let mid=s>0?n.splitText(s):n;if(e-s<mid.nodeValue.length)mid.splitText(e-s);
+    if(!mid.nodeValue.trim())return;const m=document.createElement('mark');m.className='hl';mid.parentNode.insertBefore(m,mid);m.appendChild(mid)});
+}
+function popAt(x,y,mode){const p=$('#hlpop');$('#hlDo').hidden=mode!=='add';$('#hlClear').hidden=mode!=='clear';p.hidden=false;
+  p.style.left=Math.min(window.innerWidth-140,Math.max(8,x-50))+'px';p.style.top=Math.max(8,y-48)+'px'}
+function hidePop(){$('#hlpop').hidden=true;hlRange=null;hlMark=null}
+$('#passage').addEventListener('mouseup',e=>{
+  setTimeout(()=>{const sel=window.getSelection();
+    if(sel&&!sel.isCollapsed&&sel.rangeCount&&$('#passage').contains(sel.getRangeAt(0).commonAncestorContainer)){
+      hlRange=sel.getRangeAt(0).cloneRange();const r=hlRange.getBoundingClientRect();popAt(r.left+r.width/2,r.top,'add');return}
+    const m=e.target.closest('mark.hl');if(m){hlMark=m;const r=m.getBoundingClientRect();popAt(r.left+r.width/2,r.top,'clear');return}
+    hidePop()},10)});
+$('#hlDo').addEventListener('mousedown',e=>{e.preventDefault();if(hlRange)wrapRange(hlRange);window.getSelection().removeAllRanges();hidePop()});
+$('#hlClear').addEventListener('mousedown',e=>{e.preventDefault();if(hlMark)unwrap(hlMark);hidePop()});
+document.addEventListener('mousedown',e=>{if(!e.target.closest('#hlpop')&&!e.target.closest('#passage'))hidePop()});
+$('#passage').addEventListener('scroll',hidePop);
+
+/* ---------- events ---------- */
+$('#questions').addEventListener('input',e=>{const t=e.target;const m=/^q(\d+)$/.exec(t.id)||(t.name&&/^q(\d+)$/.exec(t.name));if(!m||S.submitted)return;
+  const n=+m[1];S.answers[n]=getAns(n);if(t.type==='text')checkWords(t);cur=n;refresh();save()});
+$('#questions').addEventListener('change',e=>{const t=e.target;if(t.type!=='radio'||S.submitted)return;const n=+t.name.slice(1);S.answers[n]=t.value;cur=n;refresh();save()});
+$('#questions').addEventListener('focusin',e=>{const m=/^q(\d+)$/.exec(e.target.id||'');if(m){cur=+m[1];refresh()}});
+$('#questions').addEventListener('click',e=>{const b=e.target.closest('.bm');if(b){const n=+b.dataset.flag;S.flags=S.flags.includes(n)?S.flags.filter(x=>x!==n):[...S.flags,n];refresh();save();return}
+  const it=e.target.closest('.qitem');if(it){cur=+it.dataset.q;refresh()}});
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(b)goTo(+b.dataset.n)});
+$('#prevBtn').onclick=()=>goTo(cur-1);$('#nextBtn').onclick=()=>goTo(cur+1);
+$('#startBtn').onclick=()=>{showExam();setTimeout(()=>goTo(S.submitted?CFG.first:cur,false),60)};
+$('#retakeBtn').onclick=retake;
+$('#submitBtn').onclick=()=>{if(S.submitted){showResults();return}
+  const miss=NUMS.filter(n=>!getAns(n)).length;
+  $('#confirmTxt').textContent=miss?`You still have ${miss} unanswered question${miss>1?'s':''}. Once you submit, you cannot change your answers.`:'All questions answered. Once you submit, you cannot change your answers.';
+  $('#confirmOv').hidden=false};
+$('#cancelBtn').onclick=()=>$('#confirmOv').hidden=true;
+$('#okBtn').onclick=()=>{$('#confirmOv').hidden=true;grade();paintReview();refresh();showResults()};
+$('#homeBtn').onclick=showHome;
+$('#reviewBtn').onclick=()=>{$('#resOv').hidden=true;if($('#exam').hidden)showExam();goTo(CFG.first,false)};
+$('#menuBtn').onclick=e=>{e.stopPropagation();$('#menu').hidden=!$('#menu').hidden};
+document.addEventListener('click',e=>{if(!e.target.closest('#menu')&&!e.target.closest('#menuBtn'))$('#menu').hidden=true});
+$$('.sizes button').forEach(b=>b.onclick=()=>{S.fs=+b.dataset.fs;applyFs();save()});
+function applyFs(){document.documentElement.style.setProperty('--fs',S.fs+'px');$$('.sizes button').forEach(b=>b.classList.toggle('on',+b.dataset.fs===S.fs))}
+document.addEventListener('keydown',e=>{if($('#exam').hidden||e.target.matches('input[type=text]'))return;
+  if(e.key==='ArrowRight'&&e.altKey)goTo(cur+1);if(e.key==='ArrowLeft'&&e.altKey)goTo(cur-1)});
+window.addEventListener('resize',applySplit);
+// prevent Enter in text fields from doing anything odd; move to next
+$('#questions').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.answer-input')){e.preventDefault();goTo(cur+1)}});
+
+/* ---------- init ---------- */
+load();buildNav();applyAnswers();applyFs();
+$$('.answer-input').forEach(checkWords);
+showHome();
+</script>
+</body>
+</html>

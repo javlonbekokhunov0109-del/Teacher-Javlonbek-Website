@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IELTS WARRIORS – Reading Passage 1 – The Formation of Continents and the Evolution of Species</title>
+<style>
+:root{--fs:17px;--ink:#1a1a1a;--muted:#5b5b5b;--line:#d6d6d6;--soft:#f1f1f1;--red:#d0021b;--green:#2e7d32;--bad:#c62828;--blue:#1d6fd6}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff}
+body{font-size:var(--fs);line-height:1.6}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+[hidden]{display:none!important}
+
+/* ---------- header ---------- */
+.top{height:84px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;gap:26px;background:#fff;position:relative;z-index:20}
+.logo{font-weight:800;font-size:40px;letter-spacing:.5px;color:var(--red);line-height:1;display:flex;align-items:flex-start;font-family:Arial,Helvetica,sans-serif}
+.logo sup{font-size:10px;color:#333;margin-left:2px;margin-top:4px;font-weight:700}
+.who{display:flex;flex-direction:column;line-height:1.25}
+.who a{font-weight:700;font-size:17px;text-decoration:none}
+.who a:hover{text-decoration:underline}
+.who span{font-size:16px;color:var(--muted)}
+.icons{margin-left:auto;display:flex;align-items:center;gap:30px}
+.icons .ic{background:none;border:0;padding:4px;display:grid;place-items:center;color:#111}
+.icons svg{width:30px;height:30px}
+.saved{font-size:14px;color:var(--muted);min-width:44px}
+.menu{position:absolute;right:20px;top:78px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.14);padding:14px 16px;width:250px;font-size:15px}
+.menu h4{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:600}
+.sizes{display:flex;gap:6px}
+.sizes button{flex:1;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 0;font-weight:700}
+.sizes button.on{background:#111;color:#fff;border-color:#111}
+
+/* ---------- home ---------- */
+.home{max-width:1060px;margin:34px auto;padding:0 20px}
+.card{border:1px solid var(--line);border-radius:10px;padding:30px 34px;margin-bottom:24px;background:#fff}
+.card h1{margin:0;font-size:28px;display:flex;align-items:center;gap:10px}
+.card h1 .ck{color:var(--green)}
+.card .bigck{float:right;color:var(--green);font-size:46px;line-height:1;margin-top:-6px}
+.card h2{margin:0 0 4px;font-size:28px}
+.status{font-weight:700;color:var(--bad);margin-bottom:12px}
+.status.done{color:var(--green)}
+.info{border:1px solid var(--line);border-radius:4px;padding:12px 18px;margin-bottom:18px}
+.info b{color:var(--green);margin-left:10px}
+.btn{background:#111;color:#fff;border:0;border-radius:5px;padding:12px 26px;font-weight:700;font-size:17px;display:inline-flex;gap:8px;align-items:center}
+.btn:hover{background:#333}
+.btn.ghost{background:#fff;color:#111;border:1px solid #111;margin-left:10px}
+.btn.ghost:hover{background:#f3f3f3}
+
+/* ---------- exam ---------- */
+.exam{position:fixed;inset:84px 0 0 0;display:flex;flex-direction:column}
+.banner{background:var(--soft);padding:12px 34px;line-height:1.4;border-bottom:1px solid #e6e6e6}
+.banner p{margin:0}
+.ws{flex:1;display:flex;min-height:0;position:relative}
+.pane{overflow-y:auto;min-width:0}
+.pane.left{width:50%;padding:28px 48px 60px}
+.pane.right{flex:1;padding:28px 56px 120px 44px}
+.divider{width:14px;flex:0 0 14px;position:relative;cursor:col-resize;background:linear-gradient(#e2e2e2,#e2e2e2) center/2px 100% no-repeat}
+.divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:52px;border:1px solid #c9c9c9;background:#fff;border-radius:6px;display:grid;place-items:center;font-size:18px;color:#333;user-select:none}
+.pane.left h2{text-align:center;font-size:1.55em;line-height:1.3;margin:0 0 18px}
+.pane.left p{margin:0 0 1.1em}
+.letter{font-weight:800;margin-right:8px}
+mark.hl{background:#ffe86b;color:inherit;cursor:pointer;border-radius:2px}
+
+.question-group{margin-bottom:38px}
+.question-group h3{font-size:1.15em;margin:0 0 12px}
+.instruction{margin:0 0 8px}
+.question-group>p{margin:0 0 8px}
+.people-legend{border:1px solid var(--line);padding:12px 16px;margin:12px 0;border-radius:4px}
+.people-legend div{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:6px}
+.people-legend b{margin-right:8px}
+.matching-grid-wrap{overflow-x:auto;margin-top:16px}
+.matching-grid{border-collapse:collapse;width:100%;min-width:520px}
+.matching-grid th,.matching-grid td{border:1px solid var(--line);text-align:center;vertical-align:middle}
+.matching-grid thead th{background:var(--soft);padding:16px 8px;font-weight:700}
+.matching-grid thead th:first-child{text-align:left;padding-left:16px}
+.mg-stmt{text-align:left!important;padding:14px 16px;line-height:1.5;min-width:230px}
+.mg-stmt strong{margin-right:6px}
+.mg-cell{width:46px;padding:0}
+.mg-cell label{display:flex;width:100%;min-height:64px;align-items:center;justify-content:center;cursor:pointer}
+.mg-cell label:hover{background:#f4f8ff}
+.mg-cell input{position:absolute;opacity:0;pointer-events:none}
+.mg-cell .tick{width:22px;height:22px;border-radius:50%;border:2px solid transparent}
+.mg-cell input:checked+.tick{border-color:#111;background:radial-gradient(#111 45%,transparent 50%)}
+.mg-cell input:focus-visible+.tick{outline:2px solid var(--blue);outline-offset:3px}
+.mg-bm{width:44px}
+.bm{background:none;border:0;padding:4px;color:#9a9a9a;vertical-align:middle}
+.bm:hover{color:#333}
+.bm.on{color:var(--red)}
+.bm.on svg{fill:var(--red)}
+
+.question{margin:0 0 26px}
+.q-head{display:flex;gap:10px;align-items:flex-start}
+.q-number{font-weight:800;min-width:28px}
+.q-prompt{flex:1}
+.options{margin:10px 0 0 38px;display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:6px 10px;border-radius:4px;cursor:pointer}
+.opt:hover{background:#f4f8ff}
+.opt input{margin-top:6px;width:17px;height:17px;accent-color:#111;flex:0 0 auto}
+.opt b{margin-right:6px}
+.summary-card{border:1px solid var(--line);padding:18px 20px;border-radius:4px;line-height:2.3}
+.summary-card p{margin:0}
+.inline-answer{white-space:nowrap}
+.inline-answer>strong{margin-right:4px}
+.answer-input{border:1px solid #9a9a9a;border-radius:3px;padding:2px 8px;width:170px;height:34px;font-size:.95em;background:#fff}
+.answer-input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+.answer-input.over{border-color:var(--bad);background:#fff5f5}
+.qitem.cur>.q-head .q-number,.qitem.cur>.mg-stmt strong,.inline-answer.cur>strong{color:var(--blue)}
+
+/* review marks */
+.fb{display:none;font-size:.85em;font-weight:700;margin-left:8px;white-space:normal}
+.reviewing .fb{display:inline}
+.fb.good{color:var(--green)}
+.fb.bad{color:var(--bad)}
+.reviewing .answer-input.good{border-color:var(--green);background:#f1fbf2}
+.reviewing .answer-input.bad{border-color:var(--bad);background:#fff4f4}
+.reviewing .mg-cell.key{background:#e8f6ea}
+.reviewing .mg-cell.wrong{background:#fdeaea}
+.reviewing .opt.key{background:#e8f6ea}
+.reviewing .opt.wrong{background:#fdeaea}
+
+/* arrows + footer */
+.arrows{position:absolute;right:42px;bottom:22px;display:flex;gap:12px;z-index:5}
+.arrows button{width:72px;height:62px;border:0;border-radius:4px;color:#fff;font-size:28px;display:grid;place-items:center}
+.arrows .prev{background:#5b5b5b}.arrows .next{background:#111}
+.arrows button:disabled{opacity:.35;cursor:default}
+.foot{height:80px;border-top:1px solid var(--line);display:flex;align-items:center;padding:0 32px;gap:18px;background:#fff}
+.foot .pl{font-weight:800;font-size:19px}
+.nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.nav button{min-width:40px;height:40px;border:2px solid transparent;background:none;border-radius:3px;font-size:18px;position:relative}
+.nav button:hover{background:#f2f2f2}
+.nav button.ans{text-decoration:underline;text-underline-offset:5px;font-weight:700}
+.nav button.on{border-color:#111;font-weight:800}
+.nav button.flag::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+.nav button.good{color:var(--green);font-weight:800}
+.nav button.bad{color:var(--bad);font-weight:800}
+.count{color:var(--muted);font-size:15px;white-space:nowrap}
+.submit{background:#111;color:#fff;border:0;border-radius:5px;padding:13px 40px;font-weight:700;font-size:18px}
+.submit:hover{background:#333}
+
+/* highlight popup */
+.hlpop{position:fixed;z-index:60;background:#111;color:#fff;border-radius:6px;display:flex;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.hlpop button{background:none;border:0;color:#fff;padding:8px 14px;font-size:14px;font-weight:600}
+.hlpop button:hover{background:#333}
+
+/* modals */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+.modal{background:#fff;border-radius:8px;width:100%;max-width:880px;padding:36px 44px 40px;text-align:center}
+.modal.small{max-width:460px;margin-top:12vh}
+.modal h2{color:var(--red);font-size:30px;margin:0 0 20px}
+.modal.small h2{color:var(--ink);font-size:22px}
+.scorebox{display:inline-block;border:1px solid var(--line);border-radius:10px;padding:16px 40px 12px}
+.scorebox small{display:block;font-size:17px;color:#333}
+.scorebox strong{display:block;font-size:44px;line-height:1.15;color:var(--red)}
+.scorebox strong.pass{color:var(--green)}
+.scorebox span{font-size:16px;color:#333}
+.modal h3{text-align:left;margin:28px 0 10px;font-size:19px}
+.rt-wrap{overflow-x:auto}
+.rt{width:100%;border-collapse:collapse;text-align:left;font-size:16px}
+.rt th{background:var(--soft);font-weight:700}
+.rt th,.rt td{border:1px solid var(--line);padding:8px 10px}
+.rt .y{color:var(--green);font-weight:800}
+.rt .n{color:var(--bad);font-weight:800}
+.quote{font-style:italic;margin:26px 0 12px;font-size:18px}
+.tg{color:#2f52c8;font-weight:700;text-decoration:none;font-size:19px}
+.tg:hover{text-decoration:underline}
+.mbtns{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.mbtns .btn.ghost{margin-left:0}
+
+@media (max-width:860px){
+  .top{height:68px;padding:0 14px;gap:14px}.logo{font-size:30px}.icons{gap:14px}.icons svg{width:24px;height:24px}
+  .exam{inset:68px 0 0 0}.menu{top:62px}
+  .ws{flex-direction:column}.pane.left{width:100%!important;height:45%;padding:18px 18px 30px;border-bottom:2px solid var(--line)}
+  .pane.right{padding:18px 18px 110px}.divider{display:none}
+  .foot{height:auto;padding:10px 12px;flex-wrap:wrap}.count{display:none}
+  .arrows{right:14px;bottom:12px}.arrows button{width:54px;height:48px}
+  .card{padding:22px}.card h1,.card h2{font-size:22px}.modal{padding:26px 16px}
+  .options{margin-left:0}.answer-input{width:140px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">IELTS<sup>TM</sup></div>
+  <div class="who"><a href="https://t.me/Javlonbek_Okhunov" target="_blank" rel="noopener">Teacher Javlonbek</a><span id="whoSub" hidden>Reading</span></div>
+  <div class="icons">
+    <span class="saved" id="saved"></span>
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg></span>
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+    <button class="ic" id="menuBtn" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+  <div class="menu" id="menu" hidden>
+    <h4>Text size</h4>
+    <div class="sizes"><button data-fs="15">Small</button><button data-fs="17" class="on">Standard</button><button data-fs="20">Large</button></div>
+    <h4 style="margin-top:14px">Tip</h4>
+    <div style="font-size:14px;color:#444;line-height:1.45">Select any text in the passage to highlight it. Click a highlight to remove it.</div>
+  </div>
+</header>
+
+<!-- HOME -->
+<main class="home" id="home">
+  <div class="card"><span class="bigck">&#10004;</span><h1>IELTS WARRIORS – Reading Passage 1 <span class="ck">&#10004;</span></h1></div>
+  <div class="card">
+    <h2>Reading Passage 1 — The Formation of Continents and the Evolution of Species</h2>
+    <div class="status" id="homeStatus">Not completed</div>
+    <div class="info">&#9662; Questions 1–13. There is no time limit on this passage — submit when you are ready.<b>Confirmed</b></div>
+    <button class="btn" id="startBtn">&#10140; Start Reading</button><button class="btn ghost" id="retakeBtn" hidden>&#8635; Retake</button>
+  </div>
+</main>
+
+<!-- EXAM -->
+<section class="exam" id="exam" hidden>
+  <div class="banner"><p><strong>Part 1</strong></p><p>Read the text and answer questions 1–13.</p></div>
+  <div class="ws" id="ws">
+    <article class="pane left" id="passage"><h2>The Formation of Continents and the Evolution of Species</h2><p><span class="letter">A</span> The fact that there was once a Pangean supercontinent, a Panthalassa Ocean, and a Tethys Ocean, has profound implications for the evolution of multicellular life on Earth These considerations were unknown to the scientists of the 19th century — making their scientific deductions even more remarkable. Quite independently of each other, Charles Darwin and his young contemporary Alfred Russel Wallace reached the conclusion that life had evolved by natural selection. Wallace later wrote in My Life of his own inspiration.</p><p><span class="letter">B</span> Why do some species die and some live? The answer was clearly that on the whole the best fit lived. From the effects of disease, the most-healthy escaped; from enemies the strongest, the swiftest or the most cunning; from famine the best hunters. Then, it suddenly flashed on me that this self-acting process would improve the race, because in every generation the inferior would inevitably be killed off and the superior would remain, that is, the fittest would survive.</p><p><span class="letter">C</span> Both Darwin&#x27;s and Wallace&#x27;s ideas about natural selection had been influenced by the essays of Thomas Malthus in his Principles of Population. Their conclusions, however, had been the direct result of their personal observation of animals and plants in widely separated geographic locations: Darwin from his experiences during the voyage of the Beagle, and particularly during the ship&#x27;s visit to the Galapagos Islands in the East Pacific in 1835; Wallace during his years of travel in the Amazon Basin and in the Indonesia-Australian Archipelago in the 1850s.</p><p><span class="letter">D</span> Darwin had been documenting his ideas on natural selection for many years when he received a paper on this same subject from Wallace, who asked for Darwin&#x27;s opinion and help in getting it published. In July 1858, Charles Lyell and J. D Hooker, close friends of Darwin, pressed Darwin to present his conclusions so that he would not lose priority to an unknown naturalist. Presiding over the hastily called but now historic meeting of the Linnean Society in London, Lyell and Hooker explained to the distinguished members how &quot;these two gentlemen&quot; (who were absent: Wallace was abroad, and Darwin chose not to attend), had &quot;independently and unknown to one another, conceived the same very ingenious theory&quot;</p><p><span class="letter">E</span> Both Darwin and Wallace had realized that the anomalous distribution of species in particular regions had profound evolutionary significance. Subsequently, Darwin spent the rest of his days in almost total seclusion thinking and writing mainly about the origin of species. In contrast, Wallace applied himself to the science of biogeography, the study of the pattern and distribution of species, and its significance, resulting in the publication of a massive two volume work the Geographical Distribution of Animals in 1876.</p><p><span class="letter">F</span> Wallace was a gentle and modest man, but also persistent and quietly courageous. He spent years working in the most arduous possible climates and terrains, particularly in the Malay Archipelago, he made patient and detailed zoological observations and collected huge numbers of specimens for museums and collectors - which is how he made a living. One result of his work was the conclusion that there is a distinct faunal boundary, called &quot;Wallace&#x27;s line, &quot; between an Asian realm of animals in Java, Borneo and the Philippines and an Australian realm in New Guinea and Australia. In essence this boundary posed a difficult question: How on Earth did plants and animals with a clear affinity to the Northern Hemisphere meet with their Southern Hemispheric counterparts along such a distinct Malaysian demarcation zone? Wallace was uncertain about demarcation on one particular island - Celebes, a curiously shaped place that is midway between the two groups. Initially he assigned its flora-fauna to the Australian side of the line, but later he transferred it to the Asian side. Today we know the reason for his dilemma. 200 MYA East and West Celebes were islands with their own natural history lying on opposite sides of the Tethys Ocean. They did not collide until about 15 MYA. The answer to the main question is that Wallace&#x27;s Line categorizes Laurasia-derived flora-fauna (the Asian) and Gondwana-derived flora-fauna (the Australian), fauna that had evolved on opposing shares of the Tethys. The closure of the Tethys Ocean today is manifested by the ongoing collision of Australia/New Guinea with Indochina/Indonesia and the continuing closure of the Mediterranean Sea—a remnant of the Western Tethys Ocean.</p><p><span class="letter">G</span> In his ORIGIN OF CONTINENTS AND OCEANS, Wegener quoted at length from Wallace&#x27;s Geographical Distribution of Animals. According to Wegener&#x27;s reading, Wallace had identified three clear divisions of Australian animals, which supported his own theory of continental displacement. Wallace had shown that animals long established in southwestern Australia had an affinity with animals in South Africa, Madagascar, India, and Ceylon, but did not have an affinity with those in Asia. Wallace also showed that Australian marsupials and monotremes are clearly related to those In South America, the Moluccas, and various Pacific islands, and that none are found in neighboring Indonesia. From this and related data, Wegener concluded that the then broadly accepted &quot;landbridge&quot; theory could not account for this distribution of animals and that only his theory of continental drift could explain it.</p><p><span class="letter">H</span> The theory that Wegener dismissed in preference to his own proposed that plants and animals had once migrated across now-submerged intercontinental landbridges. In 1885, one of Europe&#x27;s leading geologists, Eduard Suess, theorized that as the rigid Earth cools, its upper crust shrinks and wrinkles like the withering skin of an aging apple. He suggested that the planet&#x27;s seas and oceans now fill the wrinkles between once-contiguous plateaus.</p><p><span class="letter">I</span> Today, we know that we live on a dynamic Earth with shifting, colliding and separating tectonic plates, not a &quot;withering skin&quot;, and the main debate in the field of biogeography has shifted. The discussion now concerns &quot;dispersalism&quot; versus &quot;vicarianism&quot; unrestricted radiation of species on the one hand and the development of barriers to migration on the other. Dispersion is a short-term phenomenon—the daily or seasonal migration of species and their radiation to the limits of their natural environment on an extensive and continuous landmass. Vicarian evolution, however, depends upon the separation and isolation of a variety of species within the confines of natural barriers in the form of islands, lakes, or shallow seas— topographical features that take a long time to develop.</p></article>
+    <div class="divider" id="divider" title="Drag to resize"><span>&#8596;</span></div>
+    <div class="pane right" id="questions"><section class="question-group"><h3>Questions 1–5</h3><p class="instruction">Use the information in the passage to match the people (listed <strong>A–E</strong>) with opinions or deeds below. Choose the appropriate letters <strong>A–E</strong>, for questions 1–5.</p><div class="people-legend"><strong>List of People</strong><div><span><b>A</b> Suess</span><span><b>B</b> Wallace</span><span><b>C</b> Darwin and Wallace</span><span><b>D</b> Wegener</span><span><b>E</b> Lyell and Hooker</span></div></div><div class="matching-grid-wrap"><table class="matching-grid"><thead><tr><th scope="col">Information</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th><th scope="col">D</th><th scope="col">E</th><th class="mg-bm"></th></tr></thead><tbody><tr data-q="1" class="qitem"><td class="mg-stmt"><strong>1</strong> Urged Darwin to publish his scientific findings<span class="fb" data-fb="1"></span></td><td class="mg-cell"><label><input type="radio" name="q1" value="A" aria-label="Question 1: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q1" value="B" aria-label="Question 1: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q1" value="C" aria-label="Question 1: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q1" value="D" aria-label="Question 1: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q1" value="E" aria-label="Question 1: E"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="1" aria-label="Bookmark question 1" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="2" class="qitem"><td class="mg-stmt"><strong>2</strong> Depicted physical features of earth&#x27;s crust<span class="fb" data-fb="2"></span></td><td class="mg-cell"><label><input type="radio" name="q2" value="A" aria-label="Question 2: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q2" value="B" aria-label="Question 2: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q2" value="C" aria-label="Question 2: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q2" value="D" aria-label="Question 2: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q2" value="E" aria-label="Question 2: E"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="2" aria-label="Bookmark question 2" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="3" class="qitem"><td class="mg-stmt"><strong>3</strong> Believed in continental drift theory while rejecting another one<span class="fb" data-fb="3"></span></td><td class="mg-cell"><label><input type="radio" name="q3" value="A" aria-label="Question 3: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q3" value="B" aria-label="Question 3: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q3" value="C" aria-label="Question 3: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q3" value="D" aria-label="Question 3: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q3" value="E" aria-label="Question 3: E"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="3" aria-label="Bookmark question 3" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="4" class="qitem"><td class="mg-stmt"><strong>4</strong> Published works about wildlife distribution in different regions<span class="fb" data-fb="4"></span></td><td class="mg-cell"><label><input type="radio" name="q4" value="A" aria-label="Question 4: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q4" value="B" aria-label="Question 4: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q4" value="C" aria-label="Question 4: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q4" value="D" aria-label="Question 4: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q4" value="E" aria-label="Question 4: E"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="4" aria-label="Bookmark question 4" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="5" class="qitem"><td class="mg-stmt"><strong>5</strong> Evolution of species is based on selection by nature<span class="fb" data-fb="5"></span></td><td class="mg-cell"><label><input type="radio" name="q5" value="A" aria-label="Question 5: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q5" value="B" aria-label="Question 5: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q5" value="C" aria-label="Question 5: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q5" value="D" aria-label="Question 5: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q5" value="E" aria-label="Question 5: E"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="5" aria-label="Bookmark question 5" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr></tbody></table></div></section><section class="question-group"><h3>Questions 6–8</h3><p class="instruction">Reading Passage 1 has nine paragraphs, <strong>A–I</strong>. Which paragraph contains the following information?</p><p>Choose the correct letter, <strong>A–I</strong>, for questions 6–8.</p><div class="matching-grid-wrap"><table class="matching-grid"><thead><tr><th scope="col">Information</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th><th scope="col">D</th><th scope="col">E</th><th scope="col">F</th><th scope="col">G</th><th scope="col">H</th><th scope="col">I</th><th class="mg-bm"></th></tr></thead><tbody><tr data-q="6" class="qitem"><td class="mg-stmt"><strong>6</strong> The most adaptable would survive<span class="fb" data-fb="6"></span></td><td class="mg-cell"><label><input type="radio" name="q6" value="A" aria-label="Question 6: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="B" aria-label="Question 6: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="C" aria-label="Question 6: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="D" aria-label="Question 6: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="E" aria-label="Question 6: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="F" aria-label="Question 6: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="G" aria-label="Question 6: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="H" aria-label="Question 6: H"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q6" value="I" aria-label="Question 6: I"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="6" aria-label="Bookmark question 6" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="7" class="qitem"><td class="mg-stmt"><strong>7</strong> The boundary called Wallace&#x27;s line is found between Asia and Australia<span class="fb" data-fb="7"></span></td><td class="mg-cell"><label><input type="radio" name="q7" value="A" aria-label="Question 7: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="B" aria-label="Question 7: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="C" aria-label="Question 7: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="D" aria-label="Question 7: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="E" aria-label="Question 7: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="F" aria-label="Question 7: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="G" aria-label="Question 7: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="H" aria-label="Question 7: H"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q7" value="I" aria-label="Question 7: I"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="7" aria-label="Bookmark question 7" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr><tr data-q="8" class="qitem"><td class="mg-stmt"><strong>8</strong> Animal affinity exists between Australia and Africa<span class="fb" data-fb="8"></span></td><td class="mg-cell"><label><input type="radio" name="q8" value="A" aria-label="Question 8: A"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="B" aria-label="Question 8: B"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="C" aria-label="Question 8: C"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="D" aria-label="Question 8: D"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="E" aria-label="Question 8: E"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="F" aria-label="Question 8: F"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="G" aria-label="Question 8: G"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="H" aria-label="Question 8: H"><span class="tick"></span></label></td><td class="mg-cell"><label><input type="radio" name="q8" value="I" aria-label="Question 8: I"><span class="tick"></span></label></td><td class="mg-bm"><button type="button" class="bm" data-flag="8" aria-label="Bookmark question 8" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></td></tr></tbody></table></div></section><section class="question-group"><h3>Questions 9–13</h3><p class="instruction">Complete the following summary of the paragraphs of Reading Passage. Write <strong>NO MORE THAN TWO WORDS</strong> from the Reading Passage for each answer.</p><div class="summary-card"><p>Wegener found that continental drift instead of &quot;land bridge&quot; theory in which vegetation and wildlife <span data-q="9" class="inline-answer qitem"><strong>9</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q9" data-maxwords="2" aria-label="Question 9"><span class="fb" data-fb="9"></span><button type="button" class="bm" data-flag="9" aria-label="Bookmark question 9" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> intercontinentally. could explain strange species&#x27; distribution phenomenon. However, Eduard Suess compared the wrinkle of the crust to the <span data-q="10" class="inline-answer qitem"><strong>10</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q10" data-maxwords="2" aria-label="Question 10"><span class="fb" data-fb="10"></span><button type="button" class="bm" data-flag="10" aria-label="Bookmark question 10" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> of an old apple. Now it is well known that we are living on the planet where there are <span data-q="11" class="inline-answer qitem"><strong>11</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q11" data-maxwords="2" aria-label="Question 11"><span class="fb" data-fb="11"></span><button type="button" class="bm" data-flag="11" aria-label="Bookmark question 11" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> in constant mobile states instead of what Suess described. The debate in biogeography has switched to concerns between two terms: &quot;<span data-q="12" class="inline-answer qitem"><strong>12</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q12" data-maxwords="2" aria-label="Question 12"><span class="fb" data-fb="12"></span><button type="button" class="bm" data-flag="12" aria-label="Bookmark question 12" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span>&quot; and &quot;<span data-q="13" class="inline-answer qitem"><strong>13</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q13" data-maxwords="2" aria-label="Question 13"><span class="fb" data-fb="13"></span><button type="button" class="bm" data-flag="13" aria-label="Bookmark question 13" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span>&quot;.</p></div></section></div>
+    <div class="arrows"><button class="prev" id="prevBtn" aria-label="Previous question">&#10229;</button><button class="next" id="nextBtn" aria-label="Next question">&#10230;</button></div>
+  </div>
+  <footer class="foot">
+    <span class="pl">Part 1</span>
+    <div class="nav" id="nav"></div>
+    <span class="count" id="count"></span>
+    <button class="submit" id="submitBtn">Submit</button>
+  </footer>
+</section>
+
+<div class="hlpop" id="hlpop" hidden><button id="hlDo">Highlight</button><button id="hlClear" hidden>Clear</button></div>
+
+<div class="ov" id="confirmOv" hidden><div class="modal small">
+  <h2>Submit your answers?</h2><p id="confirmTxt"></p>
+  <div class="mbtns"><button class="btn ghost" id="cancelBtn">Keep working</button><button class="btn" id="okBtn">Submit</button></div>
+</div></div>
+
+<div class="ov" id="resOv" hidden><div class="modal">
+  <h2>Your Results</h2>
+  <div class="scorebox"><small>Reading</small><strong id="resScore">0 / 13</strong><span id="resPct">0% correct</span></div>
+  <h3>Answers</h3>
+  <div class="rt-wrap"><table class="rt"><thead><tr><th>Q</th><th>Your answer</th><th>Answer key</th><th>Result</th></tr></thead><tbody id="resBody"></tbody></table></div>
+  <p class="quote">“Nothing changes if nothing changes. Start changing now.” — Teacher Javlonbek</p>
+  <a class="tg" href="https://t.me/Javlonbek_Okhunov" target="_blank" rel="noopener">@Javlonbek_Okhunov</a>
+  <div class="mbtns"><button class="btn ghost" id="reviewBtn">Review answers</button><button class="btn" id="homeBtn">Back to home</button></div>
+</div></div>
+
+<script>
+"use strict";
+const CFG={"part": 1, "first": 1, "last": 13, "title": "The Formation of Continents and the Evolution of Species", "key": {"1": "E", "2": "A", "3": "D", "4": "B", "5": "C", "6": "B", "7": "F", "8": "G", "9": "MIGRATED", "10": "WITHERING SKIN", "11": "TECTONIC PLATES", "12": "DISPERSALISM", "13": "VICARIANISM"}, "store": "iw_v10t1_reading_p1"};
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const NUMS=[];for(let n=CFG.first;n<=CFG.last;n++)NUMS.push(n);
+const TOTAL=NUMS.length;
+let S={answers:{},flags:[],submitted:false,results:{},score:0,fs:17,split:50};
+let cur=CFG.first;
+
+function load(){try{const r=localStorage.getItem(CFG.store);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem(CFG.store,JSON.stringify(S));const el=$('#saved');el.textContent='Saved';clearTimeout(save.t);save.t=setTimeout(()=>el.textContent='',1500)}catch(e){}}
+
+function norm(v){return String(v||'').toLowerCase().replace(/[’']/g,"'").replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
+function keyText(n){const k=CFG.key[n];const f=x=>/^[A-I]$|^(TRUE|FALSE|NOT GIVEN|YES|NO)$/.test(x)?x:x.toLowerCase();return Array.isArray(k)?k.map(f).join(' / '):f(k)}
+function isCorrect(n,a){if(!a)return false;const k=CFG.key[n];return(Array.isArray(k)?k:[k]).some(x=>norm(x)===norm(a))}
+function getAns(n){const t=document.getElementById('q'+n);if(t&&t.type==='text')return t.value.trim();const r=$(`input[name="q${n}"]:checked`);return r?r.value:''}
+function item(n){return $(`.qitem[data-q="${n}"]`)}
+
+/* ---------- restore answers into DOM ---------- */
+function applyAnswers(){
+  NUMS.forEach(n=>{const v=S.answers[n];if(!v)return;const t=document.getElementById('q'+n);
+    if(t&&t.type==='text')t.value=v;else{const r=$(`input[name="q${n}"][value="${CSS.escape(v)}"]`);if(r)r.checked=true}});
+}
+
+/* ---------- nav ---------- */
+function buildNav(){$('#nav').innerHTML=NUMS.map(n=>`<button type="button" data-n="${n}" aria-label="Question ${n}">${n}</button>`).join('')}
+function refresh(){
+  let answered=0;
+  NUMS.forEach(n=>{const b=$(`#nav [data-n="${n}"]`),a=!!getAns(n);if(a)answered++;
+    b.classList.toggle('ans',a);b.classList.toggle('on',n===cur);b.classList.toggle('flag',S.flags.includes(n));
+    b.classList.toggle('good',S.submitted&&S.results[n]===true);b.classList.toggle('bad',S.submitted&&S.results[n]===false);
+    const bm=$(`.bm[data-flag="${n}"]`);if(bm)bm.classList.toggle('on',S.flags.includes(n));
+    const it=item(n);if(it)it.classList.toggle('cur',n===cur)});
+  $('#count').textContent=`${answered} of ${TOTAL} answered`;
+  $('#prevBtn').disabled=cur<=CFG.first;$('#nextBtn').disabled=cur>=CFG.last;
+  $('#submitBtn').textContent=S.submitted?'My result':'Submit';
+}
+function goTo(n,focus=true){
+  n=Math.max(CFG.first,Math.min(CFG.last,n));cur=n;refresh();
+  const it=item(n);if(!it)return;
+  it.scrollIntoView({behavior:'smooth',block:'center'});
+  if(focus&&!S.submitted){const t=document.getElementById('q'+n);if(t&&t.type==='text')setTimeout(()=>t.focus({preventScroll:true}),250)}
+}
+
+/* ---------- word limit ---------- */
+function checkWords(t){const max=+t.dataset.maxwords||0;if(!max)return;const w=t.value.trim()?t.value.trim().split(/\s+/).length:0;t.classList.toggle('over',w>max);t.title=w>max?`Maximum ${max} word${max>1?'s':''}`:''}
+
+/* ---------- grading ---------- */
+function grade(){
+  let score=0;S.results={};
+  NUMS.forEach(n=>{const g=isCorrect(n,getAns(n));S.results[n]=g;if(g)score++});
+  S.score=score;S.submitted=true;save();
+}
+function paintReview(){
+  const on=S.submitted;$('#questions').classList.toggle('reviewing',on);
+  $$('#questions input').forEach(i=>i.disabled=on);
+  $$('.mg-cell,.opt').forEach(e=>e.classList.remove('key','wrong'));
+  $$('.answer-input').forEach(e=>e.classList.remove('good','bad'));
+  if(!on){$$('.fb').forEach(f=>{f.textContent='';f.className='fb'});return}
+  NUMS.forEach(n=>{
+    const ok=S.results[n],user=getAns(n),fb=$(`.fb[data-fb="${n}"]`);
+    if(fb){fb.className='fb '+(ok?'good':'bad');fb.textContent=ok?'✔':`✘ Answer: ${keyText(n)}`}
+    const t=document.getElementById('q'+n);
+    if(t&&t.type==='text'){t.classList.add(ok?'good':'bad');return}
+    const k=Array.isArray(CFG.key[n])?CFG.key[n][0]:CFG.key[n];
+    $$(`input[name="q${n}"]`).forEach(r=>{const box=r.closest('.mg-cell')||r.closest('.opt');if(!box)return;
+      if(r.value===k)box.classList.add('key');else if(r.checked)box.classList.add('wrong')});
+  });
+}
+function showResults(){
+  const pct=Math.round(S.score/TOTAL*100);
+  const sc=$('#resScore');sc.textContent=`${S.score} / ${TOTAL}`;sc.classList.toggle('pass',pct>=60);
+  $('#resPct').textContent=`${pct}% correct`;
+  const e=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  $('#resBody').innerHTML=NUMS.map(n=>{const u=S.answers[n]||'';const ok=S.results[n];
+    return `<tr><td>${n}</td><td>${u?e(u):'—'}</td><td>${e(keyText(n))}</td><td class="${ok?'y':'n'}">${ok?'✔':'✘'}</td></tr>`}).join('');
+  $('#resOv').hidden=false;
+}
+
+/* ---------- views ---------- */
+function showHome(){
+  $('#exam').hidden=true;$('#home').hidden=false;$('#whoSub').hidden=true;$('#resOv').hidden=true;
+  const st=$('#homeStatus');
+  if(S.submitted){st.textContent=`Completed — ${S.score} / ${TOTAL} correct`;st.classList.add('done');$('#startBtn').innerHTML='&#10140; Review Answers';$('#retakeBtn').hidden=false}
+  else{const a=Object.values(S.answers).filter(Boolean).length;st.textContent=a?`In progress — ${a} of ${TOTAL} answered`:'Not completed';st.classList.remove('done');$('#startBtn').innerHTML=a?'&#10140; Continue Reading':'&#10140; Start Reading';$('#retakeBtn').hidden=true}
+  window.scrollTo(0,0);
+}
+function showExam(){
+  $('#home').hidden=true;$('#exam').hidden=false;$('#whoSub').hidden=false;
+  applySplit();paintReview();refresh();
+}
+function retake(){
+  if(!confirm('Clear all answers and start this passage again?'))return;
+  S.answers={};S.flags=[];S.submitted=false;S.results={};S.score=0;save();
+  $$('#questions input[type=text]').forEach(i=>{i.value='';i.classList.remove('over')});
+  $$('#questions input[type=radio]').forEach(i=>i.checked=false);
+  $$('mark.hl').forEach(unwrap);
+  cur=CFG.first;paintReview();showHome();
+}
+
+/* ---------- split ---------- */
+function applySplit(){if(window.innerWidth>860)$('#passage').style.width=S.split+'%';else $('#passage').style.width=''}
+(function(){const d=$('#divider');let drag=false;
+  d.addEventListener('pointerdown',e=>{drag=true;d.setPointerCapture(e.pointerId);document.body.style.userSelect='none'});
+  d.addEventListener('pointermove',e=>{if(!drag)return;const r=$('#ws').getBoundingClientRect();S.split=Math.max(25,Math.min(75,(e.clientX-r.left)/r.width*100));applySplit()});
+  d.addEventListener('pointerup',()=>{if(!drag)return;drag=false;document.body.style.userSelect='';save()});
+  d.addEventListener('dblclick',()=>{S.split=50;applySplit();save()});
+})();
+
+/* ---------- highlighting ---------- */
+let hlRange=null,hlMark=null;
+function unwrap(m){const p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()}
+function wrapRange(range){
+  const root=$('#passage'),sc=range.startContainer,so=range.startOffset,ec=range.endContainer,eo=range.endOffset;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];
+  while(w.nextNode()){const n=w.currentNode;if(range.intersectsNode(n)&&n.nodeValue.length)nodes.push(n)}
+  nodes.forEach(n=>{let s=0,e=n.nodeValue.length;if(n===sc&&sc.nodeType===3)s=so;if(n===ec&&ec.nodeType===3)e=eo;if(s>=e)return;
+    if(n.parentNode.closest('mark.hl'))return;
+    let mid=s>0?n.splitText(s):n;if(e-s<mid.nodeValue.length)mid.splitText(e-s);
+    if(!mid.nodeValue.trim())return;const m=document.createElement('mark');m.className='hl';mid.parentNode.insertBefore(m,mid);m.appendChild(mid)});
+}
+function popAt(x,y,mode){const p=$('#hlpop');$('#hlDo').hidden=mode!=='add';$('#hlClear').hidden=mode!=='clear';p.hidden=false;
+  p.style.left=Math.min(window.innerWidth-140,Math.max(8,x-50))+'px';p.style.top=Math.max(8,y-48)+'px'}
+function hidePop(){$('#hlpop').hidden=true;hlRange=null;hlMark=null}
+$('#passage').addEventListener('mouseup',e=>{
+  setTimeout(()=>{const sel=window.getSelection();
+    if(sel&&!sel.isCollapsed&&sel.rangeCount&&$('#passage').contains(sel.getRangeAt(0).commonAncestorContainer)){
+      hlRange=sel.getRangeAt(0).cloneRange();const r=hlRange.getBoundingClientRect();popAt(r.left+r.width/2,r.top,'add');return}
+    const m=e.target.closest('mark.hl');if(m){hlMark=m;const r=m.getBoundingClientRect();popAt(r.left+r.width/2,r.top,'clear');return}
+    hidePop()},10)});
+$('#hlDo').addEventListener('mousedown',e=>{e.preventDefault();if(hlRange)wrapRange(hlRange);window.getSelection().removeAllRanges();hidePop()});
+$('#hlClear').addEventListener('mousedown',e=>{e.preventDefault();if(hlMark)unwrap(hlMark);hidePop()});
+document.addEventListener('mousedown',e=>{if(!e.target.closest('#hlpop')&&!e.target.closest('#passage'))hidePop()});
+$('#passage').addEventListener('scroll',hidePop);
+
+/* ---------- events ---------- */
+$('#questions').addEventListener('input',e=>{const t=e.target;const m=/^q(\d+)$/.exec(t.id)||(t.name&&/^q(\d+)$/.exec(t.name));if(!m||S.submitted)return;
+  const n=+m[1];S.answers[n]=getAns(n);if(t.type==='text')checkWords(t);cur=n;refresh();save()});
+$('#questions').addEventListener('change',e=>{const t=e.target;if(t.type!=='radio'||S.submitted)return;const n=+t.name.slice(1);S.answers[n]=t.value;cur=n;refresh();save()});
+$('#questions').addEventListener('focusin',e=>{const m=/^q(\d+)$/.exec(e.target.id||'');if(m){cur=+m[1];refresh()}});
+$('#questions').addEventListener('click',e=>{const b=e.target.closest('.bm');if(b){const n=+b.dataset.flag;S.flags=S.flags.includes(n)?S.flags.filter(x=>x!==n):[...S.flags,n];refresh();save();return}
+  const it=e.target.closest('.qitem');if(it){cur=+it.dataset.q;refresh()}});
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(b)goTo(+b.dataset.n)});
+$('#prevBtn').onclick=()=>goTo(cur-1);$('#nextBtn').onclick=()=>goTo(cur+1);
+$('#startBtn').onclick=()=>{showExam();setTimeout(()=>goTo(S.submitted?CFG.first:cur,false),60)};
+$('#retakeBtn').onclick=retake;
+$('#submitBtn').onclick=()=>{if(S.submitted){showResults();return}
+  const miss=NUMS.filter(n=>!getAns(n)).length;
+  $('#confirmTxt').textContent=miss?`You still have ${miss} unanswered question${miss>1?'s':''}. Once you submit, you cannot change your answers.`:'All questions answered. Once you submit, you cannot change your answers.';
+  $('#confirmOv').hidden=false};
+$('#cancelBtn').onclick=()=>$('#confirmOv').hidden=true;
+$('#okBtn').onclick=()=>{$('#confirmOv').hidden=true;grade();paintReview();refresh();showResults()};
+$('#homeBtn').onclick=showHome;
+$('#reviewBtn').onclick=()=>{$('#resOv').hidden=true;if($('#exam').hidden)showExam();goTo(CFG.first,false)};
+$('#menuBtn').onclick=e=>{e.stopPropagation();$('#menu').hidden=!$('#menu').hidden};
+document.addEventListener('click',e=>{if(!e.target.closest('#menu')&&!e.target.closest('#menuBtn'))$('#menu').hidden=true});
+$$('.sizes button').forEach(b=>b.onclick=()=>{S.fs=+b.dataset.fs;applyFs();save()});
+function applyFs(){document.documentElement.style.setProperty('--fs',S.fs+'px');$$('.sizes button').forEach(b=>b.classList.toggle('on',+b.dataset.fs===S.fs))}
+document.addEventListener('keydown',e=>{if($('#exam').hidden||e.target.matches('input[type=text]'))return;
+  if(e.key==='ArrowRight'&&e.altKey)goTo(cur+1);if(e.key==='ArrowLeft'&&e.altKey)goTo(cur-1)});
+window.addEventListener('resize',applySplit);
+// prevent Enter in text fields from doing anything odd; move to next
+$('#questions').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.answer-input')){e.preventDefault();goTo(cur+1)}});
+
+/* ---------- init ---------- */
+load();buildNav();applyAnswers();applyFs();
+$$('.answer-input').forEach(checkWords);
+showHome();
+</script>
+</body>
+</html>

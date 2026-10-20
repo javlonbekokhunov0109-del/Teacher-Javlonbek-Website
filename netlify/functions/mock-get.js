@@ -3,6 +3,7 @@
 const { json, missingEnv, serviceClient, getUserFromRequest } = require("./_shared");
 const { getAccess, canOpenMock, usedToday, limitFor } = require("./_access");
 const { getSettings } = require("./_marking");
+const { simsFor } = require("./_sims");
 
 exports.handler = async (event) => {
   if (missingEnv()) return json(500, { error: "Backend not configured." });
@@ -31,6 +32,7 @@ exports.handler = async (event) => {
         listening: m.listening_item ? items[m.listening_item] || null : null,
         reading: m.reading_item ? items[m.reading_item] || null : null,
         writing: m.writing || {}, speaking: m.speaking || {},
+        sims: (() => { const x = simsFor(m.number); return { listening: x.listening ? { title: x.listening.title } : null, reading: x.reading.map((r, i) => ({ n: i + 1, title: r.title })) }; })(),
       },
       results: res.data || [],
       usage: { used, limit: limitFor(settings, access) },

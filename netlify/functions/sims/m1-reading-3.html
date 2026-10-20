@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IELTS WARRIORS – Reading Passage 3 – Incorrect Terminology in Science</title>
+<style>
+:root{--fs:17px;--ink:#1a1a1a;--muted:#5b5b5b;--line:#d6d6d6;--soft:#f1f1f1;--red:#d0021b;--green:#2e7d32;--bad:#c62828;--blue:#1d6fd6}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff}
+body{font-size:var(--fs);line-height:1.6}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+[hidden]{display:none!important}
+
+/* ---------- header ---------- */
+.top{height:84px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;gap:26px;background:#fff;position:relative;z-index:20}
+.logo{font-weight:800;font-size:40px;letter-spacing:.5px;color:var(--red);line-height:1;display:flex;align-items:flex-start;font-family:Arial,Helvetica,sans-serif}
+.logo sup{font-size:10px;color:#333;margin-left:2px;margin-top:4px;font-weight:700}
+.who{display:flex;flex-direction:column;line-height:1.25}
+.who a{font-weight:700;font-size:17px;text-decoration:none}
+.who a:hover{text-decoration:underline}
+.who span{font-size:16px;color:var(--muted)}
+.icons{margin-left:auto;display:flex;align-items:center;gap:30px}
+.icons .ic{background:none;border:0;padding:4px;display:grid;place-items:center;color:#111}
+.icons svg{width:30px;height:30px}
+.saved{font-size:14px;color:var(--muted);min-width:44px}
+.menu{position:absolute;right:20px;top:78px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.14);padding:14px 16px;width:250px;font-size:15px}
+.menu h4{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:600}
+.sizes{display:flex;gap:6px}
+.sizes button{flex:1;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 0;font-weight:700}
+.sizes button.on{background:#111;color:#fff;border-color:#111}
+
+/* ---------- home ---------- */
+.home{max-width:1060px;margin:34px auto;padding:0 20px}
+.card{border:1px solid var(--line);border-radius:10px;padding:30px 34px;margin-bottom:24px;background:#fff}
+.card h1{margin:0;font-size:28px;display:flex;align-items:center;gap:10px}
+.card h1 .ck{color:var(--green)}
+.card .bigck{float:right;color:var(--green);font-size:46px;line-height:1;margin-top:-6px}
+.card h2{margin:0 0 4px;font-size:28px}
+.status{font-weight:700;color:var(--bad);margin-bottom:12px}
+.status.done{color:var(--green)}
+.info{border:1px solid var(--line);border-radius:4px;padding:12px 18px;margin-bottom:18px}
+.info b{color:var(--green);margin-left:10px}
+.btn{background:#111;color:#fff;border:0;border-radius:5px;padding:12px 26px;font-weight:700;font-size:17px;display:inline-flex;gap:8px;align-items:center}
+.btn:hover{background:#333}
+.btn.ghost{background:#fff;color:#111;border:1px solid #111;margin-left:10px}
+.btn.ghost:hover{background:#f3f3f3}
+
+/* ---------- exam ---------- */
+.exam{position:fixed;inset:84px 0 0 0;display:flex;flex-direction:column}
+.banner{background:var(--soft);padding:12px 34px;line-height:1.4;border-bottom:1px solid #e6e6e6}
+.banner p{margin:0}
+.ws{flex:1;display:flex;min-height:0;position:relative}
+.pane{overflow-y:auto;min-width:0}
+.pane.left{width:50%;padding:28px 48px 60px}
+.pane.right{flex:1;padding:28px 56px 120px 44px}
+.divider{width:14px;flex:0 0 14px;position:relative;cursor:col-resize;background:linear-gradient(#e2e2e2,#e2e2e2) center/2px 100% no-repeat}
+.divider span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:52px;border:1px solid #c9c9c9;background:#fff;border-radius:6px;display:grid;place-items:center;font-size:18px;color:#333;user-select:none}
+.pane.left h2{text-align:center;font-size:1.55em;line-height:1.3;margin:0 0 18px}
+.pane.left p{margin:0 0 1.1em}
+.letter{font-weight:800;margin-right:8px}
+mark.hl{background:#ffe86b;color:inherit;cursor:pointer;border-radius:2px}
+
+.question-group{margin-bottom:38px}
+.question-group h3{font-size:1.15em;margin:0 0 12px}
+.instruction{margin:0 0 8px}
+.question-group>p{margin:0 0 8px}
+.people-legend{border:1px solid var(--line);padding:12px 16px;margin:12px 0;border-radius:4px}
+.people-legend div{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:6px}
+.people-legend b{margin-right:8px}
+.matching-grid-wrap{overflow-x:auto;margin-top:16px}
+.matching-grid{border-collapse:collapse;width:100%;min-width:520px}
+.matching-grid th,.matching-grid td{border:1px solid var(--line);text-align:center;vertical-align:middle}
+.matching-grid thead th{background:var(--soft);padding:16px 8px;font-weight:700}
+.matching-grid thead th:first-child{text-align:left;padding-left:16px}
+.mg-stmt{text-align:left!important;padding:14px 16px;line-height:1.5;min-width:230px}
+.mg-stmt strong{margin-right:6px}
+.mg-cell{width:46px;padding:0}
+.mg-cell label{display:flex;width:100%;min-height:64px;align-items:center;justify-content:center;cursor:pointer}
+.mg-cell label:hover{background:#f4f8ff}
+.mg-cell input{position:absolute;opacity:0;pointer-events:none}
+.mg-cell .tick{width:22px;height:22px;border-radius:50%;border:2px solid transparent}
+.mg-cell input:checked+.tick{border-color:#111;background:radial-gradient(#111 45%,transparent 50%)}
+.mg-cell input:focus-visible+.tick{outline:2px solid var(--blue);outline-offset:3px}
+.mg-bm{width:44px}
+.bm{background:none;border:0;padding:4px;color:#9a9a9a;vertical-align:middle}
+.bm:hover{color:#333}
+.bm.on{color:var(--red)}
+.bm.on svg{fill:var(--red)}
+
+.question{margin:0 0 26px}
+.q-head{display:flex;gap:10px;align-items:flex-start}
+.q-number{font-weight:800;min-width:28px}
+.q-prompt{flex:1}
+.options{margin:10px 0 0 38px;display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:6px 10px;border-radius:4px;cursor:pointer}
+.opt:hover{background:#f4f8ff}
+.opt input{margin-top:6px;width:17px;height:17px;accent-color:#111;flex:0 0 auto}
+.opt b{margin-right:6px}
+.summary-card{border:1px solid var(--line);padding:18px 20px;border-radius:4px;line-height:2.3}
+.summary-card p{margin:0}
+.inline-answer{white-space:nowrap}
+.inline-answer>strong{margin-right:4px}
+.answer-input{border:1px solid #9a9a9a;border-radius:3px;padding:2px 8px;width:170px;height:34px;font-size:.95em;background:#fff}
+.answer-input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+.answer-input.over{border-color:var(--bad);background:#fff5f5}
+.qitem.cur>.q-head .q-number,.qitem.cur>.mg-stmt strong,.inline-answer.cur>strong{color:var(--blue)}
+
+/* review marks */
+.fb{display:none;font-size:.85em;font-weight:700;margin-left:8px;white-space:normal}
+.reviewing .fb{display:inline}
+.fb.good{color:var(--green)}
+.fb.bad{color:var(--bad)}
+.reviewing .answer-input.good{border-color:var(--green);background:#f1fbf2}
+.reviewing .answer-input.bad{border-color:var(--bad);background:#fff4f4}
+.reviewing .mg-cell.key{background:#e8f6ea}
+.reviewing .mg-cell.wrong{background:#fdeaea}
+.reviewing .opt.key{background:#e8f6ea}
+.reviewing .opt.wrong{background:#fdeaea}
+
+/* arrows + footer */
+.arrows{position:absolute;right:42px;bottom:22px;display:flex;gap:12px;z-index:5}
+.arrows button{width:72px;height:62px;border:0;border-radius:4px;color:#fff;font-size:28px;display:grid;place-items:center}
+.arrows .prev{background:#5b5b5b}.arrows .next{background:#111}
+.arrows button:disabled{opacity:.35;cursor:default}
+.foot{height:80px;border-top:1px solid var(--line);display:flex;align-items:center;padding:0 32px;gap:18px;background:#fff}
+.foot .pl{font-weight:800;font-size:19px}
+.nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.nav button{min-width:40px;height:40px;border:2px solid transparent;background:none;border-radius:3px;font-size:18px;position:relative}
+.nav button:hover{background:#f2f2f2}
+.nav button.ans{text-decoration:underline;text-underline-offset:5px;font-weight:700}
+.nav button.on{border-color:#111;font-weight:800}
+.nav button.flag::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+.nav button.good{color:var(--green);font-weight:800}
+.nav button.bad{color:var(--bad);font-weight:800}
+.count{color:var(--muted);font-size:15px;white-space:nowrap}
+.submit{background:#111;color:#fff;border:0;border-radius:5px;padding:13px 40px;font-weight:700;font-size:18px}
+.submit:hover{background:#333}
+
+/* highlight popup */
+.hlpop{position:fixed;z-index:60;background:#111;color:#fff;border-radius:6px;display:flex;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.hlpop button{background:none;border:0;color:#fff;padding:8px 14px;font-size:14px;font-weight:600}
+.hlpop button:hover{background:#333}
+
+/* modals */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+.modal{background:#fff;border-radius:8px;width:100%;max-width:880px;padding:36px 44px 40px;text-align:center}
+.modal.small{max-width:460px;margin-top:12vh}
+.modal h2{color:var(--red);font-size:30px;margin:0 0 20px}
+.modal.small h2{color:var(--ink);font-size:22px}
+.scorebox{display:inline-block;border:1px solid var(--line);border-radius:10px;padding:16px 40px 12px}
+.scorebox small{display:block;font-size:17px;color:#333}
+.scorebox strong{display:block;font-size:44px;line-height:1.15;color:var(--red)}
+.scorebox strong.pass{color:var(--green)}
+.scorebox span{font-size:16px;color:#333}
+.modal h3{text-align:left;margin:28px 0 10px;font-size:19px}
+.rt-wrap{overflow-x:auto}
+.rt{width:100%;border-collapse:collapse;text-align:left;font-size:16px}
+.rt th{background:var(--soft);font-weight:700}
+.rt th,.rt td{border:1px solid var(--line);padding:8px 10px}
+.rt .y{color:var(--green);font-weight:800}
+.rt .n{color:var(--bad);font-weight:800}
+.quote{font-style:italic;margin:26px 0 12px;font-size:18px}
+.tg{color:#2f52c8;font-weight:700;text-decoration:none;font-size:19px}
+.tg:hover{text-decoration:underline}
+.mbtns{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.mbtns .btn.ghost{margin-left:0}
+
+@media (max-width:860px){
+  .top{height:68px;padding:0 14px;gap:14px}.logo{font-size:30px}.icons{gap:14px}.icons svg{width:24px;height:24px}
+  .exam{inset:68px 0 0 0}.menu{top:62px}
+  .ws{flex-direction:column}.pane.left{width:100%!important;height:45%;padding:18px 18px 30px;border-bottom:2px solid var(--line)}
+  .pane.right{padding:18px 18px 110px}.divider{display:none}
+  .foot{height:auto;padding:10px 12px;flex-wrap:wrap}.count{display:none}
+  .arrows{right:14px;bottom:12px}.arrows button{width:54px;height:48px}
+  .card{padding:22px}.card h1,.card h2{font-size:22px}.modal{padding:26px 16px}
+  .options{margin-left:0}.answer-input{width:140px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">IELTS<sup>TM</sup></div>
+  <div class="who"><a href="https://t.me/Javlonbek_Okhunov" target="_blank" rel="noopener">Teacher Javlonbek</a><span id="whoSub" hidden>Reading</span></div>
+  <div class="icons">
+    <span class="saved" id="saved"></span>
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg></span>
+    <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+    <button class="ic" id="menuBtn" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+  <div class="menu" id="menu" hidden>
+    <h4>Text size</h4>
+    <div class="sizes"><button data-fs="15">Small</button><button data-fs="17" class="on">Standard</button><button data-fs="20">Large</button></div>
+    <h4 style="margin-top:14px">Tip</h4>
+    <div style="font-size:14px;color:#444;line-height:1.45">Select any text in the passage to highlight it. Click a highlight to remove it.</div>
+  </div>
+</header>
+
+<!-- HOME -->
+<main class="home" id="home">
+  <div class="card"><span class="bigck">&#10004;</span><h1>IELTS WARRIORS – Reading Passage 3 <span class="ck">&#10004;</span></h1></div>
+  <div class="card">
+    <h2>Reading Passage 3 — Incorrect Terminology in Science</h2>
+    <div class="status" id="homeStatus">Not completed</div>
+    <div class="info">&#9662; Questions 27–40. There is no time limit on this passage — submit when you are ready.<b>Confirmed</b></div>
+    <button class="btn" id="startBtn">&#10140; Start Reading</button><button class="btn ghost" id="retakeBtn" hidden>&#8635; Retake</button>
+  </div>
+</main>
+
+<!-- EXAM -->
+<section class="exam" id="exam" hidden>
+  <div class="banner"><p><strong>Part 3</strong></p><p>Read the text and answer questions 27–40.</p></div>
+  <div class="ws" id="ws">
+    <article class="pane left" id="passage"><h2>Incorrect Terminology in Science</h2><p><span class="letter">A</span> Science plays an increasingly significant role in people&#x27;s lives, making the faithful communication of scientific developments more important than ever. Yet such communication is fraught with challenges that can easily distort discussions, leading to unnecessary confusion and misunderstandings.</p><p><span class="letter">B</span> Some problems stem from the esoteric nature of current research and the associated difficulty of finding sufficiently faithful terminology. Abstraction and complexity are not signs that a given scientific direction is wrong, as some commentators have suggested, but are instead a tribute to the success of human ingenuity in meeting the increasingly complex challenges that nature presents. They can, however, make communication more difficult. But many of the biggest challenges for science reporting arise because in areas of evolving research, scientists themselves often only partly understand the full implications of any particular advance or development. Since that dynamic applies to most of the scientific developments that directly affect people&#x27;s lives: global warming, cancer research, diet studies — learning how to overcome it is critical to spurring a more informed scientific debate among the broader public.</p><p><span class="letter">C</span> Ambiguous word choices are the source of some misunderstandings. Scientists often employ colloquial terminology, which they then assign a specific meaning that is impossible to fathom without proper training. The term &quot;relativity,&quot; for example, is intrinsically misleading. Many interpret the theory to mean that everything is relative and there are no absolutes. Yet although the measurements any observer makes depend on his coordinates and reference frame, the physical phenomena he measures have an invariant description that transcends that observer&#x27;s particular coordinates. Einstein&#x27;s theory of relativity is really about finding an Invariant description of physical phenomena. True, Einstein agreed with the idea that his theory would have been better named &quot;Invarianten theory.&quot; But the term - &quot;relativity&quot; was already entrenched at the time for him to change.</p><p><span class="letter">D</span> &quot;The uncertainty principle&quot; is another frequently abused term. It is sometimes interpreted as a limitation on observers and their ability to make measurements. But it is not about intrinsic limitations on any one particular measurement; it is about the inability to precisely measure particular pairs of quantities simultaneously. The first Interpretation is perhaps more engaging from a philosophical or political perspective. It&#x27;s just not what science is about.</p><p><span class="letter">E</span> Even the word &quot;theory&quot; can be a problem. Unlike most people, who use the word to describe a passing conjecture that they often regard as suspect, physicists have very specific ideas in mind when they talk about theories. For physicists, theories entail a definite physical framework embodied in a set of fundamental assumptions about the world that lead to a specific set of equations and predictions — ones that are borne out by successful predictions. Theories aren&#x27;t necessarily shown to be correct or complete immediately. Even Einstein took the better part of a decade to develop the correct version of his theory of general relativity. But eventually both the ideas and the measurements settle down and theories are either proven correct, abandoned or absorbed into other, more encompassing theories.</p><p><span class="letter">F</span> &quot;Global warming&quot; is another example of problematic terminology. Climatologists predict more drastic fluctuations in temperature and rainfall — not necessarily that every place will be warmer. The name sometimes subverts the debate, since it lets people argue that their winter was worse, so how could there be global warming? Clearly &quot;global climate change&quot; would have been a better name. But not all problems stem solely from poor word choices. Some stem from the intrinsically complex nature of much of modern science. Science sometimes transcends this limitation: remarkably, chemists were able to detail the precise chemical processes involved in the destruction of the ozone layer, making the evidence that chlorofluorocarbon gases (Freon, for example) were destroying the ozone layer indisputably.</p><p><span class="letter">G</span> A better understanding of the mathematical significance of results and less insistence on a simple story would help to clarify many scientific discussions. For several months, Harvard was tortured by empty debates over the relative intrinsic scientific abilities of men and women. One of the more amusing aspects of the discussion was that those who believed in the differences and those who didn&#x27;t used the same evidence about gender-specific special ability. How could that be? The answer is that the data shows no substantial effects. Social factors might account for these tiny differences, which in any case have an unclear connection to scientific ability. Not much of a headline when phrased that way, is it? Each type of science has its own source of complexity and potential for miscommunication. Yet there are steps we can take to improve public understanding in all cases. The first would be to inculcate greater understanding and acceptance of indirect scientific evidence. The information from an unmanned space mission is no less legitimate than the information from one In which people are on board.</p><p><span class="letter">H</span> This doesn&#x27;t mean never questioning an Interpretation, but it also doesn&#x27;t mean equating indirect evidence with blind belief, as people sometimes suggest. Second, we might need different standards for evaluating science with urgent policy implications than research with purely theoretical value. When scientists say they are not certain about their predictions, it doesn&#x27;t necessarily mean they&#x27;ve found nothing substantial. It would be better if scientists were more open about the mathematical significance of their results and if the public didn&#x27;t treat math as quite so scary. Statistics and errors, which tell us the uncertainty in a measurement, give us the tools to evaluate new developments fairly.</p><p><span class="letter">I</span> But most importantly, people have to recognize that science can be complex. If we accept only simple stories, the description will necessarily be distorted. When advances are subtle or complicated, scientists should be willing to go the extra distance to give proper explanations and be patient about the truth. Even so, some difficulties are unavoidable. Most developments reflect work in progress, so the story is complex because no one yet knows the big picture.</p></article>
+    <div class="divider" id="divider" title="Drag to resize"><span>&#8596;</span></div>
+    <div class="pane right" id="questions"><section class="question-group"><h3>Questions 27–31</h3><p class="instruction">Choose the correct answer.</p><div class="question qitem" data-q="27"><div class="q-head"><span class="q-number">27</span><span class="q-prompt">Why is the faithful communication of science important?</span><button type="button" class="bm" data-flag="27" aria-label="Bookmark question 27" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="27"></span><div class="options"><label class="opt"><input type="radio" name="q27" value="A"><span><b>A</b> Science plays an increasingly significant role in people&#x27;s lives.</span></label><label class="opt"><input type="radio" name="q27" value="B"><span><b>B</b> Science is fraught with challenges the public are interested in.</span></label><label class="opt"><input type="radio" name="q27" value="C"><span><b>C</b> The nature of complexity in science communication leads to confusion.</span></label><label class="opt"><input type="radio" name="q27" value="D"><span><b>D</b> Scientific inventions are more important than ever before.</span></label></div></div><div class="question qitem" data-q="28"><div class="q-head"><span class="q-number">28</span><span class="q-prompt">What is the reason for many of the biggest challenges in science reporting?</span><button type="button" class="bm" data-flag="28" aria-label="Bookmark question 28" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="28"></span><div class="options"><label class="opt"><input type="radio" name="q28" value="A"><span><b>A</b> Phenomenon such as global warming, cancer research, diet studies are too complex</span></label><label class="opt"><input type="radio" name="q28" value="B"><span><b>B</b> Scientists themselves often only partly understand the Theory of Evolution</span></label><label class="opt"><input type="radio" name="q28" value="C"><span><b>C</b> Scientists do not totally comprehend the impact of certain scientific advancements</span></label><label class="opt"><input type="radio" name="q28" value="D"><span><b>D</b> Scientists themselves often partly understand the esoteric communication nature</span></label></div></div><div class="question qitem" data-q="29"><div class="q-head"><span class="q-number">29</span><span class="q-prompt">According to the 3rd paragraph, the reference to the term and example of &quot;theory of relativity&quot; is to demonstrate</span><button type="button" class="bm" data-flag="29" aria-label="Bookmark question 29" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="29"></span><div class="options"><label class="opt"><input type="radio" name="q29" value="A"><span><b>A</b> Theory of relativity is about an invariant physical phenomenon</span></label><label class="opt"><input type="radio" name="q29" value="B"><span><b>B</b> Scientific terms can sometimes cause misunderstandings</span></label><label class="opt"><input type="radio" name="q29" value="C"><span><b>C</b> The term &quot;relativity,&quot; is designed to be misleading public</span></label><label class="opt"><input type="radio" name="q29" value="D"><span><b>D</b> Everything is relative and there is no absolute existence</span></label></div></div><div class="question qitem" data-q="30"><div class="q-head"><span class="q-number">30</span><span class="q-prompt">Which one is a good example of an area where scientists used appropriate terminology</span><button type="button" class="bm" data-flag="30" aria-label="Bookmark question 30" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="30"></span><div class="options"><label class="opt"><input type="radio" name="q30" value="A"><span><b>A</b> The uncertainty principle</span></label><label class="opt"><input type="radio" name="q30" value="B"><span><b>B</b> Global warming</span></label><label class="opt"><input type="radio" name="q30" value="C"><span><b>C</b> The theory of relativity</span></label><label class="opt"><input type="radio" name="q30" value="D"><span><b>D</b> Freon&#x27;s destructive process on Ozone</span></label></div></div><div class="question qitem" data-q="31"><div class="q-head"><span class="q-number">31</span><span class="q-prompt">What is a surprising finding of the Harvard debates in the passage?</span><button type="button" class="bm" data-flag="31" aria-label="Bookmark question 31" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="31"></span><div class="options"><label class="opt"><input type="radio" name="q31" value="A"><span><b>A</b> There are equal intrinsic scientific abilities of men and women.</span></label><label class="opt"><input type="radio" name="q31" value="B"><span><b>B</b> Both sides used the same data in support of their argument.</span></label><label class="opt"><input type="radio" name="q31" value="C"><span><b>C</b> The scientific data usually shows no substantial figures to support a debated idea.</span></label><label class="opt"><input type="radio" name="q31" value="D"><span><b>D</b> Social factors might have a clear connection to scientific ability.</span></label></div></div></section><section class="question-group"><h3>Questions 32–35</h3><p class="instruction">Choose <strong>YES</strong> if the statement agrees with the claims of the writer, choose <strong>NO</strong> if the statement contradicts the claims of the writer, or <strong>NOT GIVEN</strong> if it is impossible to say what the writer thinks about this.</p><div class="question qitem" data-q="32"><div class="q-head"><span class="q-number">32</span><span class="q-prompt">&quot;Global warming&quot; scientifically refers to greater fluctuations in temperature and rainfall rather than a universal temperature rise.</span><button type="button" class="bm" data-flag="32" aria-label="Bookmark question 32" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="32"></span><div class="options"><label class="opt"><input type="radio" name="q32" value="YES"><span>YES</span></label><label class="opt"><input type="radio" name="q32" value="NO"><span>NO</span></label><label class="opt"><input type="radio" name="q32" value="NOT GIVEN"><span>NOT GIVEN</span></label></div></div><div class="question qitem" data-q="33"><div class="q-head"><span class="q-number">33</span><span class="q-prompt">More media coverage of &quot;global warming&quot; would help the public to recognize the phenomenon.</span><button type="button" class="bm" data-flag="33" aria-label="Bookmark question 33" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="33"></span><div class="options"><label class="opt"><input type="radio" name="q33" value="YES"><span>YES</span></label><label class="opt"><input type="radio" name="q33" value="NO"><span>NO</span></label><label class="opt"><input type="radio" name="q33" value="NOT GIVEN"><span>NOT GIVEN</span></label></div></div><div class="question qitem" data-q="34"><div class="q-head"><span class="q-number">34</span><span class="q-prompt">Harvard debates should focus more on female scientists than male scientists.</span><button type="button" class="bm" data-flag="34" aria-label="Bookmark question 34" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="34"></span><div class="options"><label class="opt"><input type="radio" name="q34" value="YES"><span>YES</span></label><label class="opt"><input type="radio" name="q34" value="NO"><span>NO</span></label><label class="opt"><input type="radio" name="q34" value="NOT GIVEN"><span>NOT GIVEN</span></label></div></div><div class="question qitem" data-q="35"><div class="q-head"><span class="q-number">35</span><span class="q-prompt">Indirect scientific evidence is always less reliable than direct scientific evidence.</span><button type="button" class="bm" data-flag="35" aria-label="Bookmark question 35" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></div><span class="fb" data-fb="35"></span><div class="options"><label class="opt"><input type="radio" name="q35" value="YES"><span>YES</span></label><label class="opt"><input type="radio" name="q35" value="NO"><span>NO</span></label><label class="opt"><input type="radio" name="q35" value="NOT GIVEN"><span>NOT GIVEN</span></label></div></div></section><section class="question-group"><h3>Questions 36–40</h3><p class="instruction">Complete the following summary of the paragraphs of Reading Passage. Write <strong>NO MORE THAN TWO WORDS</strong> from the Reading Passage for each answer.</p><div class="summary-card"><p>Science Communication is fraught with challenges that can easily distort discussions, leading to unnecessary confusion and misunderstandings. Firstly, ambiguous <span data-q="36" class="inline-answer qitem"><strong>36</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q36" data-maxwords="2" aria-label="Question 36"><span class="fb" data-fb="36"></span><button type="button" class="bm" data-flag="36" aria-label="Bookmark question 36" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> are the source of some misunderstandings. Common people without proper training do not understand clearly or deeply a specific scientific meaning via the <span data-q="37" class="inline-answer qitem"><strong>37</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q37" data-maxwords="2" aria-label="Question 37"><span class="fb" data-fb="37"></span><button type="button" class="bm" data-flag="37" aria-label="Bookmark question 37" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> that scientists often employ. For example, uncertainty is not about <span data-q="38" class="inline-answer qitem"><strong>38</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q38" data-maxwords="2" aria-label="Question 38"><span class="fb" data-fb="38"></span><button type="button" class="bm" data-flag="38" aria-label="Bookmark question 38" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span> limitations on any particular <span data-q="39" class="inline-answer qitem"><strong>39</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q39" data-maxwords="2" aria-label="Question 39"><span class="fb" data-fb="39"></span><button type="button" class="bm" data-flag="39" aria-label="Bookmark question 39" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span>. What&#x27;s more, even the word &quot;theory&quot; can be a problem. Theories aren&#x27;t necessarily shown to be correct or complete immediately since scientists often evolved better versions of specific theories, a good example can be the theory of <span data-q="40" class="inline-answer qitem"><strong>40</strong> <input type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" class="answer-input" id="q40" data-maxwords="2" aria-label="Question 40"><span class="fb" data-fb="40"></span><button type="button" class="bm" data-flag="40" aria-label="Bookmark question 40" title="Mark for review"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button></span>. Thus, most importantly people have to recognize that science can be complex.</p></div></section></div>
+    <div class="arrows"><button class="prev" id="prevBtn" aria-label="Previous question">&#10229;</button><button class="next" id="nextBtn" aria-label="Next question">&#10230;</button></div>
+  </div>
+  <footer class="foot">
+    <span class="pl">Part 3</span>
+    <div class="nav" id="nav"></div>
+    <span class="count" id="count"></span>
+    <button class="submit" id="submitBtn">Submit</button>
+  </footer>
+</section>
+
+<div class="hlpop" id="hlpop" hidden><button id="hlDo">Highlight</button><button id="hlClear" hidden>Clear</button></div>
+
+<div class="ov" id="confirmOv" hidden><div class="modal small">
+  <h2>Submit your answers?</h2><p id="confirmTxt"></p>
+  <div class="mbtns"><button class="btn ghost" id="cancelBtn">Keep working</button><button class="btn" id="okBtn">Submit</button></div>
+</div></div>
+
+<div class="ov" id="resOv" hidden><div class="modal">
+  <h2>Your Results</h2>
+  <div class="scorebox"><small>Reading</small><strong id="resScore">0 / 14</strong><span id="resPct">0% correct</span></div>
+  <h3>Answers</h3>
+  <div class="rt-wrap"><table class="rt"><thead><tr><th>Q</th><th>Your answer</th><th>Answer key</th><th>Result</th></tr></thead><tbody id="resBody"></tbody></table></div>
+  <p class="quote">“Nothing changes if nothing changes. Start changing now.” — Teacher Javlonbek</p>
+  <a class="tg" href="https://t.me/Javlonbek_Okhunov" target="_blank" rel="noopener">@Javlonbek_Okhunov</a>
+  <div class="mbtns"><button class="btn ghost" id="reviewBtn">Review answers</button><button class="btn" id="homeBtn">Back to home</button></div>
+</div></div>
+
+<script>
+"use strict";
+const CFG={"part": 3, "first": 27, "last": 40, "title": "Incorrect Terminology in Science", "key": {"27": "A", "28": "C", "29": "B", "30": "D", "31": "B", "32": "YES", "33": "NOT GIVEN", "34": "NOT GIVEN", "35": "NO", "36": "WORD CHOICES", "37": "COLLOQUIAL TERMINOLOGY", "38": "INTRINSIC", "39": "MEASUREMENT", "40": ["GENERAL RELATIVITY", "RELATIVITY"]}, "store": "iw_v10t1_reading_p3"};
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const NUMS=[];for(let n=CFG.first;n<=CFG.last;n++)NUMS.push(n);
+const TOTAL=NUMS.length;
+let S={answers:{},flags:[],submitted:false,results:{},score:0,fs:17,split:50};
+let cur=CFG.first;
+
+function load(){try{const r=localStorage.getItem(CFG.store);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem(CFG.store,JSON.stringify(S));const el=$('#saved');el.textContent='Saved';clearTimeout(save.t);save.t=setTimeout(()=>el.textContent='',1500)}catch(e){}}
+
+function norm(v){return String(v||'').toLowerCase().replace(/[’']/g,"'").replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
+function keyText(n){const k=CFG.key[n];const f=x=>/^[A-I]$|^(TRUE|FALSE|NOT GIVEN|YES|NO)$/.test(x)?x:x.toLowerCase();return Array.isArray(k)?k.map(f).join(' / '):f(k)}
+function isCorrect(n,a){if(!a)return false;const k=CFG.key[n];return(Array.isArray(k)?k:[k]).some(x=>norm(x)===norm(a))}
+function getAns(n){const t=document.getElementById('q'+n);if(t&&t.type==='text')return t.value.trim();const r=$(`input[name="q${n}"]:checked`);return r?r.value:''}
+function item(n){return $(`.qitem[data-q="${n}"]`)}
+
+/* ---------- restore answers into DOM ---------- */
+function applyAnswers(){
+  NUMS.forEach(n=>{const v=S.answers[n];if(!v)return;const t=document.getElementById('q'+n);
+    if(t&&t.type==='text')t.value=v;else{const r=$(`input[name="q${n}"][value="${CSS.escape(v)}"]`);if(r)r.checked=true}});
+}
+
+/* ---------- nav ---------- */
+function buildNav(){$('#nav').innerHTML=NUMS.map(n=>`<button type="button" data-n="${n}" aria-label="Question ${n}">${n}</button>`).join('')}
+function refresh(){
+  let answered=0;
+  NUMS.forEach(n=>{const b=$(`#nav [data-n="${n}"]`),a=!!getAns(n);if(a)answered++;
+    b.classList.toggle('ans',a);b.classList.toggle('on',n===cur);b.classList.toggle('flag',S.flags.includes(n));
+    b.classList.toggle('good',S.submitted&&S.results[n]===true);b.classList.toggle('bad',S.submitted&&S.results[n]===false);
+    const bm=$(`.bm[data-flag="${n}"]`);if(bm)bm.classList.toggle('on',S.flags.includes(n));
+    const it=item(n);if(it)it.classList.toggle('cur',n===cur)});
+  $('#count').textContent=`${answered} of ${TOTAL} answered`;
+  $('#prevBtn').disabled=cur<=CFG.first;$('#nextBtn').disabled=cur>=CFG.last;
+  $('#submitBtn').textContent=S.submitted?'My result':'Submit';
+}
+function goTo(n,focus=true){
+  n=Math.max(CFG.first,Math.min(CFG.last,n));cur=n;refresh();
+  const it=item(n);if(!it)return;
+  it.scrollIntoView({behavior:'smooth',block:'center'});
+  if(focus&&!S.submitted){const t=document.getElementById('q'+n);if(t&&t.type==='text')setTimeout(()=>t.focus({preventScroll:true}),250)}
+}
+
+/* ---------- word limit ---------- */
+function checkWords(t){const max=+t.dataset.maxwords||0;if(!max)return;const w=t.value.trim()?t.value.trim().split(/\s+/).length:0;t.classList.toggle('over',w>max);t.title=w>max?`Maximum ${max} word${max>1?'s':''}`:''}
+
+/* ---------- grading ---------- */
+function grade(){
+  let score=0;S.results={};
+  NUMS.forEach(n=>{const g=isCorrect(n,getAns(n));S.results[n]=g;if(g)score++});
+  S.score=score;S.submitted=true;save();
+}
+function paintReview(){
+  const on=S.submitted;$('#questions').classList.toggle('reviewing',on);
+  $$('#questions input').forEach(i=>i.disabled=on);
+  $$('.mg-cell,.opt').forEach(e=>e.classList.remove('key','wrong'));
+  $$('.answer-input').forEach(e=>e.classList.remove('good','bad'));
+  if(!on){$$('.fb').forEach(f=>{f.textContent='';f.className='fb'});return}
+  NUMS.forEach(n=>{
+    const ok=S.results[n],user=getAns(n),fb=$(`.fb[data-fb="${n}"]`);
+    if(fb){fb.className='fb '+(ok?'good':'bad');fb.textContent=ok?'✔':`✘ Answer: ${keyText(n)}`}
+    const t=document.getElementById('q'+n);
+    if(t&&t.type==='text'){t.classList.add(ok?'good':'bad');return}
+    const k=Array.isArray(CFG.key[n])?CFG.key[n][0]:CFG.key[n];
+    $$(`input[name="q${n}"]`).forEach(r=>{const box=r.closest('.mg-cell')||r.closest('.opt');if(!box)return;
+      if(r.value===k)box.classList.add('key');else if(r.checked)box.classList.add('wrong')});
+  });
+}
+function showResults(){
+  const pct=Math.round(S.score/TOTAL*100);
+  const sc=$('#resScore');sc.textContent=`${S.score} / ${TOTAL}`;sc.classList.toggle('pass',pct>=60);
+  $('#resPct').textContent=`${pct}% correct`;
+  const e=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  $('#resBody').innerHTML=NUMS.map(n=>{const u=S.answers[n]||'';const ok=S.results[n];
+    return `<tr><td>${n}</td><td>${u?e(u):'—'}</td><td>${e(keyText(n))}</td><td class="${ok?'y':'n'}">${ok?'✔':'✘'}</td></tr>`}).join('');
+  $('#resOv').hidden=false;
+}
+
+/* ---------- views ---------- */
+function showHome(){
+  $('#exam').hidden=true;$('#home').hidden=false;$('#whoSub').hidden=true;$('#resOv').hidden=true;
+  const st=$('#homeStatus');
+  if(S.submitted){st.textContent=`Completed — ${S.score} / ${TOTAL} correct`;st.classList.add('done');$('#startBtn').innerHTML='&#10140; Review Answers';$('#retakeBtn').hidden=false}
+  else{const a=Object.values(S.answers).filter(Boolean).length;st.textContent=a?`In progress — ${a} of ${TOTAL} answered`:'Not completed';st.classList.remove('done');$('#startBtn').innerHTML=a?'&#10140; Continue Reading':'&#10140; Start Reading';$('#retakeBtn').hidden=true}
+  window.scrollTo(0,0);
+}
+function showExam(){
+  $('#home').hidden=true;$('#exam').hidden=false;$('#whoSub').hidden=false;
+  applySplit();paintReview();refresh();
+}
+function retake(){
+  if(!confirm('Clear all answers and start this passage again?'))return;
+  S.answers={};S.flags=[];S.submitted=false;S.results={};S.score=0;save();
+  $$('#questions input[type=text]').forEach(i=>{i.value='';i.classList.remove('over')});
+  $$('#questions input[type=radio]').forEach(i=>i.checked=false);
+  $$('mark.hl').forEach(unwrap);
+  cur=CFG.first;paintReview();showHome();
+}
+
+/* ---------- split ---------- */
+function applySplit(){if(window.innerWidth>860)$('#passage').style.width=S.split+'%';else $('#passage').style.width=''}
+(function(){const d=$('#divider');let drag=false;
+  d.addEventListener('pointerdown',e=>{drag=true;d.setPointerCapture(e.pointerId);document.body.style.userSelect='none'});
+  d.addEventListener('pointermove',e=>{if(!drag)return;const r=$('#ws').getBoundingClientRect();S.split=Math.max(25,Math.min(75,(e.clientX-r.left)/r.width*100));applySplit()});
+  d.addEventListener('pointerup',()=>{if(!drag)return;drag=false;document.body.style.userSelect='';save()});
+  d.addEventListener('dblclick',()=>{S.split=50;applySplit();save()});
+})();
+
+/* ---------- highlighting ---------- */
+let hlRange=null,hlMark=null;
+function unwrap(m){const p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()}
+function wrapRange(range){
+  const root=$('#passage'),sc=range.startContainer,so=range.startOffset,ec=range.endContainer,eo=range.endOffset;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];
+  while(w.nextNode()){const n=w.currentNode;if(range.intersectsNode(n)&&n.nodeValue.length)nodes.push(n)}
+  nodes.forEach(n=>{let s=0,e=n.nodeValue.length;if(n===sc&&sc.nodeType===3)s=so;if(n===ec&&ec.nodeType===3)e=eo;if(s>=e)return;
+    if(n.parentNode.closest('mark.hl'))return;
+    let mid=s>0?n.splitText(s):n;if(e-s<mid.nodeValue.length)mid.splitText(e-s);
+    if(!mid.nodeValue.trim())return;const m=document.createElement('mark');m.className='hl';mid.parentNode.insertBefore(m,mid);m.appendChild(mid)});
+}
+function popAt(x,y,mode){const p=$('#hlpop');$('#hlDo').hidden=mode!=='add';$('#hlClear').hidden=mode!=='clear';p.hidden=false;
+  p.style.left=Math.min(window.innerWidth-140,Math.max(8,x-50))+'px';p.style.top=Math.max(8,y-48)+'px'}
+function hidePop(){$('#hlpop').hidden=true;hlRange=null;hlMark=null}
+$('#passage').addEventListener('mouseup',e=>{
+  setTimeout(()=>{const sel=window.getSelection();
+    if(sel&&!sel.isCollapsed&&sel.rangeCount&&$('#passage').contains(sel.getRangeAt(0).commonAncestorContainer)){
+      hlRange=sel.getRangeAt(0).cloneRange();const r=hlRange.getBoundingClientRect();popAt(r.left+r.width/2,r.top,'add');return}
+    const m=e.target.closest('mark.hl');if(m){hlMark=m;const r=m.getBoundingClientRect();popAt(r.left+r.width/2,r.top,'clear');return}
+    hidePop()},10)});
+$('#hlDo').addEventListener('mousedown',e=>{e.preventDefault();if(hlRange)wrapRange(hlRange);window.getSelection().removeAllRanges();hidePop()});
+$('#hlClear').addEventListener('mousedown',e=>{e.preventDefault();if(hlMark)unwrap(hlMark);hidePop()});
+document.addEventListener('mousedown',e=>{if(!e.target.closest('#hlpop')&&!e.target.closest('#passage'))hidePop()});
+$('#passage').addEventListener('scroll',hidePop);
+
+/* ---------- events ---------- */
+$('#questions').addEventListener('input',e=>{const t=e.target;const m=/^q(\d+)$/.exec(t.id)||(t.name&&/^q(\d+)$/.exec(t.name));if(!m||S.submitted)return;
+  const n=+m[1];S.answers[n]=getAns(n);if(t.type==='text')checkWords(t);cur=n;refresh();save()});
+$('#questions').addEventListener('change',e=>{const t=e.target;if(t.type!=='radio'||S.submitted)return;const n=+t.name.slice(1);S.answers[n]=t.value;cur=n;refresh();save()});
+$('#questions').addEventListener('focusin',e=>{const m=/^q(\d+)$/.exec(e.target.id||'');if(m){cur=+m[1];refresh()}});
+$('#questions').addEventListener('click',e=>{const b=e.target.closest('.bm');if(b){const n=+b.dataset.flag;S.flags=S.flags.includes(n)?S.flags.filter(x=>x!==n):[...S.flags,n];refresh();save();return}
+  const it=e.target.closest('.qitem');if(it){cur=+it.dataset.q;refresh()}});
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(b)goTo(+b.dataset.n)});
+$('#prevBtn').onclick=()=>goTo(cur-1);$('#nextBtn').onclick=()=>goTo(cur+1);
+$('#startBtn').onclick=()=>{showExam();setTimeout(()=>goTo(S.submitted?CFG.first:cur,false),60)};
+$('#retakeBtn').onclick=retake;
+$('#submitBtn').onclick=()=>{if(S.submitted){showResults();return}
+  const miss=NUMS.filter(n=>!getAns(n)).length;
+  $('#confirmTxt').textContent=miss?`You still have ${miss} unanswered question${miss>1?'s':''}. Once you submit, you cannot change your answers.`:'All questions answered. Once you submit, you cannot change your answers.';
+  $('#confirmOv').hidden=false};
+$('#cancelBtn').onclick=()=>$('#confirmOv').hidden=true;
+$('#okBtn').onclick=()=>{$('#confirmOv').hidden=true;grade();paintReview();refresh();showResults()};
+$('#homeBtn').onclick=showHome;
+$('#reviewBtn').onclick=()=>{$('#resOv').hidden=true;if($('#exam').hidden)showExam();goTo(CFG.first,false)};
+$('#menuBtn').onclick=e=>{e.stopPropagation();$('#menu').hidden=!$('#menu').hidden};
+document.addEventListener('click',e=>{if(!e.target.closest('#menu')&&!e.target.closest('#menuBtn'))$('#menu').hidden=true});
+$$('.sizes button').forEach(b=>b.onclick=()=>{S.fs=+b.dataset.fs;applyFs();save()});
+function applyFs(){document.documentElement.style.setProperty('--fs',S.fs+'px');$$('.sizes button').forEach(b=>b.classList.toggle('on',+b.dataset.fs===S.fs))}
+document.addEventListener('keydown',e=>{if($('#exam').hidden||e.target.matches('input[type=text]'))return;
+  if(e.key==='ArrowRight'&&e.altKey)goTo(cur+1);if(e.key==='ArrowLeft'&&e.altKey)goTo(cur-1)});
+window.addEventListener('resize',applySplit);
+// prevent Enter in text fields from doing anything odd; move to next
+$('#questions').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.answer-input')){e.preventDefault();goTo(cur+1)}});
+
+/* ---------- init ---------- */
+load();buildNav();applyAnswers();applyFs();
+$$('.answer-input').forEach(checkWords);
+showHome();
+</script>
+</body>
+</html>
