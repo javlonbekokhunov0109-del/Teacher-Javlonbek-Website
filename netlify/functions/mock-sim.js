@@ -1,4 +1,4 @@
-// GET /.netlify/functions/mock-sim?id=<mock id>&part=listening|reading&n=<1..>
+// GET /.netlify/functions/mock-sim?id=<mock id>&part=listening|reading
 // Returns one interactive test page (HTML) if - and only if - the signed-in student may open this mock.
 // For Listening, a short-lived protected link to the recording (the mock's attached audio file) is injected.
 const { json, missingEnv, serviceClient, getUserFromRequest, BUCKET, absoluteStorageUrl } = require("./_shared");
@@ -11,8 +11,8 @@ exports.handler = async (event) => {
   if (missingEnv()) return json(500, { error: "Backend not configured." });
   const user = await getUserFromRequest(event);
   if (!user) return json(401, { error: "Please sign in." });
-  const q = event.queryStringParameters || {}, part = q.part, n = parseInt(q.n || "1", 10);
-  if (!/^[0-9a-f-]{36}$/i.test(String(q.id || "")) || (part !== "listening" && part !== "reading") || !(n >= 1 && n <= 12)) return json(400, { error: "Invalid request." });
+  const q = event.queryStringParameters || {}, part = q.part;
+  if (!/^[0-9a-f-]{36}$/i.test(String(q.id || "")) || (part !== "listening" && part !== "reading") ) return json(400, { error: "Invalid request." });
   const db = serviceClient();
   try {
     const access = await getAccess(db, user);
@@ -20,13 +20,13 @@ exports.handler = async (event) => {
     if (!m || (!m.published && !access.admin)) return json(404, { error: "Mock not found." });
     if (!canOpenMock(access, m)) return json(403, { locked: true, error: "This mock is part of the paid pack." });
     const sims = simsFor(m.number);
-    const entry = part === "listening" ? sims.listening : sims.reading[n - 1];
+    const entry = part === "listening" ? sims.listening : sims.reading;
     const page = entry && readSim(entry.file);
     if (!page) return json(404, { error: "This part is not available yet." });
     if (part === "reading") return html(200, page);
 
-    let audioUrl = null;
-    if (m.listening_item) {
+    let audioUrl = entry.audio || null;
+    if (!audioUrl && m.listening_item) {
       const it = await db.from("content_items").select("storage_path, ready").eq("id", m.listening_item).maybeSingle();
       if (it.data && it.data.storage_path && (it.data.ready || access.admin)) {
         const s = await db.storage.from(BUCKET).createSignedUrl(it.data.storage_path, 4 * 3600);

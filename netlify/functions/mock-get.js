@@ -32,7 +32,7 @@ exports.handler = async (event) => {
         listening: m.listening_item ? items[m.listening_item] || null : null,
         reading: m.reading_item ? items[m.reading_item] || null : null,
         writing: m.writing || {}, speaking: m.speaking || {},
-        sims: (() => { const x = simsFor(m.number); return { listening: x.listening ? { title: x.listening.title } : null, reading: x.reading.map((r, i) => ({ n: i + 1, title: r.title })) }; })(),
+        sims: (() => { const x = simsFor(m.number); return { listening: x.listening ? { title: x.listening.title, minutes: x.listening.minutes || 30, questions: x.listening.questions || 40 } : null, reading: x.reading ? { title: x.reading.title, minutes: x.reading.minutes || 60, questions: x.reading.questions || 40 } : null }; })(),
       },
       results: res.data || [],
       usage: { used, limit: limitFor(settings, access) },

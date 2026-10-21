@@ -1,10 +1,17 @@
 {
   "1": {
-    "listening": { "file": "m1-listening.html", "title": "Listening \u2014 Volume 10, Test 5" },
-    "reading": [
-      { "file": "m1-reading-1.html", "title": "Passage 1 \u2014 The Formation of Continents and the Evolution of Species" },
-      { "file": "m1-reading-2.html", "title": "Passage 2 \u2014 Demystifying Yawn" },
-      { "file": "m1-reading-3.html", "title": "Passage 3 \u2014 Incorrect Terminology in Science" }
-    ]
+    "listening": {
+      "file": "m1-listening.html",
+      "title": "Listening — Volume 10, Test 5",
+      "audio": "/mock-audio/m1-4bf52fc52f5ac2219cdb.mp3",
+      "minutes": 30,
+      "questions": 40
+    },
+    "reading": {
+      "file": "m1-reading-exam.html",
+      "title": "Reading — 3 passages",
+      "minutes": 60,
+      "questions": 40
+    }
   }
 }

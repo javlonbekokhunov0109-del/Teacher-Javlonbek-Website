@@ -22,7 +22,7 @@ exports.handler = async (event) => {
     const mocks = (data || []).map((m) => ({
       id: m.id, number: m.number, title: m.title, description: m.description || "", is_free: !!m.is_free,
       locked: !canOpenMock(access, m), published: !!m.published,
-      has_listening: !!m.listening_item, has_reading: !!m.reading_item || simsFor(m.number).reading.length > 0,
+      has_listening: !!m.listening_item || !!simsFor(m.number).listening, has_reading: !!m.reading_item || !!simsFor(m.number).reading,
     }));
     const my = {};
     if (mocks.length) {

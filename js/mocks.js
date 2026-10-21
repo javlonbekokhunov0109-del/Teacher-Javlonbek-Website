@@ -164,33 +164,41 @@
   function overviewHtml() {
     var m = M.mock, sims = simsOf(), st = function (ok, t) { return '<li>' + (ok ? '\u2705 ' : '\u23F3 ') + t + '</li>'; };
     return '<div class="mk-sec"><h3>What is in this mock</h3><p class="sub">' + esc(m.description) + '</p><ul class="mk-q-list" style="list-style:none;padding:0">' +
-      st(!!m.listening, 'Listening' + (m.listening ? (sims.listening ? ' \u2014 full test, 40 questions' : '') : ' \u2014 coming soon')) + st(!!(m.reading || sims.reading.length), 'Reading' + (sims.reading.length ? ' \u2014 ' + sims.reading.length + ' passages' : m.reading ? '' : ' \u2014 coming soon')) +
+      st(!!(m.listening || sims.listening), 'Listening' + (sims.listening ? ' \u2014 full test, ' + sims.listening.questions + ' questions, about ' + sims.listening.minutes + ' minutes' : m.listening ? '' : ' \u2014 coming soon')) + st(!!(m.reading || sims.reading), 'Reading' + (sims.reading ? ' \u2014 3 passages, ' + sims.reading.questions + ' questions, ' + sims.reading.minutes + ' minutes' : m.reading ? '' : ' \u2014 coming soon')) +
       st(true, 'Writing Task 1 + Task 2 \u2014 AI marked') + st(true, 'Speaking Parts 1\u20133' + (M.settings.speaking_enabled ? ' \u2014 AI marked' : ' \u2014 record yourself (AI marking opens soon)')) + '</ul></div>' +
       '<div class="mk-sec"><h3>How to use it</h3><ol class="mk-q-list"><li>Do Listening and Reading under exam conditions.</li><li>Write Task 1 (20 min) and Task 2 (40 min). Use the timer, then press <b>Check my writing</b>.</li><li>Record your Speaking answers and review the feedback.</li><li>Find every result later under <b>My results</b>.</li></ol>' + usageNote() + '</div>';
   }
-  function simsOf() { var x = (M.mock && M.mock.sims) || {}; return { listening: x.listening || null, reading: x.reading || [] }; }
+  function simsOf() { var x = (M.mock && M.mock.sims) || {}; return { listening: x.listening || null, reading: x.reading || null }; }
   function fileHtml(kind) {
-    var it = M.mock[kind], label = kind === 'listening' ? 'Listening' : 'Reading', sims = simsOf();
-    if (kind === 'listening' && sims.listening) {
-      if (!it) return '<div class="mk-sec"><h3>Listening</h3><p class="sub">The recording for this test is being prepared. Check back soon.</p></div>';
-      return '<div class="mk-sec"><h3>Listening</h3><p class="sub">' + esc(sims.listening.title) + ' \u00B7 4 sections, 40 questions, about 30 minutes. Use headphones and a quiet room.</p><button class="wc-btn" style="width:auto;padding:12px 22px" data-sim="listening" data-n="1">Start Listening test</button><div id="mkSim" style="margin-top:14px"></div></div>';
-    }
-    if (kind === 'reading' && sims.reading.length) {
-      return '<div class="mk-sec"><h3>Reading</h3><p class="sub">Three passages, 60 minutes in the real exam. Open a passage to start.</p><div class="mk-hist">' + sims.reading.map(function (r) { return '<button data-sim="reading" data-n="' + esc(r.n) + '"><span>' + esc(r.title) + '</span><span class="bd">Open \u2192</span></button>'; }).join('') + '</div><div id="mkSim" style="margin-top:14px"></div></div>';
+    var it = M.mock[kind], label = kind === 'listening' ? 'Listening' : 'Reading', sims = simsOf(), sim = sims[kind];
+    if (sim) {
+      var rules = kind === 'listening'
+        ? ['4 sections, ' + sim.questions + ' questions, about ' + sim.minutes + ' minutes', 'Use headphones and sit somewhere quiet', 'The audio plays once, like the real exam']
+        : ['3 passages, ' + sim.questions + ' questions, <b>' + sim.minutes + ' minutes</b> in total', 'The clock starts the moment you press Start', 'Highlight text in the passage <b>and</b> in the questions', 'Day/night mode and text size are at the top right'];
+      return '<div class="mk-sec"><h3>' + label + '</h3><p class="sub">' + esc(sim.title) + '</p><ul class="mk-q-list">' + rules.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul><p class="mk-note">The test opens in full screen. Your answers are saved on this device, so a refresh will not lose them.</p><button class="wc-btn" style="width:auto;padding:13px 28px" data-exam="' + kind + '">Start ' + label + ' test</button></div>';
     }
     if (!it) return '<div class="mk-sec"><h3>' + label + '</h3><p class="sub">The ' + label + ' part of this mock is being prepared. Check back soon.</p></div>';
     return '<div class="mk-sec"><h3>' + label + '</h3><p class="sub">' + esc(it.title) + '</p><button class="wc-btn" style="width:auto;padding:12px 22px" data-file="' + esc(it.id) + '" data-kind="' + esc(it.kind || '') + '">Open ' + label + '</button><div id="mkFile" style="margin-top:14px"></div></div>';
   }
-  async function openSim(part, n) {
-    var box = $('mkSim'); if (!box || M.busy.sim) return; M.busy.sim = true;
-    box.innerHTML = '<div class="wc-loading"><span class="d"></span> Opening the test\u2026</div>';
-    try {
-      var page = await apiText('mock-sim', { id: M.mock.id, part: part, n: n });
-      box.innerHTML = '<div class="mk-rec" style="margin:0 0 8px"><button class="sy-chip" data-simfs>\u26F6 Full screen</button><button class="sy-chip" data-simclose>Close test</button></div><iframe id="mkSimFrame" title="' + esc(part) + ' test" allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-downloads" style="width:100%;height:84vh;min-height:520px;border:1.5px solid var(--tj-line);border-radius:14px;background:#fff"></iframe>';
-      $('mkSimFrame').srcdoc = page; box.scrollIntoView && box.scrollIntoView({ block: 'start' });
-    } catch (e) { box.innerHTML = '<div class="wc-err">' + esc(e.message) + '</div>'; }
-    finally { M.busy.sim = false; }
+  /* ---- full-screen exam: covers the whole site (no website header, menus or banners), exits via the exam's own Exit button ---- */
+  function closeExam() {
+    var o = $('mkExam'); if (o) o.remove(); document.body.classList.remove('mk-exam-open'); M.busy.exam = false;
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (e) {}
   }
+  async function startExam(part) {
+    if (M.busy.exam) return; M.busy.exam = true;
+    var o = document.createElement('div'); o.id = 'mkExam'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', part + ' test');
+    o.innerHTML = '<div class="mk-exam-load"><div class="wc-loading"><span class="d"></span> Opening the ' + esc(part) + ' test\u2026</div></div>';
+    document.body.appendChild(o); document.body.classList.add('mk-exam-open');
+    try { var fs = o.requestFullscreen ? o.requestFullscreen() : null; if (fs && fs.catch) fs.catch(function () {}); } catch (e) {}   // must run inside the click; iPhone has no full-screen API, the overlay alone still covers the site
+    try {
+      var page = await apiText('mock-sim', { id: M.mock.id, part: part });
+      var fr = document.createElement('iframe'); fr.id = 'mkExamFrame'; fr.title = part + ' test'; fr.setAttribute('allow', 'autoplay; fullscreen'); fr.setAttribute('allowfullscreen', '');
+      fr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-downloads');
+      o.innerHTML = ''; o.appendChild(fr); fr.srcdoc = page;
+    } catch (e) { o.innerHTML = '<div class="mk-exam-load"><div class="wc-err">' + esc(e.message) + '</div><p><button class="wc-btn" style="width:auto;padding:10px 22px" data-examclose>Close</button></p></div>'; }
+  }
+  window.addEventListener('message', function (e) { var f = $('mkExamFrame'); if (e.data && e.data.type === 'exam-exit' && f && e.source === f.contentWindow) closeExam(); });
   async function openFile(id, kind, btn) {
     var box = $('mkFile'); if (!box) return; box.innerHTML = '<div class="wc-loading"><span class="d"></span> Opening\u2026</div>';
     try {
@@ -334,9 +342,8 @@
     if (t.hasAttribute('data-open')) return openMock(t.getAttribute('data-open'));
     if (t.hasAttribute('data-mkback')) return showList();
     if (t.hasAttribute('data-tab')) { stopRecorders(); M.tab = t.getAttribute('data-tab'); return drawTab(); }
-    if (t.hasAttribute('data-sim')) return openSim(t.getAttribute('data-sim'), Number(t.getAttribute('data-n')));
-    if (t.hasAttribute('data-simfs')) { var fr = $('mkSimFrame'); if (fr && fr.requestFullscreen) fr.requestFullscreen(); return; }
-    if (t.hasAttribute('data-simclose')) { var sb = $('mkSim'); if (sb) sb.innerHTML = ''; return; }
+    if (t.hasAttribute('data-exam')) return startExam(t.getAttribute('data-exam'));
+    if (t.hasAttribute('data-examclose')) return closeExam();
     if (t.hasAttribute('data-file')) return openFile(t.getAttribute('data-file'), t.getAttribute('data-kind'), t);
     if (t.hasAttribute('data-timer')) { var k = t.getAttribute('data-timer'); if (k === 'prep') { var key = 'prep'; if (M.timers[key]) clearInterval(M.timers[key].iv); var end = Date.now() + 60000; var tick = function () { var l = Math.max(0, Math.round((end - Date.now()) / 1000)); if ($('mkTmprep')) $('mkTmprep').textContent = '0:' + (l < 10 ? '0' : '') + l + (l === 0 ? ' \u2014 start speaking!' : ''); if (l === 0) clearInterval(M.timers[key].iv); }; M.timers[key] = { iv: setInterval(tick, 1000) }; tick(); return; } return startTimer(Number(k), Number(t.getAttribute('data-min'))); }
     if (t.hasAttribute('data-check')) return checkWriting(Number(t.getAttribute('data-check')), t);
@@ -345,8 +352,9 @@
     if (t.hasAttribute('data-result')) return showResult(t.getAttribute('data-result'));
   }
   function onInput(e) { if (/^mkTa[12]$/.test(e.target.id)) updateWc(Number(e.target.id.slice(-1))); }
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-examclose]')) closeExam(); });
   function init() { var r = root(); if (!r || r.getAttribute('data-ready')) return; r.setAttribute('data-ready', '1'); r.addEventListener('click', onClick); r.addEventListener('input', onInput); }
-  function onView() { var v = document.body.getAttribute('data-view'); if (v === 'mocks') { init(); if (window.TJ && window.TJ.getUser && window.TJ.getUser()) showList(); } else { clearTimers(); stopRecorders(); } }
+  function onView() { var v = document.body.getAttribute('data-view'); if (v !== 'mocks') closeExam(); if (v === 'mocks') { init(); if (window.TJ && window.TJ.getUser && window.TJ.getUser()) showList(); } else { clearTimers(); stopRecorders(); } }
   init();
   new MutationObserver(onView).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
   window.TJMocks = { chartHtml: chartHtml, resultHtml: resultHtml, encodeWav: encodeWav, toWav16k: toWav16k, showList: showList, openMock: openMock, _M: M, setPollMs: function (n) { M.pollMs = n; } };
