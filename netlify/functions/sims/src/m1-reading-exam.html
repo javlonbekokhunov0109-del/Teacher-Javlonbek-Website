@@ -21,6 +21,7 @@ button,input{font:inherit;color:inherit}button{cursor:pointer}[hidden]{display:n
 .xb{height:38px;min-width:38px;padding:0 12px;border:1px solid var(--line);background:var(--panel);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:15px}
 .xb:hover{background:var(--soft)}.xb:disabled{opacity:.35;cursor:default}
 .xb svg{width:20px;height:20px}
+.tgpin{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 9px;border:1.5px solid var(--ink);border-radius:999px;color:var(--ink);text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap}.tgpin:hover{background:var(--soft)}.tgpin i{width:22px;height:22px;border-radius:50%;background:var(--ink);display:inline-grid;place-items:center}.tgpin svg{width:13px;height:13px;fill:var(--bg)}
 .saved{font-size:13px;color:var(--muted);min-width:46px;text-align:right}
 /* ---- stage ---- */
 #stage{position:relative;flex:1;min-height:0}
@@ -95,6 +96,7 @@ button.pgrp:hover{background:var(--soft)}
 .btn{background:var(--btn);color:var(--btnink);border:1px solid var(--btn);border-radius:6px;padding:12px 26px;font-weight:700}.btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
 @media (max-width:1500px){.count{display:none}}
 @media (max-width:860px){
+  .tgpin{display:none}
   .xt{padding:0 8px;flex-basis:52px;gap:6px}.xtitle,.saved{display:none}.timer{font-size:21px;padding:2px 6px}.xb{padding:0 9px;height:36px;min-width:36px}.xb .lbl{display:none}.xt .xr{gap:5px}
   .ws{flex-direction:column}.pane.left{width:100%!important;height:42%;padding:14px 14px 22px;border-bottom:2px solid var(--line)}.pane.right{padding:14px 14px 40px}.divider{display:none}
   .banner{padding:6px 14px;font-size:.92em}
@@ -115,6 +117,7 @@ button.pgrp:hover{background:var(--soft)}
     <button class="xb" id="themeBtn" aria-label="Day or night mode" title="Day / night mode"></button>
     <button class="xb" id="fsDn" aria-label="Smaller text" title="Smaller text">A&minus;</button>
     <button class="xb" id="fsUp" aria-label="Bigger text" title="Bigger text">A+</button>
+    <a class="tgpin" href="https://t.me/Javlonbek_Okhunov" target="_blank" rel="noopener noreferrer" title="Teacher Javlonbek on Telegram"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 4.3L2.8 11.2c-1 .4-1 1 0 1.3l4.6 1.4 1.8 5.5c.2.6.4.8.8.8s.6-.2.9-.5l2.2-2.2 4.6 3.4c.8.5 1.4.2 1.6-.8L22 5.3c.3-1.2-.5-1.7-1-1z"/></svg></i><span>Teacher Javlonbek</span></a>
   </div>
 </header>
 <main id="stage">

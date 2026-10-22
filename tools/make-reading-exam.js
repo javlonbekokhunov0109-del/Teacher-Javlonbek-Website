@@ -6,7 +6,7 @@
 const fs = require("fs"), path = require("path");
 const args = process.argv.slice(2); const opt = { minutes: 60 }; const files = [];
 for (let i = 0; i < args.length; i++) { if (args[i].startsWith("--")) opt[args[i].slice(2)] = args[++i]; else files.push(args[i]); }
-if (!opt.out || files.length < 1) { console.error("usage: make-reading-exam.js --out <file> [--title T] [--minutes 60] part1.html part2.html ..."); process.exit(1); }
+if (!opt.out || files.length < 1) { console.error("usage: make-reading-exam.js --out <file> [--title T] [--minutes 60] [--name NAME] [--link https://t.me/Javlonbek_Okhunov] part1.html part2.html ..."); process.exit(1); }
 const must = (m, what, f) => { if (!m) { console.error(`ERROR: ${f}: could not find ${what}. Is this one of the IELTS WARRIORS reading pages?`); process.exit(2); } return m; };
 const parts = files.map((f) => {
   const s = fs.readFileSync(f, "utf8");
@@ -33,6 +33,6 @@ const cfg = { title: opt.title || "Reading", minutes: Number(opt.minutes), store
 const body = parts.map((p, i) => `<div class="part" data-part="${p.cfg.part}"${i ? " hidden" : ""}>\n<div class="banner">${p.banner}</div>\n<div class="ws"><article class="pane left">${p.passage}</article><div class="divider" aria-hidden="true"><span>&#8596;</span></div><div class="pane right">${p.questions}</div></div>\n</div>`).join("\n");
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 let html = fs.readFileSync(path.join(__dirname, "reading-exam.template.html"), "utf8")
-  .replace("__TITLE__", esc(cfg.title)).replace("__HEADTITLE__", esc(cfg.title)).replace("__PARTS__", () => body).replace("__CFG__", () => JSON.stringify(cfg).replace(/</g, "\\u003c"));
+  .replace(/__NAME__/g, esc(opt.name || "Teacher Javlonbek")).replace(/__LINK__/g, esc(opt.link || "https://t.me/Javlonbek_Okhunov")).replace("__TITLE__", esc(cfg.title)).replace("__HEADTITLE__", esc(cfg.title)).replace("__PARTS__", () => body).replace("__CFG__", () => JSON.stringify(cfg).replace(/</g, "\\u003c"));
 fs.mkdirSync(path.dirname(opt.out), { recursive: true }); fs.writeFileSync(opt.out, html);
 console.log(`OK  ${opt.out}\n    ${parts.length} parts, ${total} questions, ${cfg.minutes} minutes, ${Math.round(html.length / 1024)} KB, storage key "${store}"`);
