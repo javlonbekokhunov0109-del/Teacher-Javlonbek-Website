@@ -1099,6 +1099,13 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
       <p>Learn linkers, Task 1 language and topic vocabulary as groups of expressions that mean the same &mdash; odd one out, synonym hunt and match pairs.</p>
       <span class="tj-go">Open Synonym Trainer <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
+    <button class="tj-door destination" data-go="destination">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14M7 9h2M7 13h2M15 9h2M15 13h2"/></svg></div>
+      <div class="tj-tag">Vocabulary &middot; A1&ndash;B2</div>
+      <h2>Destination Vocabulary</h2>
+      <p>Four books, unit by unit. Flashcards you tap to flip, quizzes and games &mdash; English &rarr; Uzbek or Uzbek &rarr; English, your choice.</p>
+      <span class="tj-go">Open Destination <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
     <button class="tj-door typing" data-go="typing">
       <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7 14h6M15 14h2"/></svg></div>
       <div class="tj-tag">Speed &middot; Typing</div>
@@ -1524,6 +1531,14 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   <div id="synRoot"></div>
 </section>
 
+<!-- ================= DESTINATION VOCABULARY ================= -->
+<section id="destination-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">Premium English &middot; Vocabulary</div>
+  <h1 class="wc-h1">Destination Vocabulary</h1>
+  <p class="wc-sub">Choose your book, pick the units you have studied, and practise. Tap a flashcard to flip it, and switch between English &rarr; Uzbek and Uzbek &rarr; English whenever you like.</p>
+  <div id="dstRoot"></div>
+</section>
+
 <!-- ================= LEADERBOARD ================= -->
 <section id="leaderboard-root" class="tj-panel" hidden>
   <div class="wc-eyebrow">Premium English &middot; Practice</div>
@@ -1681,7 +1696,7 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root',multilevel:'multilevel-root',lessons:'lessons-root',mocks:'mocks-root',synonyms:'synonyms-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root',multilevel:'multilevel-root',lessons:'lessons-root',mocks:'mocks-root',synonyms:'synonyms-root',destination:'destination-root'};
   var navHist=[]; var curView=null; window.__tjUserNavigated=false;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -6236,5 +6251,6 @@ setTimeout(restoreFields, 1200);
 <script src="/js/synonyms.js?v=20261020" defer></script>
 <script src="/js/mocks.js?v=20261020" defer></script>
 <script src="/js/mocks-admin.js?v=20261020" defer></script>
+<script src="/js/destination.js?v=20261024" defer></script>
 </body>
 </html>
