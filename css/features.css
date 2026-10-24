@@ -190,3 +190,11 @@ kbd{font:600 11px/1 ui-monospace,Menlo,monospace; border:1px solid var(--tj-line
 
 .dst-rep{border:1px solid var(--tj-line); background:transparent; color:var(--tj-fg-soft); border-radius:99px; padding:5px 11px; font:600 12px/1 inherit; cursor:pointer} .dst-rep:hover{color:var(--tj-fg); border-color:var(--tj-fg-soft)} .dst-rep:disabled{color:var(--tj-green); border-color:var(--tj-green)}
 .dst-repbar{text-align:center; min-height:30px} .dst-repi{grid-column:1/-1; text-align:right; margin-top:-2px}
+
+/* ---- Destination: round statistics ---- */
+.dst-result{text-align:center}
+.dst-scorebox{margin:2px 0 14px} .dst-scorebox .big{font-size:clamp(54px,9vw,84px)} .dst-pct{font-size:20px; font-weight:700; color:var(--tj-green); margin-top:-4px}
+.dst-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:12px auto 16px; max-width:760px; text-align:left}
+.dst-stat{border:1px solid var(--tj-line); background:var(--tj-card2); border-radius:14px; padding:11px 14px} .dst-stat span{display:block; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--tj-fg-soft); font-weight:700} .dst-stat b{display:block; font-size:15px; margin-top:3px; line-height:1.35; word-break:break-word}
+.dst-hist{display:grid; gap:6px} .dst-hrow{display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; border:1px solid var(--tj-line); background:var(--tj-card); border-radius:12px; padding:9px 13px; font-size:13.5px} .dst-hd{color:var(--tj-fg-soft); font-size:12.5px} .dst-hs{font-weight:800; color:var(--tj-gold-deep); white-space:nowrap}
+@media(max-width:640px){.dst-hrow{grid-template-columns:1fr; gap:3px} .dst-stats{grid-template-columns:1fr 1fr}}

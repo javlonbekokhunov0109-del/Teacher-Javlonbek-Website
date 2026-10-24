@@ -123,8 +123,7 @@
       '<button class="sy-mode" data-md="mt"' + (deck.length < 6 ? ' disabled' : '') + '><span class="ic">\uD83D\uDD17</span><b>Match pairs</b><span>Connect six English words with their Uzbek.</span></button>' +
       '<button class="sy-mode" data-md="sp"' + (deck.filter(spellable).length < 1 ? ' disabled' : '') + '><span class="ic">\u2328\uFE0F</span><b>Spelling</b><span>Read the Uzbek, type the English word.</span></button>' +
       '<button class="sy-mode" data-md="ls"' + (disabled ? ' disabled' : '') + '><span class="ic">\uD83D\uDCCB</span><b>List &amp; cover</b><span>Browse everything. Hide one side to test yourself.</span></button></div>' +
-      (disabled ? '<div class="wc-empty">No cards for this selection. Pick more units or word types.</div>' : '') +
-      '';
+      (disabled ? '<div class="wc-empty">No cards for this selection. Pick more units or word types.</div>' : '') + histHtml();
     setHtml(h, true);
   }
   function updateSummary() { var el = $('dstSum'); if (!el || !S.data) return; var deck = buildDeck(S.data, S.pref), k = knownCount(S.book, deck); el.innerHTML = '<b>' + deck.length + '</b> cards selected \u00B7 <b>' + k + '</b> known (' + pct(k, deck.length) + '%)'; var m = document.querySelectorAll('.dst-modes .sy-mode'); [deck.length < 1, deck.length < 4, deck.length < 6, deck.filter(spellable).length < 1, deck.length < 1].forEach(function (off, i) { if (m[i]) m[i].disabled = off; }); }
@@ -133,11 +132,43 @@
     return loadBook(id).then(function (d) { S.data = d; S.pref = getPref(id, d); S.loading = false; var s = load(); s.last = id; save(s); home(); }).catch(function (e) { S.loading = false; setHtml(tabsHtml() + '<div class="wc-err">' + esc(e.message) + '</div><div class="sy-next"><button class="wc-btn" data-bk="' + id + '">Try again</button></div>'); });
   }
 
+
+  /* ---------- statistics shown when a round ends ---------- */
+  var MODE_NAME = { fc: 'Flashcards', qz: 'Quiz', mt: 'Match pairs', sp: 'Spelling', ls: 'List' };
+  function unitsLabel(data, p) {
+    var first = data.units[0].n, last = data.units[data.units.length - 1].n, lo = Math.min(p.from, p.to), hi = Math.max(p.from, p.to);
+    if (lo === first && hi === last) return 'All units (' + first + '\u2013' + last + ')';
+    if (lo === hi) { var u = data.units.filter(function (x) { return x.n === lo; })[0]; return 'Unit ' + lo + (u ? ' \u00B7 ' + u.t : ''); }
+    return 'Units ' + lo + ' to ' + hi;
+  }
+  function dirLabel(d) { return d === 'uz2en' ? 'Uzbek \u2192 English' : d === 'mixed' ? 'Mixed (both ways)' : 'English \u2192 Uzbek'; }
+  function sessionMeta() { var p = S.pref, d = S.data; return { book: d.name, bookId: d.id, units: unitsLabel(d, p), dir: dirLabel(p.dir), types: p.secs.length === d.secs.length ? 'All word types' : p.secs.join(', ') }; }
+  function fmtTime(ms) { var s = Math.max(0, Math.round(ms / 1000)), m = Math.floor(s / 60); return m ? m + ' min ' + (s % 60 < 10 ? '0' : '') + (s % 60) + ' s' : s + ' s'; }
+  function saveRound(s, score, total) {
+    if (s.saved) return; s.saved = true; var st = load(); st.hist = st.hist || [];
+    st.hist.unshift({ t: Date.now(), book: s.meta.book, bookId: s.meta.bookId, units: s.meta.units, mode: s.mode, dir: s.meta.dir, score: score, total: total, pct: pct(score, total), secs: Math.round((Date.now() - s.t0) / 1000), practice: !!s.meta.practice });
+    st.hist = st.hist.slice(0, 40); save(st);
+  }
+  /* one stats card for every kind of round: score, book, units, question type (+ direction, word types, time) */
+  function resultView(o) {
+    var s = S.ses, m = s.meta, rows = [['Book', m.book], ['Units', m.units], ['Question type', MODE_NAME[s.mode] + (m.practice ? ' (practice of missed cards)' : '')], ['Direction', m.dir], ['Word types', m.types], ['Time', fmtTime(Date.now() - s.t0)]].concat(o.extra || []);
+    saveRound(s, o.score, o.total);
+    setHtml('<div class="sy-q sy-res dst-result"><div class="dst-scorebox"><div class="big">' + esc(o.big) + '</div><div class="dst-pct">' + pct(o.score, o.total) + '%</div><p class="hint">' + esc(o.caption) + '</p></div>' +
+      '<div class="dst-stats" aria-label="Round statistics">' + rows.map(function (r) { return '<div class="dst-stat"><span>' + esc(r[0]) + '</span><b>' + esc(r[1]) + '</b></div>'; }).join('') + '</div>' +
+      '<p>' + esc(o.message) + '</p><div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="again-round">Play again</button>' + (s.missed.length && s.mode !== 'mt' && s.mode !== 'sp' ? '<button class="wc-btn ghost" data-act="missed-round">Practise the ' + s.missed.length + ' missed</button>' : '') + '<button class="wc-btn ghost" data-act="home">Back</button></div></div>' +
+      (o.review && o.review.length ? '<div class="sy-sub">Review these</div><div class="dst-list">' + o.review.map(rowHtml).join('') + '</div>' : ''));
+  }
+  var MODE_SHORT = { fc: 'Flashcards', qz: 'Quiz', mt: 'Match', sp: 'Spelling' };
+  function histHtml() {
+    var h = (load().hist || []).slice(0, 6); if (!h.length) return '';
+    return '<div class="sy-sub">Your recent rounds</div><div class="dst-hist">' + h.map(function (r) { var dt = new Date(r.t); return '<div class="dst-hrow"><span class="dst-hd">' + dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ' ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2) + '</span><span><b>' + esc(r.book) + '</b> \u00B7 ' + esc(r.units) + ' \u00B7 ' + esc(MODE_SHORT[r.mode] || r.mode) + ' \u00B7 ' + esc(r.dir) + '</span><span class="dst-hs">' + r.score + '/' + r.total + ' \u00B7 ' + r.pct + '%</span></div>'; }).join('') + '</div>';
+  }
+
   /* ---------- sessions ---------- */
   function startSession(mode) {
     var deck = buildDeck(S.data, S.pref); if (!deck.length) return;
     var cards = pickSession(deck, S.pref, S.book), map = {};
-    S.ses = { mode: mode, deck: deck, cards: cards, i: 0, dirMap: map, right: 0, wrong: 0, missed: [], queue: cards.slice(), flipped: false, streak: 0, best: 0 };
+    S.ses = { mode: mode, deck: deck, cards: cards, i: 0, dirMap: map, right: 0, wrong: 0, missed: [], queue: cards.slice(), flipped: false, streak: 0, best: 0, t0: Date.now(), pairs: 0, meta: sessionMeta() };
     if (mode === 'ls') return listView('', 'none');
     if (mode === 'mt') { S.ses.boards = 3; S.ses.board = 0; return matchBoard(); }
     if (mode === 'sp') { S.ses.queue = shuffle(deck.filter(spellable)).slice(0, S.pref.size === 'all' ? 9999 : Math.min(Number(S.pref.size) || 30, 30)); S.ses.total = S.ses.queue.length; return spellQ(); }
@@ -166,9 +197,8 @@
     s.cur = null; fcShow();
   }
   function fcDone() {
-    var s = S.ses, k = knownCount(S.book, s.deck);
-    setHtml('<div class="sy-q sy-res"><div class="big">' + s.total + '</div><p class="hint">cards finished \u00B7 ' + s.missed.length + ' needed another look</p><p>' + (s.missed.length === 0 ? 'Perfect round!' : 'Good work. The tricky ones will come up more often next time.') + '</p>' +
-      '<div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="again-round">Another round</button>' + (s.missed.length ? '<button class="wc-btn ghost" data-act="missed-round">Practise the ' + s.missed.length + ' tricky</button>' : '') + '<button class="wc-btn ghost" data-act="home">Back</button></div><p class="mk-note">Known in this selection: ' + k + ' of ' + s.deck.length + '</p></div>');
+    var s = S.ses, first = s.total - s.missed.length, k = knownCount(S.book, s.deck);
+    resultView({ big: first + '/' + s.total, score: first, total: s.total, caption: 'cards known first time', extra: [['Needed another look', s.missed.length], ['Known in this selection', k + ' of ' + s.deck.length]], message: s.missed.length === 0 ? 'Perfect round!' : 'Good work. The tricky ones will come up more often next time.', review: s.missed });
   }
 
   /* quiz */
@@ -185,12 +215,12 @@
     Array.prototype.forEach.call(document.querySelectorAll('.sy-opt'), function (b, k) { b.disabled = true; if (k === q.answer) b.classList.add(ok ? 'ok' : 'miss'); if (k === i && !ok) b.classList.add('bad'); });
     $('dstFb').innerHTML = '<div class="sy-fb ' + (ok ? 'good' : 'wrong') + '"><h3>' + (ok ? '\u2705 Correct!' : '\u274C Not quite') + '</h3><p style="margin:4px 0"><b>' + esc(c.en) + '</b> = ' + esc(c.uz) + '</p>' + exampleHtml(c, true) + repBtn(c) + '</div><div class="sy-next"><button class="wc-btn" data-act="qnext">' + (s.i + 1 >= s.total ? 'See my result' : 'Next \u2192') + '</button></div>';
   }
-  function quizDone() { var s = S.ses; setHtml('<div class="sy-q sy-res"><div class="big">' + pct(s.right, s.total) + '%</div><p class="hint">' + s.right + ' of ' + s.total + ' correct \u00B7 best streak ' + s.best + '</p><div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="again-round">Play again</button>' + (s.missed.length ? '<button class="wc-btn ghost" data-act="missed-round">Practise the ' + s.missed.length + ' missed</button>' : '') + '<button class="wc-btn ghost" data-act="home">Back</button></div></div>' + (s.missed.length ? '<div class="sy-sub">Review</div><div class="dst-list">' + s.missed.map(rowHtml).join('') + '</div>' : '')); }
+  function quizDone() { var s = S.ses; resultView({ big: s.right + '/' + s.total, score: s.right, total: s.total, caption: 'correct answers', extra: [['Best streak', s.best]], message: s.right === s.total ? 'Perfect round!' : s.right / s.total >= 0.7 ? 'Good work. Review the missed ones below.' : 'Keep going. Repetition is how words stay.', review: s.missed }); }
 
   /* match pairs */
   function matchBoard() {
     var s = S.ses; if (s.board >= s.boards) return matchDone(); var cards = makeMatch(s.deck, 6); if (cards.length < 3) return matchDone();
-    s.m = { cards: cards, left: shuffle(cards.map(function (_, i) { return i; })), right: shuffle(cards.map(function (_, i) { return i; })), picked: null, done: [], wrong: 0 }; s.done = s.board; s.total = s.boards;
+    s.pairs += cards.length; s.m = { cards: cards, left: shuffle(cards.map(function (_, i) { return i; })), right: shuffle(cards.map(function (_, i) { return i; })), picked: null, done: [], wrong: 0 }; s.done = s.board; s.total = s.boards;
     var uzFirst = S.pref.dir === 'uz2en' || (S.pref.dir === 'mixed' && rng() < 0.5); s.m.uzFirst = uzFirst;
     setHtml(topBar('Board <b>' + (s.board + 1) + '</b> of ' + s.boards + ' \u00B7 mistakes ' + s.wrong) + '<div class="sy-q"><h2>Match the pairs</h2><p class="hint">Tap a word on the left, then its meaning on the right.</p><div class="sy-pairs"><div class="col">' +
       s.m.left.map(function (i) { return '<button class="sy-opt" data-ml="' + i + '">' + esc(uzFirst ? cards[i].uz : cards[i].en) + '</button>'; }).join('') + '</div><div class="col">' + s.m.right.map(function (i) { return '<button class="sy-opt" data-mr="' + i + '">' + esc(uzFirst ? cards[i].en : cards[i].uz) + '</button>'; }).join('') + '</div></div><div id="dstFb"></div></div>', true);
@@ -203,7 +233,7 @@
       if (m.done.length === m.cards.length) { s.right += m.wrong === 0 ? 1 : 0; $('dstFb').innerHTML = '<div class="sy-fb ' + (m.wrong ? 'wrong' : 'good') + '"><h3>' + (m.wrong ? 'Done with ' + m.wrong + ' mistake' + (m.wrong === 1 ? '' : 's') : '\u2705 Perfect board!') + '</h3></div><div class="sy-next"><button class="wc-btn" data-act="mnext">' + (s.board + 1 >= s.boards ? 'Finish' : 'Next board \u2192') + '</button></div>'; } }
     else { m.wrong++; s.wrong++; rate(S.book, m.cards[l], false); rb.classList.add('shake', 'bad'); lb.classList.remove('sel'); m.picked = null; setTimeout(function () { rb.classList.remove('shake', 'bad'); }, 450); }
   }
-  function matchDone() { var s = S.ses; setHtml('<div class="sy-q sy-res"><div class="big">' + s.right + '/' + s.boards + '</div><p class="hint">perfect boards \u00B7 ' + s.wrong + ' mistakes in total</p><div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="again-round">Play again</button><button class="wc-btn ghost" data-act="home">Back</button></div></div>'); }
+  function matchDone() { var s = S.ses, ok = Math.max(0, s.pairs - s.wrong); resultView({ big: ok + '/' + s.pairs, score: ok, total: s.pairs || 1, caption: 'pairs matched without a mistake', extra: [['Perfect boards', s.right + ' of ' + s.boards], ['Mistakes', s.wrong]], message: s.wrong === 0 ? 'Not a single mistake!' : 'Nice. Play again to beat your score.' }); }
 
   /* spelling */
   function spellQ() {
@@ -221,7 +251,7 @@
   }
   function spellReveal(ok, first) { var s = S.ses, c = s.cur.c; s.queue.shift(); if (!ok) { s.wrong++; rate(S.book, c, false); if (s.missed.indexOf(c) < 0) s.missed.push(c); } s.cur.done = true; $('dstFb').innerHTML = '<div class="sy-fb ' + (ok ? 'good' : 'wrong') + '"><h3>' + (ok ? (first ? '\u2705 Correct!' : '\u2705 Correct (with help)') : 'The answer:') + ' <b>' + esc(c.en) + '</b> ' + spk(c.en) + '</h3>' + exampleHtml(c, true) + '</div><div class="sy-next"><button class="wc-btn" data-act="snext">' + (s.queue.length ? 'Next \u2192' : 'See my result') + '</button></div>'; var inp = $('dstType'); if (inp) inp.disabled = true; }
   function spellHint() { var s = S.ses; if (!s || !s.cur || s.cur.done) return; s.cur.hint++; var c = s.cur.c, k = Math.min(s.cur.hint, c.en.length), shown = c.en.slice(0, k); $('dstShape').textContent = shown + c.en.slice(k).replace(/[A-Za-z]/g, ' _').replace(/ {2,}/g, ' '); var inp = $('dstType'); if (inp) inp.focus(); }
-  function spellDone() { var s = S.ses; setHtml('<div class="sy-q sy-res"><div class="big">' + pct(s.right, s.total) + '%</div><p class="hint">' + s.right + ' of ' + s.total + ' spelled correctly first time</p><div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="again-round">Play again</button><button class="wc-btn ghost" data-act="home">Back</button></div></div>'); }
+  function spellDone() { var s = S.ses; resultView({ big: s.right + '/' + s.total, score: s.right, total: s.total, caption: 'spelled correctly first time', extra: [['Needed help or a retry', s.total - s.right]], message: s.right === s.total ? 'Perfect spelling!' : 'Good effort. Try the missed words again.', review: s.missed }); }
 
   /* list + cover */
   function rowHtml(c) { return '<div class="dst-item"><div class="dst-l"><b>' + esc(c.en) + '</b> ' + spk(c.en) + '<small>' + esc(c.sec) + ' \u00B7 Unit ' + c.unit + '</small></div><div class="dst-r">' + esc(c.uz) + '</div>' + '<div class="dst-repi">' + repBtn(c) + '</div>' + (c.ex ? '<div class="dst-ex2">' + esc(c.ex) + (c.exuz ? '<span> \u2014 ' + esc(c.exuz) + '</span>' : '') + '</div>' : '') + '</div>'; }
@@ -261,7 +291,7 @@
     if (a === 'quit') { if (window.confirm('Leave this round? Your progress so far is saved.')) home(); return; }
     if (a === 'home') return home();
     if (a === 'again-round') return startSession(s.mode);
-    if (a === 'missed-round') { var m = s.missed.slice(), mode = s.mode, deck = s.deck; S.ses = { mode: mode, deck: deck, cards: m, i: 0, dirMap: {}, right: 0, wrong: 0, missed: [], queue: m.slice(), flipped: false, streak: 0, best: 0, total: m.length }; return mode === 'qz' ? quizQ() : fcShow(); }
+    if (a === 'missed-round') { var m = s.missed.slice(), mode = s.mode, deck = s.deck; var meta = Object.assign({}, s.meta, { practice: true }); S.ses = { mode: mode, deck: deck, cards: m, i: 0, dirMap: {}, right: 0, wrong: 0, missed: [], queue: m.slice(), flipped: false, streak: 0, best: 0, total: m.length, t0: Date.now(), pairs: 0, meta: meta }; return mode === 'qz' ? quizQ() : fcShow(); }
   }
   function onChange(e) {
     var el = e.target; if (!el.hasAttribute || !el.hasAttribute('data-sel') || !S.pref) return; var k = el.getAttribute('data-sel');
