@@ -1,4 +1,4 @@
-import json, re, collections
+import json, re, collections, fixes
 APOS = re.compile(r"[‘’ʻʼ`´′]")
 def norm_uz(s):
     s = APOS.sub("'", s); s = s.replace("ó", "o'").replace("ò", "o'").replace("ǵ", "g'").replace("\u00a0", " ")
@@ -97,6 +97,7 @@ def build(book):
             if i.get("ex"): it["ex"] = norm_en(i["ex"]); it["exuz"] = norm_uz(i.get("exuz", ""))
             items.append(it)
         out.append({"n": u["n"], "title": re.sub(r"\s+", " ", u["title"]).strip(), "items": items})
+    print(f"   {book}: {fixes.apply(book, out)} approved translation fixes applied")
     return out, dropped
 if __name__ == "__main__":
     allw = {}; tot = 0

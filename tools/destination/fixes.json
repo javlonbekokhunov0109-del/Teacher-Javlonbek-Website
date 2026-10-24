@@ -1,0 +1,170 @@
+[
+ {
+  "book": "B1",
+  "unit": 3,
+  "en": "Defeat",
+  "old": "g'alaba (qozonmoq)",
+  "new": "mag'lub etmoq; mag'lubiyat"
+ },
+ {
+  "book": "B1",
+  "unit": 9,
+  "en": "Ferry",
+  "old": "yassi kema(yuk kemasi)",
+  "new": "parom"
+ },
+ {
+  "book": "B1",
+  "unit": 21,
+  "en": "Click",
+  "old": "kattalashtirmoq, oydinlashtirmoq",
+  "new": "bosmoq (sichqoncha tugmasini); chertmoq"
+ },
+ {
+  "book": "B1",
+  "unit": 21,
+  "en": "Swear",
+  "old": "haqoratlamoq",
+  "new": "so'kinmoq; qasam ichmoq"
+ },
+ {
+  "book": "B1",
+  "unit": 33,
+  "en": "Maintain",
+  "old": "ta'mirlamoq",
+  "new": "yaxshi holatda saqlamoq; parvarish qilmoq"
+ },
+ {
+  "book": "B2",
+  "unit": 4,
+  "en": "Maintain",
+  "old": "ta'mirlamoq",
+  "new": "yaxshi holatda saqlamoq; parvarish qilmoq"
+ },
+ {
+  "book": "B1",
+  "unit": 36,
+  "en": "Heatwave",
+  "old": "issiq shamol",
+  "new": "jazirama issiq davri"
+ },
+ {
+  "book": "B1",
+  "unit": 39,
+  "en": "Bad-tempered",
+  "old": "xafa",
+  "new": "jahldor, serjahl"
+ },
+ {
+  "book": "B1",
+  "unit": 18,
+  "en": "Pull off",
+  "old": "yulib olmoq",
+  "new": "uddalamoq, eplamoq"
+ },
+ {
+  "book": "B1",
+  "unit": 18,
+  "en": "Hardware",
+  "old": "ehtiyot qism",
+  "new": "kompyuterning jismoniy qismlari (apparat ta'minoti)"
+ },
+ {
+  "book": "B1",
+  "unit": 39,
+  "en": "Stress",
+  "old": "tushkunlik",
+  "new": "stress, asabiy zo'riqish"
+ },
+ {
+  "book": "B1",
+  "unit": 42,
+  "en": "Claim",
+  "old": "tasdiqlamoq",
+  "new": "da'vo qilmoq; ta'kidlamoq"
+ },
+ {
+  "book": "B1",
+  "unit": 42,
+  "en": "Deny",
+  "old": "tan olmaslik",
+  "new": "inkor qilmoq, rad etmoq"
+ },
+ {
+  "book": "B1",
+  "unit": 15,
+  "en": "Fee",
+  "old": "haq, maosh",
+  "new": "to'lov, haq (xizmat uchun)"
+ },
+ {
+  "book": "B1",
+  "unit": 30,
+  "en": "Sensible",
+  "old": "aqlli",
+  "new": "oqilona, mulohazali"
+ },
+ {
+  "book": "B2",
+  "unit": 10,
+  "en": "Sensible",
+  "old": "aqlli, ma'noli, bamani",
+  "new": "oqilona, mulohazali"
+ },
+ {
+  "book": "B1",
+  "unit": 3,
+  "en": "Sailing",
+  "old": "dengiz safari",
+  "new": "yelkanli qayiqda suzish"
+ },
+ {
+  "book": "B2",
+  "unit": 2,
+  "en": "In a way",
+  "old": "yo'lda",
+  "new": "qaysidir ma'noda"
+ },
+ {
+  "book": "B2",
+  "unit": 8,
+  "en": "Press",
+  "old": "nashriyot",
+  "new": "matbuot, bosma nashrlar"
+ },
+ {
+  "book": "B2",
+  "unit": 28,
+  "en": "Applicant",
+  "old": "da'vogar",
+  "new": "nomzod; ariza beruvchi"
+ },
+ {
+  "book": "B2",
+  "unit": 2,
+  "en": "Photography",
+  "old": "rasmchilik",
+  "new": "fotografiya, suratga olish san'ati"
+ },
+ {
+  "book": "B2",
+  "unit": 28,
+  "en": "Arrangement",
+  "old": "uchrashuv",
+  "new": "kelishuv; rejalashtirish, tartib"
+ },
+ {
+  "book": "B2",
+  "unit": 24,
+  "en": "Entertaining",
+  "old": "ko'ngilxushlik qilish",
+  "new": "ko'ngilochar, qiziqarli"
+ },
+ {
+  "book": "B2",
+  "unit": 2,
+  "en": "Native",
+  "old": "bir hududda yashovchi",
+  "new": "mahalliy; o'sha yerda tug'ilgan"
+ }
+]
