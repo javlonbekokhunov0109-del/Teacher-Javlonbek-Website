@@ -124,7 +124,7 @@
       '<button class="sy-mode" data-md="sp"' + (deck.filter(spellable).length < 1 ? ' disabled' : '') + '><span class="ic">\u2328\uFE0F</span><b>Spelling</b><span>Read the Uzbek, type the English word.</span></button>' +
       '<button class="sy-mode" data-md="ls"' + (disabled ? ' disabled' : '') + '><span class="ic">\uD83D\uDCCB</span><b>List &amp; cover</b><span>Browse everything. Hide one side to test yourself.</span></button></div>' +
       (disabled ? '<div class="wc-empty">No cards for this selection. Pick more units or word types.</div>' : '') +
-      '<p class="mk-note dst-credit">' + esc(d.credit) + '</p>';
+      '';
     setHtml(h, true);
   }
   function updateSummary() { var el = $('dstSum'); if (!el || !S.data) return; var deck = buildDeck(S.data, S.pref), k = knownCount(S.book, deck); el.innerHTML = '<b>' + deck.length + '</b> cards selected \u00B7 <b>' + k + '</b> known (' + pct(k, deck.length) + '%)'; var m = document.querySelectorAll('.dst-modes .sy-mode'); [deck.length < 1, deck.length < 4, deck.length < 6, deck.filter(spellable).length < 1, deck.length < 1].forEach(function (off, i) { if (m[i]) m[i].disabled = off; }); }
