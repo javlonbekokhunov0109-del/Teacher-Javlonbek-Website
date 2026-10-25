@@ -79,17 +79,25 @@ exports.handler = async (event) => {
         const r = await db.from("mocks").delete().eq("id", body.id); if (r.error) throw r.error; return json(200, { ok: true });
       }
       case "save-settings": {
-        const off = Number(body.calibration_offset);
-        if (!isFinite(off) || off < 0 || off > 0.5 || Math.round(off * 4) / 4 !== off) return json(400, { error: "Calibration offset must be 0, 0.25 or 0.5." });
+        // The two score dials now live in Admin -> Writing checks (action "save-calibration"); this form only keeps them as they are.
         const lf = clampInt(body.daily_limit_free, 0, 200), lm = clampInt(body.daily_limit_member, 0, 500);
         if (lf === null || lm === null) return json(400, { error: "Daily limits must be whole numbers (free 0-200, members 0-500)." });
         const wp = String(body.writing_prompt || ""), sp = String(body.speaking_prompt || "");
         if (wp.length > 14000 || sp.length > 14000) return json(400, { error: "A prompt is too long (max 14,000 characters)." });
         if (wp.trim() && !/json/i.test(wp)) return json(400, { error: "The Writing prompt must tell the AI to return JSON (keep the OUTPUT section). Use 'Reset to built-in' if unsure." });
         if (sp.trim() && !/json/i.test(sp)) return json(400, { error: "The Speaking prompt must tell the AI to return JSON (keep the OUTPUT section). Use 'Reset to built-in' if unsure." });
-        const row = { id: 1, writing_prompt: wp.trim() || null, speaking_prompt: sp.trim() || null, calibration_offset: off, show_range: !!body.show_range, speaking_enabled: !!body.speaking_enabled, daily_limit_free: lf, daily_limit_member: lm, gemini_model: String(body.gemini_model || "").trim().slice(0, 60) || null, updated_at: new Date().toISOString() };
+        const row = { id: 1, writing_prompt: wp.trim() || null, speaking_prompt: sp.trim() || null, show_range: !!body.show_range, speaking_enabled: !!body.speaking_enabled, daily_limit_free: lf, daily_limit_member: lm, gemini_model: String(body.gemini_model || "").trim().slice(0, 60) || null, updated_at: new Date().toISOString() };
         const r = await db.from("mock_settings").upsert(row, { onConflict: "id" });
         if (r.error) return json(500, { error: "Could not save. Run the mocks SQL in Supabase first." });
+        return json(200, { ok: true });
+      }
+      case "save-calibration": {
+        // IELTS dial: -0.5 .. +1 in 0.25 steps (bands). Multilevel dial: -2 .. +2 in 0.5 steps (points of the 17-point writing score).
+        const io = Number(body.ielts_offset), mo = Number(body.ml_offset);
+        if (!isFinite(io) || io < -0.5 || io > 1 || Math.round(io * 4) / 4 !== io) return json(400, { error: "The IELTS dial must be between -0.5 and +1, in steps of 0.25." });
+        if (!isFinite(mo) || mo < -2 || mo > 2 || Math.round(mo * 2) / 2 !== mo) return json(400, { error: "The Multilevel dial must be between -2 and +2 points, in steps of 0.5." });
+        const r = await db.from("mock_settings").upsert({ id: 1, calibration_offset: io, ml_offset: mo, updated_at: new Date().toISOString() }, { onConflict: "id" });
+        if (r.error) return json(500, { error: "Could not save. Run the new SQL in Supabase first." });
         return json(200, { ok: true });
       }
       case "reset-prompt": {

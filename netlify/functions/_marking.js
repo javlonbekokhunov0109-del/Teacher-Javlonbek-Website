@@ -4,7 +4,7 @@
 const { WRITING_PROMPT, SPEAKING_PROMPT } = require("./_prompts");
 
 const DEFAULTS = {
-  writing_prompt: null, speaking_prompt: null, calibration_offset: 0, show_range: true,
+  writing_prompt: null, speaking_prompt: null, calibration_offset: 0, ml_offset: 0, show_range: true,
   speaking_enabled: false, daily_limit_free: 6, daily_limit_member: 30, gemini_model: null,
 };
 
@@ -12,7 +12,7 @@ async function getSettings(db) {
   try {
     const { data, error } = await db.from("mock_settings").select("*").eq("id", 1).maybeSingle();
     if (error || !data) return { ...DEFAULTS };
-    return { ...DEFAULTS, ...data, calibration_offset: Math.min(0.5, Math.max(0, Number(data.calibration_offset) || 0)) };
+    return { ...DEFAULTS, ...data, calibration_offset: Math.min(1, Math.max(-0.5, Number(data.calibration_offset) || 0)), ml_offset: Math.min(2, Math.max(-2, Number(data.ml_offset) || 0)) };
   } catch (e) { return { ...DEFAULTS }; }
 }
 const modelOf = (s) => (s && s.gemini_model) || process.env.GEMINI_MODEL || "gemini-2.5-flash";
@@ -74,8 +74,8 @@ const aiMessage = (code) => AI_MESSAGES[code] || AI_MESSAGES.gemini_network;
 
 // ---------- bands ----------
 function normBand(v) { let n = Number(v); if (!isFinite(n)) n = 0; n = Math.max(0, Math.min(9, n)); return Math.round(n * 2) / 2; }
-// optional calibration lift (0 .. 0.5), never applied to a zero and never above 9
-function adjust(band, offset) { if (band <= 0) return 0; return Math.min(9, Math.round((band + (offset || 0)) * 2) / 2); }
+// teacher's calibration (-0.5 .. +1), never applied to a zero and never outside 0 .. 9
+function adjust(band, offset) { if (band <= 0) return 0; return Math.max(0, Math.min(9, Math.round((band + (offset || 0)) * 2) / 2)); }
 function overallOf(bands) { const avg = bands.reduce((a, b) => a + b, 0) / bands.length; return Math.round(avg * 2) / 2; }
 const str = (v, n) => String(v == null ? "" : v).trim().slice(0, n);
 const strList = (v, max, n = 400) => (Array.isArray(v) ? v.slice(0, max).map((x) => str(x, n)).filter(Boolean) : []);

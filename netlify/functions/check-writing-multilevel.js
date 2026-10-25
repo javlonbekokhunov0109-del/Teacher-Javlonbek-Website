@@ -28,6 +28,7 @@
 // presented as directly-sourced.
 
 const { json, missingEnv, getUserFromRequest, serviceClient } = require("./_shared");
+const { getSettings } = require("./_marking");
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
@@ -141,7 +142,7 @@ Rules:
 
 async function gradeOneTask(taskType, question, essay) {
   const words = countWords(essay);
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
+  const endpoint = `${(process.env.GEMINI_BASE || "https://generativelanguage.googleapis.com").replace(/\/+$/, "")}/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
 
   const resp = await fetch(endpoint, {
     method: "POST",
@@ -196,6 +197,32 @@ async function gradeOneTask(taskType, question, essay) {
   };
 }
 
+// ---- Teacher's calibration dial for this checker (Admin -> Writing checks): points added to the score, in 0.5 steps ----
+const half = (n) => Math.round(n * 2) / 2;
+function labelFor(taskType, band) {
+  const rows = BANDS[taskType].table, row = rows.find((r) => r[0] === Math.floor(band));
+  return row ? row[1] : "";
+}
+function applyOffsetSingle(result, taskType, off) {
+  const o = half(Number(off) || 0); if (!o) return result;
+  const band = Math.max(0, Math.min(result.max_band, half(result.band + o)));
+  return { ...result, band, band_label: labelFor(taskType, band) || result.band_label };
+}
+// full mode: the offset is shared out so that Task 1.1 + Task 1.2 + Task 2 still add up to the total
+function applyOffsetFull(results, off) {
+  let left = half(Number(off) || 0); if (!left) return results;
+  const out = { ...results };
+  for (const t of ["2", "1.2", "1.1"]) {
+    const r = out[t], max = r.max_band;
+    const step = left > 0 ? Math.min(left, max - r.band) : Math.max(left, -r.band);
+    if (!step) continue;
+    const band = half(r.band + step); out[t] = { ...r, band, band_label: labelFor(t, band) || r.band_label }; left = half(left - step);
+    if (!left) break;
+  }
+  return out;
+}
+
+exports.convertRawTo75 = convertRawTo75; exports.cefrFor75 = cefrFor75; exports.applyOffsetFull = applyOffsetFull; exports.applyOffsetSingle = applyOffsetSingle; exports.BANDS_MAX = { "1.1": 5, "1.2": 6, "2": 6 };
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return json(405, { error: "Method not allowed." });
   if (missingEnv() || !process.env.GEMINI_API_KEY) {
@@ -227,7 +254,8 @@ exports.handler = async (event) => {
       if (countWords(essay) < 3) return json(400, { error: "Your response is too short to assess." });
       if (countWords(essay) > 800) return json(400, { error: "That response is unusually long. Please trim it." });
 
-      const result = await gradeOneTask(taskType, question, essay);
+      const settings = await getSettings(serviceClient());
+      const result = applyOffsetSingle(await gradeOneTask(taskType, question, essay), taskType, settings.ml_offset);
       try{
         const db = serviceClient();
         const { error: insErr } = await db.from("multilevel_submissions").insert({
@@ -253,10 +281,11 @@ exports.handler = async (event) => {
       }
     }
 
-    const results = {};
+    let results = {};
     for (const t of order) {
       results[t] = await gradeOneTask(t, tasks[t].question, tasks[t].essay);
     }
+    results = applyOffsetFull(results, (await getSettings(serviceClient())).ml_offset);
 
     const rawScore = results["1.1"].band + results["1.2"].band + results["2"].band;
     const converted = convertRawTo75(rawScore);

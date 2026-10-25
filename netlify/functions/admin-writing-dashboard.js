@@ -5,6 +5,8 @@
 // what, their score, essay, feedback and mistakes — split by exam type.
 
 const { json, missingEnv, serviceClient, getUserFromRequest, isAdminEmail } = require("./_shared");
+const { getSettings } = require("./_marking");
+const { convertRawTo75, cefrFor75 } = require("./check-writing-multilevel");
 
 exports.handler = async (event) => {
   if (missingEnv()) return json(500, { error: "Backend not configured." });
@@ -14,6 +16,38 @@ exports.handler = async (event) => {
   if (!isAdminEmail(user.email)) return json(403, { error: "Not authorised." });
 
   const db = serviceClient();
+
+  // ---- POST: the teacher changes one student's score (the student then simply sees the new score) ----
+  if (event.httpMethod === "POST") {
+    let body; try { body = JSON.parse(event.body || "{}"); } catch { return json(400, { error: "Invalid request." }); }
+    const id = String(body.id || ""); if (!/^[0-9a-f-]{36}$/i.test(id)) return json(400, { error: "Missing id." });
+    const half = (n) => Math.round(n * 2) / 2;
+    if (body.action === "set-ielts-band") {
+      const band = Number(body.band); if (!isFinite(band) || band < 0 || band > 9 || half(band) !== band) return json(400, { error: "The band must be between 0 and 9, in steps of 0.5." });
+      const { data: row } = await db.from("submissions").select("id, overall_band, feedback").eq("id", id).maybeSingle();
+      if (!row) return json(404, { error: "Result not found." });
+      const fb = row.feedback && typeof row.feedback === "object" ? { ...row.feedback } : {};
+      if (fb.original_overall_band == null) fb.original_overall_band = Number(row.overall_band);   // what the AI said (only the teacher ever sees this)
+      fb.overall_band = band;
+      const up = await db.from("submissions").update({ overall_band: band, feedback: fb }).eq("id", id);
+      if (up.error) return json(500, { error: "Could not save." });
+      return json(200, { ok: true, band });
+    }
+    if (body.action === "set-multilevel-score") {
+      const { data: row } = await db.from("multilevel_submissions").select("id, mode, raw_score, max_score, converted_score, cefr_level, payload").eq("id", id).maybeSingle();
+      if (!row) return json(404, { error: "Result not found." });
+      const raw = Number(body.raw), max = Number(row.max_score) || 17;
+      if (!isFinite(raw) || raw < 0 || raw > max || half(raw) !== raw) return json(400, { error: `The score must be between 0 and ${max}, in steps of 0.5.` });
+      const payload = row.payload && typeof row.payload === "object" ? { ...row.payload } : {};
+      if (!payload.original) payload.original = { raw_score: row.raw_score, converted_score: row.converted_score, cefr_level: row.cefr_level };
+      const patch = { raw_score: raw, payload };
+      if (row.mode === "full") { patch.converted_score = convertRawTo75(raw); patch.cefr_level = cefrFor75(patch.converted_score); }
+      const up = await db.from("multilevel_submissions").update(patch).eq("id", id);
+      if (up.error) return json(500, { error: "Could not save." });
+      return json(200, { ok: true, raw_score: raw, converted_score: patch.converted_score == null ? null : patch.converted_score, cefr_level: patch.cefr_level || null });
+    }
+    return json(400, { error: "Unknown action." });
+  }
 
   const { data: profiles, error: pErr } = await db
     .from("profiles")
@@ -58,6 +92,7 @@ exports.handler = async (event) => {
       coherence_cohesion: s.coherence_cohesion,
       lexical_resource: s.lexical_resource,
       grammatical_range_accuracy: s.grammatical_range_accuracy,
+      original_band: s.feedback && s.feedback.original_overall_band != null ? s.feedback.original_overall_band : null,
       summary: s.feedback && s.feedback.summary,
       corrections: (s.feedback && s.feedback.corrections) || [],
       weaknesses: (s.feedback && s.feedback.weaknesses) || [],
@@ -79,8 +114,10 @@ exports.handler = async (event) => {
       converted_score: s.converted_score,
       cefr_level: s.cefr_level,
       payload: s.payload,
+      original: s.payload && s.payload.original ? s.payload.original : null,
     };
   });
 
-  return json(200, { ielts, multilevel });
+  const cal = await getSettings(db);
+  return json(200, { ielts, multilevel, calibration: { ielts_offset: cal.calibration_offset, ml_offset: cal.ml_offset } });
 };

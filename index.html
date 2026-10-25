@@ -4543,7 +4543,14 @@ function fmtWhen(iso){
 function renderWritingDash(){
   var root=$("wdRoot");
   var ieltsN=(wdData.ielts||[]).length, mlN=(wdData.multilevel||[]).length;
-  var html='<div class="au-tabs" id="wdTabs" style="max-width:420px">'+
+  var cal=wdData.calibration||{ielts_offset:0,ml_offset:0};
+  var opts=function(lo,hi,step,sel,unit){ var o=''; for(var v=lo; v<=hi+1e-9; v=Math.round((v+step)*100)/100){ o+='<option value="'+v+'"'+(Math.abs(v-sel)<1e-9?' selected':'')+'>'+(v>0?'+':v<0?'\u2212':'')+Math.abs(v)+(v===0?' (as the AI marks)':'')+'</option>'; } return o; };
+  var html='<div class="wc-card wd-cal" id="wdCal"><h3>Score dials</h3><p class="wc-sub" style="margin:2px 0 12px">Add or take away points after the AI has marked. It applies at once to every new check. Students just see the final score.</p>'+
+    '<div class="wd-cal-row"><label>IELTS checker (bands)<select id="calIelts">'+opts(-0.5,1,0.25,Number(cal.ielts_offset)||0)+'</select></label>'+
+    '<label>Multilevel checker (points of 17)<select id="calMl">'+opts(-2,2,0.5,Number(cal.ml_offset)||0)+'</select></label>'+
+    '<button class="wc-btn" id="calSave" style="width:auto;padding:10px 22px">Save dials</button><span class="wc-note" id="calMsg"></span></div>'+
+    '<p class="wc-note" style="margin:10px 0 0">Multilevel: the points are shared across Task 1.1, 1.2 and 2 so they still add up to the total. To change ONE student\u2019s score, open their check below.</p></div>'+
+    '<div class="au-tabs" id="wdTabs" style="max-width:420px;margin-top:18px">'+
     '<button class="'+(wdMode==="ielts"?"on":"")+'" data-wdmode="ielts">IELTS ('+ieltsN+')</button>'+
     '<button class="'+(wdMode==="multilevel"?"on":"")+'" data-wdmode="multilevel">Multilevel ('+mlN+')</button>'+
   '</div><div id="wdList"></div>';
@@ -4552,6 +4559,17 @@ function renderWritingDash(){
     b.addEventListener("click",function(){ wdMode=b.getAttribute("data-wdmode"); renderWritingDash(); });
   });
   renderWdList();
+  $("calSave").addEventListener("click",wdSaveDials);
+}
+async function wdSaveDials(){
+  var btn=$("calSave"), msg=$("calMsg"); btn.disabled=true; msg.textContent="Saving\u2026";
+  try{
+    var t=await TJ.token();
+    var res=await fetch(FN+"mock-admin",{method:"POST",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({action:"save-calibration",ielts_offset:Number($("calIelts").value),ml_offset:Number($("calMl").value)})});
+    var d=await res.json(); if(!res.ok) throw new Error(d.error||"Could not save.");
+    wdData.calibration={ielts_offset:Number($("calIelts").value),ml_offset:Number($("calMl").value)}; msg.textContent="Saved \u2713 It is live now.";
+  }catch(e){ msg.textContent=e.message; }
+  btn.disabled=false;
 }
 
 function wdMistakesHtml(corrections){
@@ -4576,27 +4594,51 @@ function renderWdList(){
   if(!rows.length){ list.innerHTML='<div class="wc-empty" style="margin-top:16px">No '+(wdMode==="ielts"?"IELTS":"Multilevel")+' checks yet.</div>'; return; }
   var html='';
   rows.forEach(function(r,i){
-    var headScore = wdMode==="ielts"
-      ? 'Band '+TJ.band(r.overall_band)
-      : (r.mode==="full" ? r.converted_score+'/75 · CEFR '+esc(r.cefr_level||'') : (r.task_type?('Task '+esc(r.task_type)+' · '):'')+r.raw_score+'/'+r.max_score);
+    var headScore = wdHeadScore(r);
     html+='<div class="wc-card" style="margin-top:14px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;cursor:pointer" data-wdtoggle="'+i+'">'+
         '<div><b>'+esc(r.student_name)+'</b> <span class="wc-sub" style="display:inline">'+esc(r.student_email||'')+'</span><div class="wc-sub" style="margin-top:2px">'+fmtWhen(r.created_at)+'</div></div>'+
-        '<div class="wc-pill">'+headScore+'</div>'+
+        '<div class="wc-pill" id="wdPill'+i+'">'+headScore+'</div>'+
       '</div>'+
       '<div id="wdDetail'+i+'" hidden style="margin-top:14px"></div>'+
     '</div>';
   });
   list.innerHTML=html;
+  list.onclick=function(e){ var b=e.target.closest("[data-wdsave]"); if(b) wdSaveScore(b); };
   document.querySelectorAll('[data-wdtoggle]').forEach(function(el){
     el.addEventListener('click',function(){
       var i=el.getAttribute('data-wdtoggle');
       var d=$('wdDetail'+i);
-      if(d.hidden){ d.hidden=false; d.innerHTML=wdDetailHtml(rows[i]); } else { d.hidden=true; }
+      if(d.hidden){ d.hidden=false; d.innerHTML=wdEditHtml(rows[i],i)+wdDetailHtml(rows[i]); } else { d.hidden=true; }
     });
   });
 }
 
+function wdHeadScore(r){
+  return wdMode==="ielts"
+    ? 'Band '+TJ.band(r.overall_band)
+    : (r.mode==="full" ? r.converted_score+'/75 · CEFR '+esc(r.cefr_level||'') : (r.task_type?('Task '+esc(r.task_type)+' · '):'')+r.raw_score+'/'+r.max_score);
+}
+function wdEditHtml(r,i){
+  var ielts=wdMode==="ielts", cur=ielts?r.overall_band:r.raw_score, max=ielts?9:(r.max_score||17);
+  var was=ielts ? (r.original_band!=null?'The AI first gave <b>'+TJ.band(r.original_band)+'</b>.':'') : (r.original?'The AI first gave <b>'+(r.original.converted_score!=null?r.original.converted_score+'/75':r.original.raw_score)+'</b>.':'');
+  return '<div class="wd-edit"><label>Change this score'+(ielts?' (band)':' (raw points, 0\u2013'+max+')')+'<input type="number" id="wdEd'+i+'" min="0" max="'+max+'" step="0.5" value="'+esc(String(cur))+'"></label>'+
+    '<button class="wc-btn" data-wdsave="'+esc(r.id)+'" data-i="'+i+'" style="width:auto;padding:9px 20px">Save score</button><span class="wc-note" id="wdMsg'+i+'">'+was+'</span></div>'+
+    (!ielts&&r.mode==="full"?'<p class="wc-note" style="margin:-4px 0 12px">The score out of 75 and the CEFR level are recalculated for you.</p>':'');
+}
+async function wdSaveScore(btn){
+  var i=btn.getAttribute("data-i"), id=btn.getAttribute("data-wdsave"), rows=wdMode==="ielts"?wdData.ielts:wdData.multilevel, r=rows[i], msg=$("wdMsg"+i), val=Number($("wdEd"+i).value);
+  btn.disabled=true; msg.textContent="Saving\u2026";
+  try{
+    var t=await TJ.token(), body=wdMode==="ielts"?{action:"set-ielts-band",id:id,band:val}:{action:"set-multilevel-score",id:id,raw:val};
+    var res=await fetch(FN+"admin-writing-dashboard",{method:"POST",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify(body)});
+    var d=await res.json(); if(!res.ok) throw new Error(d.error||"Could not save.");
+    if(wdMode==="ielts"){ if(r.original_band==null) r.original_band=r.overall_band; r.overall_band=val; }
+    else { if(!r.original) r.original={raw_score:r.raw_score,converted_score:r.converted_score,cefr_level:r.cefr_level}; r.raw_score=d.raw_score; if(d.converted_score!=null){ r.converted_score=d.converted_score; r.cefr_level=d.cefr_level; } }
+    $("wdPill"+i).textContent=wdHeadScore(r).replace(/&middot;/g,"\u00b7"); msg.textContent="Saved \u2713 The student now sees this score.";
+  }catch(e){ msg.textContent=e.message; }
+  btn.disabled=false;
+}
 function wdDetailHtml(r){
   if(wdMode==="ielts"){
     return '<div class="wc-sec"><h4>Task question</h4><p class="wc-sub">'+esc(r.question||"")+'</p></div>'+
@@ -4699,12 +4741,13 @@ function renderForm(item){
         (editingId?'<button class="wc-btn ghost" id="cmCancel">Cancel</button>':'')+
         '<div class="cm-status" id="cmStatus"></div>'+
       '</div>'+
-      '<div class="cm-prog full" id="cmProg"><i></i></div>'+
+      '<div class="cm-up full" id="cmUpWrap" hidden><div class="cm-up-top"><b id="cmUpPct">0%</b><span id="cmUpDetail"></span><button type="button" class="wc-btn ghost" id="cmUpStop" style="width:auto;padding:6px 14px">Cancel upload</button></div>'+
+        '<div class="cm-prog show det" id="cmProg"><i id="cmBar" style="width:0%"></i></div><div class="cm-up-warn" id="cmUpWarn" role="status"></div></div>'+
     '</div>';
 
   // wire
   $("cmFreeSeg").addEventListener("click",function(e){var b=e.target.closest("[data-free]");if(!b)return;formFree=b.getAttribute("data-free")==="1";Array.prototype.forEach.call(this.querySelectorAll("button"),function(x){x.classList.toggle("on",x===b);});$("cmAssign").style.display=formFree?"none":"";});
-  var fi=$("cmFileInput"); if(fi){ fi.addEventListener("change",function(){ formFile=this.files[0]||null; $("cmFileName").textContent=formFile?(formFile.name+" ("+hsize(formFile.size)+")"):"No file selected"; if(formFile&&!$("cmTitle").value.trim()){ $("cmTitle").value=formFile.name.replace(/\.[^.]+$/,""); } }); }
+  var fi=$("cmFileInput"); if(fi){ fi.addEventListener("change",function(){ formFile=this.files[0]||null; $("cmFileName").textContent=formFile?((formFile.size>52428800?"\u26A0 Over 50 MB: the free storage plan may refuse this file.  ":"")+formFile.name+" ("+hsize(formFile.size)+")"):"No file selected"; if(formFile&&!$("cmTitle").value.trim()){ $("cmTitle").value=formFile.name.replace(/\.[^.]+$/,""); } }); }
   $("cmClasses").addEventListener("click",function(e){var c=e.target.closest("[data-id]");if(!c)return;var id=c.getAttribute("data-id");if(selClasses.has(id))selClasses.delete(id);else selClasses.add(id);c.classList.toggle("on");});
   $("cmStudents").addEventListener("click",function(e){var c=e.target.closest("[data-id]");if(!c)return;var id=c.getAttribute("data-id");if(selStudents.has(id))selStudents.delete(id);else selStudents.add(id);c.classList.toggle("on");});
   $("cmSave").addEventListener("click",submitCM);
@@ -4717,6 +4760,66 @@ function classChips(){
 function studentChips(){
   if(!STATE.students||!STATE.students.length) return '<span class="wc-note">No students registered yet.</span>';
   return STATE.students.map(function(s){var on=selStudents.has(s.id);return '<span class="cm-chip'+(on?' on':'')+'" data-id="'+esc(s.id)+'"><svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg>'+esc(s.full_name||s.email||"student")+'</span>';}).join("");
+}
+/* ---- upload with a real progress bar: percent, MB sent, speed, time left, "stuck" warning, Cancel, 2 automatic retries ---- */
+function cmUploadWithProgress(created,file,ui){
+  var STALL=window.__CM_STALL_MS||15000, DEAD=window.__CM_DEAD_MS||120000, RETRY_WAIT=window.__CM_RETRY_MS||3000;
+  return new Promise(function(resolve,reject){
+    var attempt=0, xhr=null, cancelled=false, samples=[], lastMove=Date.now(), iv=null, done=false;
+    function finish(fn,arg){ if(done) return; done=true; clearInterval(iv); fn(arg); }
+    ui.onCancel=function(){ cancelled=true; if(xhr) try{xhr.abort();}catch(e){} finish(reject,new Error("Upload cancelled.")); };
+    function fail(msg){ finish(reject,new Error(msg)); }
+    function retry(why){
+      if(cancelled||done) return;
+      if(attempt>=3) return fail(why+" The upload could not finish. Please check your internet and try again.");
+      ui.warn(why+" Retrying ("+attempt+"/2)\u2026"); samples=[]; ui.progress(0,file.size,0,null);
+      setTimeout(function(){ if(!cancelled&&!done) start(); },RETRY_WAIT);
+    }
+    iv=setInterval(function(){
+      var idle=Date.now()-lastMove;
+      if(idle>DEAD && xhr){ try{xhr.abort();}catch(e){} return; }                       // dead: onabort -> retry
+      if(idle>STALL) ui.warn("No data has been sent for "+Math.round(idle/1000)+" seconds. Your internet may be slow or disconnected. The upload keeps trying, or press Cancel.");
+    },1000);
+    async function start(){
+      attempt++; lastMove=Date.now();
+      var tok; try{ tok=await TJ.token(); }catch(e){ return retry("Could not reach the server."); }
+      if(cancelled||done) return;
+      var url=TJ.getUrl()+"/storage/v1/object/upload/sign/"+BUCKET+"/"+created.path.split("/").map(encodeURIComponent).join("/")+"?token="+encodeURIComponent(created.token);
+      xhr=new XMLHttpRequest(); xhr.open("PUT",url);
+      xhr.setRequestHeader("apikey",TJ.getAnonKey()); xhr.setRequestHeader("Authorization","Bearer "+tok); xhr.setRequestHeader("x-upsert","true");
+      xhr.upload.onprogress=function(e){
+        if(!e.lengthComputable) return; var now=Date.now(); lastMove=now; ui.warn("");
+        samples.push({t:now,b:e.loaded}); while(samples.length>2&&now-samples[0].t>6000) samples.shift();
+        var a=samples[0], dt=(now-a.t)/1000, speed=dt>0.4?(e.loaded-a.b)/dt:0;
+        ui.progress(e.loaded,e.total,speed,speed>0?(e.total-e.loaded)/speed:null);
+      };
+      xhr.upload.onload=function(){ ui.finishing(); };
+      xhr.onload=function(){
+        if(xhr.status>=200&&xhr.status<300) return finish(resolve);
+        var m=""; try{ var j=JSON.parse(xhr.responseText); m=j.message||j.error||""; }catch(e){}
+        if(xhr.status===413||/exceeded the maximum/i.test(m)) return fail("This file is too big for your storage plan (the free Supabase plan allows 50 MB per file). Use a smaller file, or upgrade the plan.");
+        if(xhr.status>=500) return retry("The server had a problem.");
+        fail(m||("Upload failed (code "+xhr.status+")."));
+      };
+      xhr.onerror=function(){ retry("Connection lost."); };
+      xhr.ontimeout=function(){ retry("The connection timed out."); };
+      xhr.onabort=function(){ if(!cancelled) retry("The connection stopped responding."); };
+      var fd=new FormData(); fd.append("cacheControl","3600"); fd.append("",file); xhr.send(fd);
+    }
+    start();
+  });
+}
+function cmMakeUploadUI(){
+  var wrap=$("cmUpWrap"), bar=$("cmBar"), pct=$("cmUpPct"), det=$("cmUpDetail"), warn=$("cmUpWarn"), stop=$("cmUpStop");
+  function secs(s){ s=Math.max(0,Math.round(s)); if(s<60) return s+" s"; var m=Math.floor(s/60); return m+" min "+(s%60<10?"0":"")+(s%60)+" s"; }
+  var ui={ onCancel:null,
+    show:function(){ wrap.hidden=false; bar.style.width="0%"; pct.textContent="0%"; det.textContent="Starting\u2026"; warn.textContent=""; stop.disabled=false; },
+    hide:function(){ wrap.hidden=true; },
+    progress:function(loaded,total,speed,eta){ var p=total?Math.min(100,Math.round(loaded/total*100)):0; bar.style.width=p+"%"; pct.textContent=p+"%"; det.textContent=hsize(loaded)+" of "+hsize(total)+(speed>0?" \u00b7 "+hsize(speed)+"/s":"")+(eta!=null&&isFinite(eta)&&p<100?" \u00b7 about "+secs(eta)+" left":""); },
+    finishing:function(){ bar.style.width="100%"; pct.textContent="100%"; det.textContent="Sent. Finishing on the server\u2026"; stop.disabled=true; },
+    warn:function(m){ warn.textContent=m||""; warn.classList.toggle("on",!!m); } };
+  stop.onclick=function(){ if(ui.onCancel) ui.onCancel(); };
+  return ui;
 }
 async function submitCM(){
   var title=$("cmTitle").value.trim();
@@ -4735,21 +4838,20 @@ async function submitCM(){
   if(!formFile){ errBox.innerHTML='<div class="wc-err">Please choose a file to upload.</div>'; return; }
   var sb=TJ.getSb(); if(!sb){ errBox.innerHTML='<div class="wc-err">Still connecting — try again in a moment.</div>'; return; }
 
-  save.disabled=true; prog.classList.add("show"); status.textContent="Preparing upload…";
+  save.disabled=true; var upUI=cmMakeUploadUI(); upUI.show(); status.textContent="Preparing upload…";
   var created=null;
   try{
     created=await api("create-item",Object.assign({mime_type:formFile.type||"application/octet-stream",file_name:formFile.name,size_bytes:formFile.size},payloadBase));
     status.textContent="Uploading “"+formFile.name+"” ("+hsize(formFile.size)+")… please keep this tab open.";
-    var up=await sb.storage.from(BUCKET).uploadToSignedUrl(created.path, created.token, formFile, {upsert:true, contentType:formFile.type||undefined});
-    if(up.error) throw up.error;
+    await cmUploadWithProgress(created, formFile, upUI);
     status.textContent="Finishing…";
     await api("confirm-item",{id:created.id});
-    prog.classList.remove("show"); status.textContent="";
+    upUI.hide(); status.textContent="";
     formFile=null; formFree=true; selStudents=new Set(); selClasses=new Set();
     await loadContent();
   }catch(e){
-    prog.classList.remove("show"); status.textContent="";
-    errBox.innerHTML='<div class="wc-err">Upload failed: '+esc(e.message||"error")+'</div>';
+    upUI.hide(); status.textContent="";
+    errBox.innerHTML='<div class="wc-err">'+(/cancelled/i.test(e.message||"")?"":"Upload failed: ")+esc(e.message||"error")+'</div>';
     if(created&&created.id){ try{ await api("delete-item",{id:created.id}); }catch(_){} }
     save.disabled=false;
   }

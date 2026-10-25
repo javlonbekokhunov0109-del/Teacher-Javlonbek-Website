@@ -38,10 +38,9 @@
       '<div class="mka-row"><button class="wc-btn" data-save style="width:auto;padding:10px 20px">Save</button>' + (isNew ? '' : '<button class="wc-btn ghost" data-del style="width:auto;padding:10px 20px">Delete</button>') + '</div><div data-out></div></div>';
   }
   function settingsCard() {
-    var s = D.settings || {}, off = Number(s.calibration_offset) || 0;
+    var s = D.settings || {};
     return '<div class="mka-card" id="mkaSettings"><h3 style="margin:0 0 4px;font-family:\'Cormorant Garamond\',serif;font-size:24px">AI marking settings</h3><div class="mk-note" style="margin:0 0 10px">These control the Writing checker everywhere (IELTS checker + mocks) and the Speaking check. Changes apply immediately, no deploy.</div>' +
-      '<div class="mka-row"><label>Score calibration</label><select data-s="calibration_offset"><option value="0"' + (off === 0 ? ' selected' : '') + '>0 \u2014 as the AI marks (recommended)</option><option value="0.25"' + (off === 0.25 ? ' selected' : '') + '>+0.25 band</option><option value="0.5"' + (off === 0.5 ? ' selected' : '') + '>+0.5 band</option></select></div>' +
-      '<div class="mk-note" style="margin:-2px 0 8px">If, after comparing with your own marking, the AI is consistently too strict, add 0.25 or 0.5. It lifts each criterion once; it never changes a 0 and never goes above 9.</div>' +
+      '<div class="mk-note" style="margin:0 0 10px">The score dials (IELTS and Multilevel) are in <b>Writing checks</b>, together with editing one student\u2019s score.</div>' +
       '<div class="mka-row"><label class="cl-flag"><input type="checkbox" data-s="show_range"' + (s.show_range ? ' checked' : '') + '> Show a likely range (for example 6.0\u20137.0) next to the band</label></div>' +
       '<div class="mka-row"><label class="cl-flag"><input type="checkbox" data-s="speaking_enabled"' + (s.speaking_enabled ? ' checked' : '') + '> <b>Speaking AI check is ON</b> (students can send recordings)</label></div>' +
       '<div class="mka-row"><label>AI checks per day \u2014 free users</label><input type="number" min="0" max="200" data-s="daily_limit_free" value="' + esc(s.daily_limit_free) + '" style="width:80px"><label>members</label><input type="number" min="0" max="500" data-s="daily_limit_member" value="' + esc(s.daily_limit_member) + '" style="width:80px"></div>' +
