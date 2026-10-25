@@ -95,7 +95,7 @@
 
   /* ---------- rendering ---------- */
   function root() { return $('dstRoot'); }
-  function setHtml(h, keepScroll) { var r = root(); if (r) { r.innerHTML = h; if (r.parentNode && r.parentNode.classList) r.parentNode.classList.toggle('dst-live', !!(S.ses && S.ses.mode !== 'ls')); if (!keepScroll) window.scrollTo({ top: 0, behavior: 'auto' }); } }
+  function setHtml(h, keepScroll) { var r = root(); if (r) { if (S.mis && S.mis.bar) h = missionBar() + h; r.innerHTML = h; if (r.parentNode && r.parentNode.classList) r.parentNode.classList.toggle('dst-live', !!((S.ses && S.ses.mode !== 'ls') || (S.mis && S.mis.live))); r.parentNode.classList.toggle('dst-cave', !!(S.mis && S.mis.live)); if (!keepScroll) window.scrollTo({ top: 0, behavior: 'auto' }); } }
   function pct(a, b) { return b ? Math.round(100 * a / b) : 0; }
   function tabsHtml() {
     var st = load();
@@ -105,7 +105,7 @@
     }).join('') + '</div>';
   }
   function home() {
-    S.ses = null; var h = tabsHtml();
+    S.ses = null; S.mis = null; var h = tabsHtml();
     if (S.loading) return setHtml(h + '<div class="wc-loading"><span class="d"></span> Loading ' + esc(bookMeta(S.book)[1]) + '\u2026</div>');
     if (!S.data) return setHtml(h);
     var d = S.data, p = S.pref, deck = buildDeck(d, p), known = knownCount(S.book, deck), size = p.size;
@@ -118,6 +118,7 @@
       '<div class="dst-row" style="margin-top:12px"><label>Cards per round <select data-sel="size" aria-label="Cards per round">' + ['10', '20', '30', '50', '100', 'all'].map(function (n) { return '<option value="' + n + '"' + (String(size) === n ? ' selected' : '') + '>' + (n === 'all' ? 'All' : n) + '</option>'; }).join('') + '</select></label><label>Order <select data-sel="order" aria-label="Order"><option value="random"' + (p.order === 'random' ? ' selected' : '') + '>Random</option><option value="weak"' + (p.order === 'weak' ? ' selected' : '') + '>Weakest first</option></select></label></div>' +
       '<div class="dst-sum" id="dstSum"><b>' + deck.length + '</b> cards selected \u00B7 <b>' + known + '</b> known (' + pct(known, deck.length) + '%)</div></div>' +
       '<div class="sy-modes dst-modes">' +
+      '<button class="sy-mode dst-mission" data-md="ms"' + (deck.length < 4 ? ' disabled' : '') + '><span class="ic">\uD83D\uDD6F\uFE0F</span><b>Mission</b><span>Go deep into the cave: Flashcards \u2192 Quiz \u2192 Match \u2192 Spelling \u2192 Guardian. Learn the same words step by step and reveal your treasure card.</span></button>' +
       '<button class="sy-mode" data-md="fc"' + (disabled ? ' disabled' : '') + '><span class="ic">\uD83C\uDCCF</span><b>Flashcards</b><span>See one side, think, tap to flip. Mark what you knew.</span></button>' +
       '<button class="sy-mode" data-md="qz"' + (deck.length < 4 ? ' disabled' : '') + '><span class="ic">\uD83C\uDFAF</span><b>Quiz</b><span>Choose the right answer from four options.</span></button>' +
       '<button class="sy-mode" data-md="mt"' + (deck.length < 6 ? ' disabled' : '') + '><span class="ic">\uD83D\uDD17</span><b>Match pairs</b><span>Connect six English words with their Uzbek.</span></button>' +
@@ -126,7 +127,7 @@
       (disabled ? '<div class="wc-empty">No cards for this selection. Pick more units or word types.</div>' : '') + histHtml();
     setHtml(h, true);
   }
-  function updateSummary() { var el = $('dstSum'); if (!el || !S.data) return; var deck = buildDeck(S.data, S.pref), k = knownCount(S.book, deck); el.innerHTML = '<b>' + deck.length + '</b> cards selected \u00B7 <b>' + k + '</b> known (' + pct(k, deck.length) + '%)'; var m = document.querySelectorAll('.dst-modes .sy-mode'); [deck.length < 1, deck.length < 4, deck.length < 6, deck.filter(spellable).length < 1, deck.length < 1].forEach(function (off, i) { if (m[i]) m[i].disabled = off; }); }
+  function updateSummary() { var el = $('dstSum'); if (!el || !S.data) return; var deck = buildDeck(S.data, S.pref), k = knownCount(S.book, deck); el.innerHTML = '<b>' + deck.length + '</b> cards selected \u00B7 <b>' + k + '</b> known (' + pct(k, deck.length) + '%)'; var m = document.querySelectorAll('.dst-modes .sy-mode'); [deck.length < 4, deck.length < 1, deck.length < 4, deck.length < 6, deck.filter(spellable).length < 1, deck.length < 1].forEach(function (off, i) { if (m[i]) m[i].disabled = off; }); }
   function selectBook(id) {
     S.book = id; S.data = null; S.all = null; S.loading = true; home();
     return loadBook(id).then(function (d) { S.data = d; S.pref = getPref(id, d); S.loading = false; var s = load(); s.last = id; save(s); home(); }).catch(function (e) { S.loading = false; setHtml(tabsHtml() + '<div class="wc-err">' + esc(e.message) + '</div><div class="sy-next"><button class="wc-btn" data-bk="' + id + '">Try again</button></div>'); });
@@ -134,7 +135,7 @@
 
 
   /* ---------- statistics shown when a round ends ---------- */
-  var MODE_NAME = { fc: 'Flashcards', qz: 'Quiz', mt: 'Match pairs', sp: 'Spelling', ls: 'List' };
+  var MODE_NAME = { fc: 'Flashcards', qz: 'Quiz', mt: 'Match pairs', sp: 'Spelling', ls: 'List', ms: 'Mission' };
   function unitsLabel(data, p) {
     var first = data.units[0].n, last = data.units[data.units.length - 1].n, lo = Math.min(p.from, p.to), hi = Math.max(p.from, p.to);
     if (lo === first && hi === last) return 'All units (' + first + '\u2013' + last + ')';
@@ -151,6 +152,7 @@
   }
   /* one stats card for every kind of round: score, book, units, question type (+ direction, word types, time) */
   function resultView(o) {
+    if (S.ses && S.ses.mission) return missionChamberDone(o);
     var s = S.ses, m = s.meta, rows = [['Book', m.book], ['Units', m.units], ['Question type', MODE_NAME[s.mode] + (m.practice ? ' (practice of missed cards)' : '')], ['Direction', m.dir], ['Word types', m.types], ['Time', fmtTime(Date.now() - s.t0)]].concat(o.extra || []);
     saveRound(s, o.score, o.total);
     setHtml('<div class="sy-q sy-res dst-result"><div class="dst-scorebox"><div class="big">' + esc(o.big) + '</div><div class="dst-pct">' + pct(o.score, o.total) + '%</div><p class="hint">' + esc(o.caption) + '</p></div>' +
@@ -158,17 +160,86 @@
       '<p>' + esc(o.message) + '</p><div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="again-round">Play again</button>' + (s.missed.length && s.mode !== 'mt' && s.mode !== 'sp' ? '<button class="wc-btn ghost" data-act="missed-round">Practise the ' + s.missed.length + ' missed</button>' : '') + '<button class="wc-btn ghost" data-act="home">Back</button></div></div>' +
       (o.review && o.review.length ? '<div class="sy-sub">Review these</div><div class="dst-list">' + o.review.map(rowHtml).join('') + '</div>' : ''));
   }
-  var MODE_SHORT = { fc: 'Flashcards', qz: 'Quiz', mt: 'Match', sp: 'Spelling' };
+  var MODE_SHORT = { fc: 'Flashcards', qz: 'Quiz', mt: 'Match', sp: 'Spelling', ms: 'Mission' };
   function histHtml() {
     var h = (load().hist || []).slice(0, 6); if (!h.length) return '';
     return '<div class="sy-sub">Your recent rounds</div><div class="dst-hist">' + h.map(function (r) { var dt = new Date(r.t); return '<div class="dst-hrow"><span class="dst-hd">' + dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ' ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2) + '</span><span><b>' + esc(r.book) + '</b> \u00B7 ' + esc(r.units) + ' \u00B7 ' + esc(MODE_SHORT[r.mode] || r.mode) + ' \u00B7 ' + esc(r.dir) + '</span><span class="dst-hs">' + r.score + '/' + r.total + ' \u00B7 ' + r.pct + '%</span></div>'; }).join('') + '</div>';
   }
+
+  /* ---------- MISSION: one run through every kind of practice, ending with the treasure card ---------- */
+  var CH = { fc: { name: 'Torch Room', sub: 'Flashcards', icon: '\uD83D\uDD25' }, qz: { name: 'Quiz Cavern', sub: 'Multiple-choice quiz', icon: '\uD83C\uDFAF' }, mt: { name: 'Crystal Bridge', sub: 'Match pairs', icon: '\uD83D\uDC8E' }, sp: { name: 'Scribe Tunnel', sub: 'Spelling', icon: '\u270D\uFE0F' }, boss: { name: 'The Guardian', sub: 'Final quiz on your tricky words', icon: '\uD83D\uDC09' } };
+  function userName() { try { var u = window.TJ && window.TJ.getUser && window.TJ.getUser(); return (u && ((u.user_metadata && u.user_metadata.full_name) || u.email)) || 'Explorer'; } catch (e) { return 'Explorer'; } }
+  function missionBar() {
+    var m = S.mis; if (!m || !m.plan) return '';
+    return '<div class="dst-cavebar" role="progressbar" aria-label="Mission progress" aria-valuemin="0" aria-valuemax="' + m.plan.length + '" aria-valuenow="' + Math.max(0, m.idx) + '">' + m.plan.map(function (c, i) {
+      var st = c.skipped ? 'skip' : i < m.idx || (i === m.idx && m.cleared) ? 'done' : i === m.idx ? 'cur' : '';
+      var r = m.res[i];
+      return '<div class="dst-node ' + st + '"><span class="dst-torch">' + (st === 'done' ? '\uD83D\uDD25' : st === 'cur' ? '\uD83D\uDD6F\uFE0F' : st === 'skip' ? '\u2728' : '\u25AB\uFE0F') + '</span><small>' + esc(CH[c.id].name) + '</small>' + (r && !c.skipped ? '<i>' + r.score + '/' + r.total + '</i>' : c.skipped ? '<i>flawless</i>' : '') + '</div>';
+    }).join('<div class="dst-tun"></div>') + '</div>';
+  }
+  function startMission(deck) {
+    var size = S.pref.size === 'all' ? 40 : Math.min(Number(S.pref.size) || 20, 40), cards = pickSession(deck, Object.assign({}, S.pref, { size: size }), S.book);
+    var plan = [{ id: 'fc' }, { id: 'qz' }]; if (cards.length >= 6 && makeMatch(cards, 6).length >= 6) plan.push({ id: 'mt' }); if (cards.filter(spellable).length >= 3) plan.push({ id: 'sp' }); plan.push({ id: 'boss' });
+    S.ses = null; S.mis = { cards: cards, deck: deck, plan: plan, idx: -1, res: [], missed: [], t0: Date.now(), meta: sessionMeta(), dirMap: {}, bar: false, live: true, cleared: false };
+    S.mis.when = new Date();
+    setHtml('<div class="dst-cave-screen"><div class="dst-cave-title">\uD83D\uDD6F\uFE0F Mission</div><h2>' + esc(S.mis.meta.book) + ' \u00B7 ' + cards.length + ' words</h2><p class="dst-cave-sub">' + esc(S.mis.meta.units) + ' \u00B7 ' + esc(S.mis.meta.dir) + '</p><ol class="dst-route">' + plan.map(function (c) { return '<li><span>' + CH[c.id].icon + '</span><div><b>' + esc(CH[c.id].name) + '</b><small>' + esc(CH[c.id].sub) + '</small></div></li>'; }).join('') + '</ol><p class="dst-cave-sub">The same ' + cards.length + ' words in every chamber, so they really stay in your head. At the end your treasure card reveals your score.</p><div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="mis-enter">Enter the cave \u2192</button><button class="wc-btn ghost dst-ghost" data-act="home">Back</button></div></div>');
+  }
+  function missionEnter(i) {
+    var m = S.mis, c = m.plan[i]; m.idx = i; m.cleared = false;
+    if (c.id === 'boss' && !m.missed.length) { c.skipped = true; m.res[i] = { id: 'boss', score: 0, total: 0, skipped: true }; return missionFinish(); }
+    m.bar = true; m.live = true; var cards = c.id === 'boss' ? shuffle(m.missed).slice(0, 10) : m.cards, mode = c.id === 'boss' ? 'qz' : c.id;
+    S.ses = { mode: mode, deck: m.deck, cards: cards, mcards: cards, i: 0, dirMap: m.dirMap, right: 0, wrong: 0, missed: [], queue: cards.slice(), flipped: false, streak: 0, best: 0, t0: Date.now(), pairs: 0, meta: m.meta, mission: true, total: cards.length, boss: c.id === 'boss' };
+    if (mode === 'fc') return fcShow(); if (mode === 'qz') return quizQ();
+    if (mode === 'mt') { S.ses.boards = Math.max(1, Math.min(2, Math.floor(cards.length / 6))); S.ses.board = 0; return matchBoard(); }
+    S.ses.queue = shuffle(cards.filter(spellable)).slice(0, 10); S.ses.total = S.ses.queue.length; return spellQ();
+  }
+  function missionChamberDone(o) {
+    var m = S.mis, s = S.ses, c = m.plan[m.idx];
+    m.res[m.idx] = { id: c.id, score: o.score, total: o.total, secs: Math.round((Date.now() - s.t0) / 1000) };
+    (s.missed || []).forEach(function (x) { if (m.missed.indexOf(x) < 0 && c.id !== 'boss') m.missed.push(x); });
+    m.cleared = true; var nextIdx = m.idx + 1, last = nextIdx >= m.plan.length, p = pct(o.score, o.total);
+    var nx = !last ? m.plan[nextIdx] : null, nxName = nx ? (nx.id === 'boss' && !m.missed.length ? 'Treasure Room' : CH[nx.id].name) : 'Treasure Room';
+    setHtml('<div class="dst-cave-screen"><div class="dst-cave-title">' + CH[c.id].icon + ' ' + esc(CH[c.id].name) + ' cleared</div><div class="dst-cave-score">' + o.score + '/' + o.total + '<small>' + p + '%</small></div><p class="dst-cave-sub">' + (p >= 90 ? 'Brilliant! The torches burn bright.' : p >= 60 ? 'Well done. Keep going deeper.' : 'Tough one, but the words are getting closer.') + '</p>' +
+      '<div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="mis-next">' + (last ? 'Open the treasure \uD83D\uDDDD\uFE0F' : nx.id === 'boss' && !m.missed.length ? 'Go to the treasure room \u2192' : 'Next: ' + esc(nxName) + ' \u2192') + '</button></div></div>');
+  }
+  function missionFinish() {
+    var m = S.mis, tot = 0, sc = 0; m.res.forEach(function (r) { if (r && !r.skipped) { tot += r.total; sc += r.score; } });
+    var p = pct(sc, tot), stars = p >= 90 ? 3 : p >= 70 ? 2 : 1, ms = Date.now() - m.t0, when = m.when || new Date();
+    m.final = { name: userName(), book: m.meta.book, units: m.meta.units, dir: m.meta.dir, words: m.cards.length, score: sc, total: tot, pct: p, stars: stars, time: fmtTime(ms), when: new Date().toLocaleString(), rows: m.plan.map(function (c, i) { var r = m.res[i]; return { name: CH[c.id].name, icon: CH[c.id].icon, text: c.skipped ? 'flawless: no Guardian needed' : r ? r.score + '/' + r.total : '-' }; }) };
+    var st = load(); st.hist = st.hist || []; st.hist.unshift({ t: Date.now(), book: m.meta.book, bookId: m.meta.bookId, units: m.meta.units, mode: 'ms', dir: m.meta.dir, score: sc, total: tot, pct: p, secs: Math.round(ms / 1000) }); st.hist = st.hist.slice(0, 40); save(st);
+    m.bar = false; S.ses = null; var f = m.final;
+    setHtml('<div class="dst-cave-screen dst-treasure"><div class="dst-chest" aria-hidden="true"><div class="dst-lid"></div><div class="dst-box"></div><div class="dst-glow"></div></div><div class="dst-cave-title">Mission complete!</div>' +
+      '<div class="dst-final" id="dstFinal"><div class="dst-stars" aria-label="' + f.stars + ' of 3 stars">' + [1, 2, 3].map(function (i) { return '<span class="' + (i <= f.stars ? 'on' : '') + '">\u2605</span>'; }).join('') + '</div>' +
+      '<div class="dst-f-name">' + esc(f.name) + '</div><div class="dst-f-score">' + f.score + ' / ' + f.total + '<small>' + f.pct + '%</small></div>' +
+      '<dl class="dst-f-grid"><div><dt>Book</dt><dd>' + esc(f.book) + '</dd></div><div><dt>Units</dt><dd>' + esc(f.units) + '</dd></div><div><dt>Words</dt><dd>' + f.words + ' \u00B7 ' + esc(f.dir) + '</dd></div><div><dt>Time</dt><dd>' + esc(f.time) + '</dd></div><div><dt>Date and time</dt><dd>' + esc(f.when) + '</dd></div></dl>' +
+      '<ul class="dst-f-rows">' + f.rows.map(function (r) { return '<li><span>' + r.icon + ' ' + esc(r.name) + '</span><b>' + esc(r.text) + '</b></li>'; }).join('') + '</ul></div>' +
+      '<div class="sy-next" style="justify-content:center"><button class="wc-btn" data-act="mis-img" id="dstImgBtn">Save as image</button><button class="wc-btn ghost dst-ghost" data-act="mis-again">New mission</button><button class="wc-btn ghost dst-ghost" data-act="home">Back</button></div></div>');
+    if (!canvasOk()) { var b = $('dstImgBtn'); if (b) b.hidden = true; }
+  }
+  function canvasOk() { try { var c = document.createElement('canvas'); return !!(c.getContext && c.getContext('2d')); } catch (e) { return false; } }
+  function drawFinal(f) {
+    var W = 1080, H = 1480, c = document.createElement('canvas'); c.width = W; c.height = H; var x = c.getContext('2d');
+    var g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#1b1410'); g.addColorStop(1, '#0b0806'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    var rg = x.createRadialGradient(W / 2, 330, 40, W / 2, 330, 560); rg.addColorStop(0, 'rgba(255,196,80,.35)'); rg.addColorStop(1, 'rgba(255,196,80,0)'); x.fillStyle = rg; x.fillRect(0, 0, W, 900);
+    x.textAlign = 'center'; var fit = function (t, max, size, w, weight, family) { do { x.font = weight + ' ' + size + 'px ' + family; size -= 2; } while (x.measureText(t).width > max && size > 14); x.fillText(t, W / 2, w); };
+    x.fillStyle = '#e9c46a'; fit('MISSION COMPLETE', 900, 64, 130, '700', 'Georgia, serif');
+    x.font = '110px serif'; x.fillText([1, 2, 3].map(function (i) { return i <= f.stars ? '\u2605' : '\u2606'; }).join(' '), W / 2, 270);
+    x.fillStyle = '#fff'; fit(f.name, 900, 78, 400, '700', 'Georgia, serif');
+    x.fillStyle = '#e9c46a'; fit(f.score + ' / ' + f.total + '   (' + f.pct + '%)', 900, 120, 550, '700', 'Georgia, serif');
+    var rows = [['Book', f.book], ['Units', f.units], ['Words', f.words + '  \u00B7  ' + f.dir], ['Time', f.time], ['Date and time', f.when]], y = 660;
+    rows.forEach(function (r) { x.textAlign = 'left'; x.fillStyle = '#a99c8a'; x.font = '600 30px Arial, sans-serif'; x.fillText(r[0].toUpperCase(), 120, y); x.fillStyle = '#fff'; x.textAlign = 'right'; var size = 40; do { x.font = '700 ' + size + 'px Arial, sans-serif'; size -= 2; } while (x.measureText(r[1]).width > 640 && size > 18); x.fillText(r[1], W - 120, y); y += 84; });
+    y += 20; f.rows.forEach(function (r) { x.textAlign = 'left'; x.fillStyle = '#d8cdbd'; x.font = '500 34px Arial, sans-serif'; x.fillText(r.name, 120, y); x.textAlign = 'right'; x.fillStyle = '#e9c46a'; x.font = '700 34px Arial, sans-serif'; x.fillText(r.text, W - 120, y); y += 56; });
+    x.textAlign = 'center'; x.fillStyle = '#7d705f'; x.font = '500 30px Arial, sans-serif'; x.fillText('Teacher Javlonbek \u00B7 teacherjavlonbek.uz', W / 2, H - 60);
+    return c;
+  }
+  function saveImage() { var m = S.mis; if (!m || !m.final || !canvasOk()) return; var c = drawFinal(m.final); c.toBlob(function (b) { if (!b) return; var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'mission-' + m.final.book.replace(/\s+/g, '-').toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.png'; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); URL.revokeObjectURL(a.href); }, 500); }, 'image/png'); }
 
   /* ---------- sessions ---------- */
   function startSession(mode) {
     var deck = buildDeck(S.data, S.pref); if (!deck.length) return;
     var cards = pickSession(deck, S.pref, S.book), map = {};
     S.ses = { mode: mode, deck: deck, cards: cards, i: 0, dirMap: map, right: 0, wrong: 0, missed: [], queue: cards.slice(), flipped: false, streak: 0, best: 0, t0: Date.now(), pairs: 0, meta: sessionMeta() };
+    if (mode === 'ms') return startMission(deck);
     if (mode === 'ls') return listView('', 'none');
     if (mode === 'mt') { S.ses.boards = 3; S.ses.board = 0; return matchBoard(); }
     if (mode === 'sp') { S.ses.queue = shuffle(deck.filter(spellable)).slice(0, S.pref.size === 'all' ? 9999 : Math.min(Number(S.pref.size) || 30, 30)); S.ses.total = S.ses.queue.length; return spellQ(); }
@@ -219,7 +290,7 @@
 
   /* match pairs */
   function matchBoard() {
-    var s = S.ses; if (s.board >= s.boards) return matchDone(); var cards = makeMatch(s.deck, 6); if (cards.length < 3) return matchDone();
+    var s = S.ses; if (s.board >= s.boards) return matchDone(); var cards = makeMatch(s.mcards && s.mcards.length >= 6 ? s.mcards : s.deck, 6); if (cards.length < 3) return matchDone();
     s.pairs += cards.length; s.m = { cards: cards, left: shuffle(cards.map(function (_, i) { return i; })), right: shuffle(cards.map(function (_, i) { return i; })), picked: null, done: [], wrong: 0 }; s.done = s.board; s.total = s.boards;
     var uzFirst = S.pref.dir === 'uz2en' || (S.pref.dir === 'mixed' && rng() < 0.5); s.m.uzFirst = uzFirst;
     setHtml(topBar('Board <b>' + (s.board + 1) + '</b> of ' + s.boards + ' \u00B7 mistakes ' + s.wrong) + '<div class="sy-q"><h2>Match the pairs</h2><p class="hint">Tap a word on the left, then its meaning on the right.</p><div class="sy-pairs"><div class="col">' +
@@ -277,6 +348,10 @@
     if (t.hasAttribute('data-mr')) return matchTap('r', Number(t.getAttribute('data-mr')));
     if (t.hasAttribute('data-lh')) return listView(S.ses.listQ || '', t.getAttribute('data-lh'), S.ses.listLimit);
     var a = t.getAttribute('data-act'), s = S.ses;
+    if (a === 'mis-enter') return missionEnter(0);
+    if (a === 'mis-next') { var mm = S.mis; return mm.idx + 1 >= mm.plan.length ? missionFinish() : missionEnter(mm.idx + 1); }
+    if (a === 'mis-img') return saveImage();
+    if (a === 'mis-again') return startSession('ms');
     if (a === 'flip') return fcFlip();
     if (a === 'know') return fcRate(true);
     if (a === 'again') return fcRate(false);
@@ -291,7 +366,7 @@
     if (a === 'quit') { if (window.confirm('Leave this round? Your progress so far is saved.')) home(); return; }
     if (a === 'home') return home();
     if (a === 'again-round') return startSession(s.mode);
-    if (a === 'missed-round') { var m = s.missed.slice(), mode = s.mode, deck = s.deck; var meta = Object.assign({}, s.meta, { practice: true }); S.ses = { mode: mode, deck: deck, cards: m, i: 0, dirMap: {}, right: 0, wrong: 0, missed: [], queue: m.slice(), flipped: false, streak: 0, best: 0, total: m.length, t0: Date.now(), pairs: 0, meta: meta }; return mode === 'qz' ? quizQ() : fcShow(); }
+    if (a === 'missed-round') { var m = s.missed.slice(), mode = s.mode, deck = s.deck; if (s.mission) return; var meta = Object.assign({}, s.meta, { practice: true }); S.ses = { mode: mode, deck: deck, cards: m, i: 0, dirMap: {}, right: 0, wrong: 0, missed: [], queue: m.slice(), flipped: false, streak: 0, best: 0, total: m.length, t0: Date.now(), pairs: 0, meta: meta }; return mode === 'qz' ? quizQ() : fcShow(); }
   }
   function onChange(e) {
     var el = e.target; if (!el.hasAttribute || !el.hasAttribute('data-sel') || !S.pref) return; var k = el.getAttribute('data-sel');
@@ -314,5 +389,5 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (document.body.getAttribute('data-view') === 'destination') init(); }); else if (document.body.getAttribute('data-view') === 'destination') init();
   new MutationObserver(function () { if (document.body.getAttribute('data-view') === 'destination') init(); }).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
-  window.TJDest = { buildDeck: buildDeck, makeQuiz: makeQuiz, makeMatch: makeMatch, spellable: spellable, sameAnswer: sameAnswer, usNorm: usNorm, maskExample: maskExample, norm: norm, setRng: function (f) { rng = f || Math.random; }, state: function () { return S; }, selectBook: selectBook, loadBook: loadBook, init: init };
+  window.TJDest = { mission: function () { return S.mis; }, drawFinal: drawFinal, userName: userName, buildDeck: buildDeck, makeQuiz: makeQuiz, makeMatch: makeMatch, spellable: spellable, sameAnswer: sameAnswer, usNorm: usNorm, maskExample: maskExample, norm: norm, setRng: function (f) { rng = f || Math.random; }, state: function () { return S; }, selectBook: selectBook, loadBook: loadBook, init: init };
 })();
