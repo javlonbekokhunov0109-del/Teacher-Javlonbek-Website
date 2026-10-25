@@ -12,7 +12,8 @@ exports.handler = async (event) => {
   const user = await getUserFromRequest(event);
   if (!user) return json(401, { error: "Please sign in." });
   let body; try { body = JSON.parse(event.body || "{}"); } catch { return json(400, { error: "Invalid request." }); }
-  const part = Number(body.part), mockId = String(body.mock_id || ""), dur = Number(body.duration_sec);
+  const part = Number(body.part), mockId = String(body.mock_id || ""), dur = Number(body.duration_sec), attemptId = String(body.attempt_id || "");
+  if (!/^[0-9a-f-]{36}$/i.test(attemptId)) return json(400, { error: "Speaking is only part of the full mock. Start a full mock to do it." });
   if (![1, 2, 3].includes(part) || !/^[0-9a-f-]{36}$/i.test(mockId)) return json(400, { error: "Invalid request." });
   if (!isFinite(dur) || dur < 3) return json(400, { error: "That recording is too short. Please record your answer again." });
   if (dur > 330) return json(400, { error: "That recording is too long (max 5 minutes per part)." });
@@ -24,10 +25,14 @@ exports.handler = async (event) => {
     const { data: mock } = await db.from("mocks").select("id, is_free, published, speaking").eq("id", mockId).maybeSingle();
     if (!mock || (!mock.published && !access.admin)) return json(404, { error: "Mock not found." });
     if (!canOpenMock(access, mock)) return json(403, { locked: true, error: "This mock is part of the paid pack." });
+    const { data: at } = await db.from("mock_attempts").select("id, user_id, mock_id, status, state").eq("id", attemptId).maybeSingle();
+    if (!at || at.user_id !== user.id || at.mock_id !== mock.id || at.status !== "in_progress") return json(404, { error: "Sitting not found." });
+    const ss = at.state && at.state.sections && at.state.sections.speaking;
+    if (!ss || ss.status !== "active") return json(409, { error: "The Speaking section is not open." });
     const used = await usedToday(db, user.id), limit = limitFor(settings, access);
     if (used >= limit) return json(429, { error: `You have used all ${limit} AI checks for today. Come back tomorrow.`, usage: { used, limit } });
 
-    const ins = await db.from("mock_results").insert({ user_id: user.id, mock_id: mock.id, section: "speaking", status: "pending", payload: { part, duration_sec: Math.round(dur) } }).select("id").single();
+    const ins = await db.from("mock_results").insert({ user_id: user.id, mock_id: mock.id, attempt_id: attemptId, section: "speaking", status: "pending", payload: { part, duration_sec: Math.round(dur) } }).select("id").single();
     if (ins.error) throw ins.error;
     const path = `${user.id}/${ins.data.id}.wav`;
     const signed = await db.storage.from(BUCKET).createSignedUploadUrl(path);

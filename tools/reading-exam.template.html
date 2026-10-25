@@ -141,14 +141,16 @@ __PARTS__
 <script>
 "use strict";
 const CFG=__CFG__;
+const SIT=window.MOCK_SITTING||null;   // set by the website when this exam is one section of a full mock
+const STORE=CFG.store+(SIT?':'+SIT.attempt:'');
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const P=CFG.parts,KEY={},NUMS=[];P.forEach(p=>{Object.assign(KEY,p.key);for(let n=p.first;n<=p.last;n++)NUMS.push(n)});
 const TOTAL=NUMS.length,FS=[15,17,19,21,23];
 const partOf=n=>P.find(p=>n>=p.first&&n<=p.last);
 let S={answers:{},flags:[],submitted:false,results:{},score:0,fs:17,theme:'light',split:50,endAt:0,part:P[0].part,cur:NUMS[0]};
 let timerIv=null;
-function load(){try{const r=localStorage.getItem(CFG.store);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
-function save(){try{localStorage.setItem(CFG.store,JSON.stringify(S));const el=$('#saved');el.textContent='Saved';clearTimeout(save.t);save.t=setTimeout(()=>el.textContent='',1400)}catch(e){}}
+function load(){try{const r=localStorage.getItem(STORE);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S));const el=$('#saved');el.textContent='Saved';clearTimeout(save.t);save.t=setTimeout(()=>el.textContent='',1400)}catch(e){}}
 /* ---------- answers ---------- */
 function norm(v){return String(v||'').toLowerCase().replace(/[’']/g,"'").replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
 function keyText(n){const k=KEY[n],f=x=>/^[A-I]$|^(TRUE|FALSE|NOT GIVEN|YES|NO)$/.test(x)?x:x.toLowerCase();return Array.isArray(k)?k.map(f).join(' / '):f(k)}
@@ -227,12 +229,22 @@ function showResults(auto){
   $('#resBody').innerHTML=NUMS.map(n=>{const u=S.answers[n]||'',ok=S.results[n];return `<tr><td>${n}</td><td>${u?e(u):'—'}</td><td>${e(keyText(n))}</td><td class="${ok?'y':'n'}">${ok?'✔':'✘'}</td></tr>`}).join('');
   $('#resOv').hidden=false;
 }
-function finalize(auto){if(S.submitted){showResults(false);return}grade();clearInterval(timerIv);$('#timer').textContent='Finished';$('#timer').classList.remove('warn');paintReview();refresh();showResults(auto)}
+function postSitting(){
+  document.body.style.visibility='hidden';
+  const review=NUMS.map(n=>({ids:[n],user:String(S.answers[n]||''),correct:keyText(n),score:S.results[n]?1:0,max:1}));
+  try{parent.postMessage({type:'section-submit',section:'reading',score:S.score,total:TOTAL,review:review},'*')}catch(e){}
+}
+function finalize(auto){
+  if(S.submitted){if(SIT)postSitting();else showResults(false);return}
+  grade();clearInterval(timerIv);$('#timer').textContent='Finished';$('#timer').classList.remove('warn');
+  if(SIT){postSitting();return}                                  // full mock: no answers, no score shown now
+  paintReview();refresh();showResults(auto)
+}
 function askSubmit(){
   if(S.submitted){showResults(false);return}
   const un=NUMS.filter(n=>!getAns(n)).length;
-  $('#confirmH').textContent='Submit your answers?';$('#okBtn').textContent='Submit';$('#cancelBtn').textContent='Keep working';
-  $('#confirmTxt').textContent=(un?`You have ${un} unanswered question${un>1?'s':''}. `:'You have answered every question. ')+`Time left: ${fmt(remaining())}. You cannot change your answers after submitting.`;
+  $('#confirmH').textContent=SIT?'Submit Reading and continue?':'Submit your answers?';$('#okBtn').textContent=SIT?'Submit and continue':'Submit';$('#cancelBtn').textContent='Keep working';
+  $('#confirmTxt').textContent=(un?`You have ${un} unanswered question${un>1?'s':''}. `:'You have answered every question. ')+`Time left: ${fmt(remaining())}. You cannot change your answers after submitting.`+(SIT?' Your score is shown at the end of the whole mock.':'');
   $('#confirmOv').hidden=false;$('#okBtn').onclick=()=>{$('#confirmOv').hidden=true;finalize(false)};
 }
 function askExit(){
@@ -296,11 +308,12 @@ window.addEventListener('resize',applySplit);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#confirmOv').hidden)$('#confirmOv').hidden=true}});
 /* ---------- boot: no start screen, the exam is already running ---------- */
 load();if(FS.indexOf(S.fs)<0)S.fs=17;
-if(!S.endAt){S.endAt=Date.now()+CFG.minutes*60000;save()}
+if(SIT&&SIT.deadline)S.endAt=SIT.deadline;else if(!S.endAt){S.endAt=Date.now()+CFG.minutes*60000}
+save()
 applyLook();applyAnswers();$$('.answer-input').forEach(checkWords);
 if(!P.some(p=>p.part===S.part))S.part=P[0].part;showPart(S.part);paintReview();refresh();
-if(S.submitted){$('#timer').textContent='Finished'}else startTimer();
-window.__exam={S:()=>S,finalize,goTo,tick,retake};
+if(S.submitted){$('#timer').textContent='Finished';if(SIT)postSitting()}else startTimer();
+window.__exam={S:()=>S,finalize,goTo,tick,retake,SIT:()=>SIT};
 </script>
 </body>
 </html>

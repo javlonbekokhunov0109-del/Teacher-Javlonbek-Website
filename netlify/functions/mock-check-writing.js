@@ -11,16 +11,24 @@ exports.handler = async (event) => {
   const user = await getUserFromRequest(event);
   if (!user) return json(401, { error: "Please sign in to check your writing." });
   let body; try { body = JSON.parse(event.body || "{}"); } catch { return json(400, { error: "Invalid request." }); }
-  const task = Number(body.task), mockId = String(body.mock_id || ""), text = String(body.text || "").trim();
+  const task = Number(body.task), mockId = String(body.mock_id || ""); let text = String(body.text || "").trim();
+  const attemptId = body.attempt_id ? String(body.attempt_id) : null;
+  if (attemptId && !/^[0-9a-f-]{36}$/i.test(attemptId)) return json(400, { error: "Invalid sitting." });
   if (task !== 1 && task !== 2) return json(400, { error: "Task must be 1 or 2." });
   if (!/^[0-9a-f-]{36}$/i.test(mockId)) return json(400, { error: "Missing mock." });
   if (text.length > 14000) return json(400, { error: "That is far too long for one task." });
-  const words = countWords(text);
-  if (words < 20) return json(400, { error: "Your answer is too short to assess (minimum 20 words)." });
-  if (words > 1200) return json(400, { error: "That answer is unusually long (over 1200 words). Please trim it." });
-
   const db = serviceClient();
   try {
+    if (attemptId) {   // marking a full-mock sitting: the text is the one SAVED in the sitting (not whatever the browser sends)
+      const { data: at } = await db.from("mock_attempts").select("id, user_id, mock_id, status, state").eq("id", attemptId).maybeSingle();
+      if (!at || at.user_id !== user.id || at.mock_id !== mockId || at.status !== "in_progress") return json(404, { error: "Sitting not found." });
+      const ws = at.state && at.state.sections && at.state.sections.writing;
+      if (!ws || ws.status !== "done") return json(409, { error: "Submit the Writing section first." });
+      text = String(((at.state.data || {}).writing || {})["t" + task] || "").trim();
+    }
+    const words = countWords(text);
+    if (words < 20) return json(400, { error: attemptId ? `Task ${task} is too short to mark (it has ${words} words). It will count as not marked.` : "Your answer is too short to assess (minimum 20 words)." });
+    if (words > 1200) return json(400, { error: "That answer is unusually long (over 1200 words). Please trim it." });
     const [access, settings] = await Promise.all([getAccess(db, user), getSettings(db)]);
     const { data: mock } = await db.from("mocks").select("id, number, title, is_free, published, writing").eq("id", mockId).maybeSingle();
     if (!mock || (!mock.published && !access.admin)) return json(404, { error: "Mock not found." });
@@ -50,7 +58,7 @@ exports.handler = async (event) => {
     clean.word_count = words; clean.min_words = minWords; clean.under_length = words < minWords;
 
     const ins = await db.from("mock_results").insert({
-      user_id: user.id, mock_id: mock.id, section: task === 1 ? "writing_t1" : "writing_t2", status: "done",
+      user_id: user.id, mock_id: mock.id, attempt_id: attemptId, section: task === 1 ? "writing_t1" : "writing_t2", status: "done",
       band: clean.overall_band, payload: { text, word_count: words, min_words: minWords, evaluation: clean },
     }).select("id, created_at").single();
     await db.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", user.id);

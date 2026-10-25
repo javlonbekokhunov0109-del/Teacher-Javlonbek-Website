@@ -2,7 +2,7 @@
 //   GET  -> all mocks (incl. drafts), content files to attach, AI-marking settings (+ built-in prompts), recent results
 //   POST -> { action: save-mock | set-mock-flags | delete-mock | save-settings | reset-prompt }
 const { json, missingEnv, serviceClient, getUserFromRequest, isAdminEmail } = require("./_shared");
-const { getSettings, DEFAULTS, WRITING_PROMPT, SPEAKING_PROMPT } = require("./_marking");
+const { getSettings, DEFAULTS, WRITING_PROMPT, SPEAKING_PROMPT, callGemini, modelOf, speakingPromptOf, AIError, aiMessage } = require("./_marking");
 const { validateWriting, validateSpeaking } = require("./_mockdata");
 
 async function requireAdmin(event) {
@@ -22,11 +22,12 @@ exports.handler = async (event) => {
   if (event.httpMethod === "GET") {
     const mk = await db.from("mocks").select("*").order("number");
     if (mk.error) return json(200, { setup_needed: true, mocks: [], items: [], settings: { ...DEFAULTS }, defaults: { writing_prompt: WRITING_PROMPT, speaking_prompt: SPEAKING_PROMPT }, recent: [] });
-    const [items, settings, results, profs] = await Promise.all([
+    const [items, settings, results, profs, atts] = await Promise.all([
       db.from("content_items").select("id, title, kind, course, lesson, ready").order("created_at", { ascending: false }).limit(300),
       getSettings(db),
       db.from("mock_results").select("id, user_id, mock_id, section, status, band, created_at").order("created_at", { ascending: false }).limit(40),
       db.from("profiles").select("id, full_name, email"),
+      db.from("mock_attempts").select("id, user_id, mock_id, status, started_at, finished_at, final").order("started_at", { ascending: false }).limit(30),
     ]);
     const pmap = Object.fromEntries((profs.data || []).map((p) => [p.id, p])); const mmap = Object.fromEntries((mk.data || []).map((m) => [m.id, m]));
     const raw = await db.from("mock_settings").select("*").eq("id", 1).maybeSingle();
@@ -35,6 +36,7 @@ exports.handler = async (event) => {
       settings: { ...settings, writing_prompt: (raw.data && raw.data.writing_prompt) || "", speaking_prompt: (raw.data && raw.data.speaking_prompt) || "" },
       defaults: { writing_prompt: WRITING_PROMPT, speaking_prompt: SPEAKING_PROMPT },
       settings_row_exists: !!raw.data,
+      attempts: (atts.data || []).map((a) => ({ id: a.id, who: (pmap[a.user_id] || {}).full_name || (pmap[a.user_id] || {}).email || "?", mock: (mmap[a.mock_id] || {}).number || "?", status: a.status, started_at: a.started_at, finished_at: a.finished_at, overall: a.final ? a.final.overall : null, bands: a.final ? Object.fromEntries(Object.entries(a.final.sections || {}).map(([k, v]) => [k, v.band])) : null })),
       recent: (results.data || []).map((r) => ({ id: r.id, section: r.section, status: r.status, band: r.band, created_at: r.created_at, who: (pmap[r.user_id] || {}).full_name || (pmap[r.user_id] || {}).email || "?", mock: (mmap[r.mock_id] || {}).number || "?" })),
     });
   }
@@ -99,6 +101,21 @@ exports.handler = async (event) => {
         const r = await db.from("mock_settings").upsert({ id: 1, calibration_offset: io, ml_offset: mo, updated_at: new Date().toISOString() }, { onConflict: "id" });
         if (r.error) return json(500, { error: "Could not save. Run the new SQL in Supabase first." });
         return json(200, { ok: true });
+      }
+      case "test-speaking": {
+        // Sends 2 seconds of generated sound (not speech) to Gemini with the real Speaking prompt. If Gemini answers with valid JSON, the whole audio pipeline works.
+        if (!process.env.GEMINI_API_KEY) return json(200, { ok: false, step: "key", message: "GEMINI_API_KEY is missing in Netlify." });
+        const settings = await getSettings(db), rate = 16000, n = rate * 2, buf = Buffer.alloc(44 + n * 2);
+        buf.write("RIFF", 0); buf.writeUInt32LE(36 + n * 2, 4); buf.write("WAVEfmt ", 8); buf.writeUInt32LE(16, 16); buf.writeUInt16LE(1, 20); buf.writeUInt16LE(1, 22); buf.writeUInt32LE(rate, 24); buf.writeUInt32LE(rate * 2, 28); buf.writeUInt16LE(2, 32); buf.writeUInt16LE(16, 34); buf.write("data", 36); buf.writeUInt32LE(n * 2, 40);
+        for (let i = 0; i < n; i++) buf.writeInt16LE(Math.round(Math.sin((2 * Math.PI * 440 * i) / rate) * 9000), 44 + i * 2);
+        const t0 = Date.now(), model = modelOf(settings);
+        try {
+          const raw = await callGemini({ system: speakingPromptOf(settings), model, timeoutMs: 20000, retries: 0, parts: [{ text: "This is a connection test. The recording contains only a tone, no speech. Reply with the JSON as specified (assessable false is correct)." }, { inline_data: { mime_type: "audio/wav", data: buf.toString("base64") } }] });
+          return json(200, { ok: true, ms: Date.now() - t0, model, assessable: raw && raw.assessable !== false, message: "Gemini accepted the audio and answered in the right format. The Speaking check is ready to switch on." });
+        } catch (e) {
+          const code = e instanceof AIError ? e.code : "gemini_network";
+          return json(200, { ok: false, step: "gemini", code, http: e && e.status || null, ms: Date.now() - t0, model, message: aiMessage(code) + (e && e.status ? " (Gemini replied with HTTP " + e.status + (e.status === 400 ? ": it did not accept this model or audio" : e.status === 403 || e.status === 401 ? ": the key is not allowed" : e.status === 404 ? ": the model name was not found" : e.status === 429 ? ": too many requests or the free limit is used up" : "") + ".)" : "") });
+        }
       }
       case "reset-prompt": {
         const col = body.which === "speaking" ? "speaking_prompt" : body.which === "writing" ? "writing_prompt" : null; if (!col) return json(400, { error: "Unknown prompt." });
