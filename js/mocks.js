@@ -1,12 +1,12 @@
-/* Mock Tests (students): list + paywall, Listening/Reading files, Writing with generated charts + AI marking, Speaking recorder
-   + AI marking (when the teacher switches it on), and a results history. All data and rules come from the server functions. */
+/* Mock Tests (students): two areas. FULL MOCK = one sitting through every section (js/mock-sitting.js); PRACTICE = Listening, Reading and
+   Writing on their own, with AI checks for Writing. Speaking exists only inside the full mock. All data and rules come from the server functions. */
 (function () {
   'use strict';
   var FN = '/.netlify/functions/', TELEGRAM = 'https://t.me/Javlonbek_Okhunov';
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var COLORS = ['#B8901E', '#2f7d55', '#c0504d', '#4a6fa5', '#8064a2', '#e08a2c'];
-  var M = { list: null, mock: null, tab: 'overview', results: [], settings: {}, usage: {}, rec: {}, busy: {}, timers: {}, part: 1 };
+  var M = { list: null, mock: null, tab: 'overview', results: [], settings: {}, usage: {}, rec: {}, busy: {}, timers: {}, part: 1, mode: (function () { try { return localStorage.getItem('tj_mk_mode') === 'practice' ? 'practice' : 'full'; } catch (e) { return 'full'; } })() };
 
   /* ---------- API ---------- */
   async function tok() { return (window.TJ && window.TJ.token) ? window.TJ.token() : null; }
@@ -115,15 +115,21 @@
     var a = d.access || {}, banner = a.mocks ? '<div class="mk-banner pass">\u2705 <b>Full mock pack active</b>' + (a.until ? ' until <b>' + esc(fmtDate(a.until)) + '</b>' : '') + '. You can use every mock below.</div>'
       : a.expired ? '<div class="mk-banner"><b>Your mock pack has ended.</b> Message <a href="' + TELEGRAM + '" target="_blank" rel="noopener">Teacher Javlonbek</a> to renew it.</div>'
       : '<div class="mk-banner"><b>Mock 1 is free for everyone.</b> The rest are part of the paid pack \u2014 message <a href="' + TELEGRAM + '" target="_blank" rel="noopener">Teacher Javlonbek on Telegram</a> to unlock them.</div>';
+    var sw = '<div class="mk-mode" role="tablist" aria-label="Full mock or practice"><button role="tab" aria-selected="' + (M.mode === 'full') + '" class="' + (M.mode === 'full' ? 'on' : '') + '" data-mode="full"><b>Full mock</b><span>One sitting, all sections, results at the end</span></button><button role="tab" aria-selected="' + (M.mode === 'practice') + '" class="' + (M.mode === 'practice' ? 'on' : '') + '" data-mode="practice"><b>Practice</b><span>Listening, Reading and Writing on their own</span></button></div>';
+    var note = '<div class="mk-note" style="margin-top:14px">AI checks left today: <b>' + Math.max(0, (M.usage.limit || 0) - (M.usage.used || 0)) + '</b>' + (M.usage.limit >= 9999 ? '' : ' of ' + M.usage.limit) + '.</div>';
+    if (M.mode === 'full' && window.TJSitting) {
+      var atts = await window.TJSitting.hubData();
+      return setHtml(banner + sw + window.TJSitting.hubHtml(d, atts) + note);
+    }
     var cards = (d.mocks || []).map(function (m) {
-      var tags = ['Listening', 'Reading', 'Writing', 'Speaking'].filter(function (t) { return t === 'Writing' || t === 'Speaking' || (t === 'Listening' && m.has_listening) || (t === 'Reading' && m.has_reading); });
+      var tags = ['Listening', 'Reading', 'Writing'].filter(function (t) { return t === 'Writing' || (t === 'Listening' && m.has_listening) || (t === 'Reading' && m.has_reading); });
       var my = (d.my || {})[m.id];
       return '<button class="mk-card' + (m.locked ? ' locked' : '') + '" data-open="' + esc(m.id) + '"><div style="display:flex;justify-content:space-between;align-items:center"><span class="mk-num">' + esc(m.number) + '</span>' +
         (!m.published ? '<span class="mk-badge draft">Draft</span>' : m.is_free ? '<span class="mk-badge free">Free</span>' : m.locked ? '<span class="mk-badge lock">\uD83D\uDD12 Locked</span>' : '<span class="mk-badge paid">Unlocked</span>') + '</div>' +
         '<h3>' + esc(m.title) + '</h3><p>' + esc(m.description) + '</p><div class="mk-tags" style="margin:0">' + tags.map(function (t) { return '<span class="mk-tag">' + t + '</span>'; }).join('') + '</div>' +
         (my ? '<div class="mk-note" style="margin:0">' + my.count + ' AI check' + (my.count === 1 ? '' : 's') + ' done</div>' : '') + '</button>';
     }).join('');
-    setHtml(banner + (cards ? '<div class="mk-grid">' + cards + '</div>' : '<div class="wc-empty">No mock tests yet.</div>') + '<div class="mk-note" style="margin-top:14px">AI checks left today: <b>' + Math.max(0, (M.usage.limit || 0) - (M.usage.used || 0)) + '</b> of ' + (M.usage.limit >= 9999 ? 'unlimited' : M.usage.limit) + '.</div>');
+    setHtml(banner + sw + (cards ? '<div class="mk-grid">' + cards + '</div>' : '<div class="wc-empty">No mock tests yet.</div>') + note);
   }
 
   /* ---------- one mock ---------- */
@@ -141,10 +147,10 @@
   }
   function lockedHtml(m) {
     setHtml('<div class="mk-tabs"><button class="mk-tab" data-mkback>\u2190 All mocks</button></div><div class="mk-lockbox"><div class="ic">\uD83D\uDD12</div><h2 style="margin:8px 0">Mock ' + esc(m.number || '') + ' \u2014 ' + esc(m.title || '') + '</h2>' +
-      '<p>This mock is part of the <b>paid mock pack</b>: full Listening, Reading, Writing and Speaking, with AI marking.</p><p><a class="wc-btn" style="display:inline-block;width:auto;padding:12px 22px" href="' + TELEGRAM + '" target="_blank" rel="noopener">Message the teacher on Telegram</a></p>' +
+      '<p>This mock is part of the <b>paid mock pack</b>: a full sitting of Listening, Reading, Writing and Speaking, with AI marking.</p><p><a class="wc-btn" style="display:inline-block;width:auto;padding:12px 22px" href="' + TELEGRAM + '" target="_blank" rel="noopener">Message the teacher on Telegram</a></p>' +
       '<p class="mk-note">Already paid? Ask the teacher to add you to the pack, then reload this page.</p></div>');
   }
-  var TABS = [['overview', 'Overview'], ['listening', 'Listening'], ['reading', 'Reading'], ['writing', 'Writing'], ['speaking', 'Speaking'], ['results', 'My results']];
+  var TABS = [['overview', 'Overview'], ['listening', 'Listening'], ['reading', 'Reading'], ['writing', 'Writing'], ['results', 'My results']];
   function drawMock() {
     var m = M.mock;
     setHtml('<div class="mk-tabs"><button class="mk-tab" data-mkback>\u2190 All mocks</button></div><h2 style="margin:0 0 4px">Mock ' + esc(m.number) + ' \u2014 ' + esc(m.title) + '</h2>' +
@@ -158,15 +164,14 @@
     if (M.tab === 'overview') b.innerHTML = overviewHtml();
     else if (M.tab === 'listening' || M.tab === 'reading') b.innerHTML = fileHtml(M.tab);
     else if (M.tab === 'writing') { b.innerHTML = writingHtml(); wireWriting(); }
-    else if (M.tab === 'speaking') { b.innerHTML = speakingHtml(); }
     else resultsHtml();
   }
   function overviewHtml() {
     var m = M.mock, sims = simsOf(), st = function (ok, t) { return '<li>' + (ok ? '\u2705 ' : '\u23F3 ') + t + '</li>'; };
     return '<div class="mk-sec"><h3>What is in this mock</h3><p class="sub">' + esc(m.description) + '</p><ul class="mk-q-list" style="list-style:none;padding:0">' +
       st(!!(m.listening || sims.listening), 'Listening' + (sims.listening ? ' \u2014 full test, ' + sims.listening.questions + ' questions, about ' + sims.listening.minutes + ' minutes' : m.listening ? '' : ' \u2014 coming soon')) + st(!!(m.reading || sims.reading), 'Reading' + (sims.reading ? ' \u2014 3 passages, ' + sims.reading.questions + ' questions, ' + sims.reading.minutes + ' minutes' : m.reading ? '' : ' \u2014 coming soon')) +
-      st(true, 'Writing Task 1 + Task 2 \u2014 AI marked') + st(true, 'Speaking Parts 1\u20133' + (M.settings.speaking_enabled ? ' \u2014 AI marked' : ' \u2014 record yourself (AI marking opens soon)')) + '</ul></div>' +
-      '<div class="mk-sec"><h3>How to use it</h3><ol class="mk-q-list"><li>Do Listening and Reading under exam conditions.</li><li>Write Task 1 (20 min) and Task 2 (40 min). Use the timer, then press <b>Check my writing</b>.</li><li>Record your Speaking answers and review the feedback.</li><li>Find every result later under <b>My results</b>.</li></ol>' + usageNote() + '</div>';
+      st(true, 'Writing Task 1 + Task 2 \u2014 AI marked') + st(true, 'Speaking \u2014 only in the <b>Full mock</b>') + '</ul></div>' +
+      '<div class="mk-sec"><h3>How to use it</h3><ol class="mk-q-list"><li>Do Listening and Reading under exam conditions.</li><li>Write Task 1 (20 min) and Task 2 (40 min). Use the timer, then press <b>Check my writing</b>.</li><li>This is the practice area. For the real thing, with every section in one sitting and your results at the end, use the <b>Full mock</b> tab on the Mock Tests page.</li><li>Find every practice result later under <b>My results</b>.</li></ol>' + usageNote() + '</div>';
   }
   function simsOf() { var x = (M.mock && M.mock.sims) || {}; return { listening: x.listening || null, reading: x.reading || null }; }
   function fileHtml(kind) {
@@ -245,41 +250,6 @@
     finally { M.busy['w' + n] = false; btn.disabled = false; btn.textContent = old; }
   }
 
-  /* ---------- speaking ---------- */
-  function speakingHtml() {
-    var sp = M.mock.speaking || {}, p = M.part, h = '<div class="mk-tabs">' + [1, 2, 3].map(function (n) { return '<button class="mk-tab' + (p === n ? ' on' : '') + '" data-part="' + n + '">Part ' + n + '</button>'; }).join('') + '</div><div class="mk-sec">';
-    if (p === 1) { h += '<h3>Part 1 \u2014 Introduction and interview</h3><p class="sub">Answer each question in 2\u20133 sentences, as in the real test (4\u20135 minutes in total).</p>' + (sp.part1 || []).map(function (t) { return '<h4 style="margin:14px 0 4px">' + esc(t.topic) + '</h4><ol class="mk-q-list">' + t.questions.map(function (q) { return '<li>' + esc(q) + '</li>'; }).join('') + '</ol>'; }).join(''); }
-    else if (p === 2) { var c = sp.part2 || {}; h += '<h3>Part 2 \u2014 Long turn</h3><p class="sub">You have 1 minute to prepare, then speak for 1\u20132 minutes.</p><div class="mk-cue"><b>' + esc(c.title) + '</b><div style="margin-top:8px">You should say:</div><ul>' + (c.bullets || []).map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' + (c.roundoff ? '<div>' + esc(c.roundoff) + '</div>' : '') + '</div><div class="mk-meta"><span><button class="sy-chip" data-timer="prep">\u23F1 1-minute preparation</button> <span class="mk-timer" id="mkTmprep"></span></span></div>'; }
-    else h += '<h3>Part 3 \u2014 Discussion</h3><p class="sub">Give reasoned, developed answers (4\u20135 minutes in total).</p><ol class="mk-q-list">' + (sp.part3 || []).map(function (q) { return '<li>' + esc(q) + '</li>'; }).join('') + '</ol>';
-    h += '<h4 style="margin:18px 0 6px">Record your answer</h4>' + recorderHtml(p) + '</div>' + usageNote();
-    return h;
-  }
-  function recorderControls(p) {
-    var r = M.rec[p] || {}, can = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
-    if (!can) return '<div class="mk-banner">Recording is not supported in this browser. Please open this page in Chrome or Safari.</div>';
-    var h = '<div class="mk-rec" id="mkRec">';
-    if (r.state === 'recording') h += '<span class="dot"></span><b id="mkRecT">0:00</b><button class="wc-btn" data-rec="stop" style="width:auto;padding:10px 18px">Stop</button>';
-    else if (r.url) h += '<audio controls src="' + esc(r.url) + '"></audio><button class="wc-btn ghost" data-rec="start" style="width:auto;padding:10px 18px">Record again</button>' + (M.settings.speaking_enabled ? '<button class="wc-btn" data-rec="submit" style="width:auto;padding:10px 18px">Get AI feedback</button>' : '');
-    else h += '<button class="wc-btn" data-rec="start" style="width:auto;padding:10px 18px">\u25CF Start recording</button>';
-    return h + '</div>';
-  }
-  function redrawRec() { var w = $('mkRecWrap'); if (w) w.innerHTML = recorderControls(M.part); }
-  function recorderHtml(p) {
-    return '<div id="mkRecWrap">' + recorderControls(p) + '</div>' + (M.settings.speaking_enabled ? '' : '<div class="mk-note">AI marking for Speaking is opening soon. For now you can record yourself, listen back, and compare with the questions.</div>') + '<div id="mkSpkOut"></div>';
-  }
-  async function recStart() {
-    var p = M.part, old = M.rec[p]; if (old && old.url) { try { URL.revokeObjectURL(old.url); } catch (e) {} }
-    var out = $('mkSpkOut'); if (out) out.innerHTML = '';
-    var stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { if (out) out.innerHTML = '<div class="wc-err">We could not use your microphone. Please allow microphone access in your browser and try again.</div>'; return; }
-    var mr = new MediaRecorder(stream), chunks = [], r = { state: 'recording', mr: mr, stream: stream, started: Date.now() };
-    M.rec[p] = r; var max = p === 2 ? 180 : 300;
-    mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
-    mr.onstop = function () { clearInterval(r.iv); stream.getTracks().forEach(function (t) { t.stop(); }); var blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' }); r.blob = blob; r.url = URL.createObjectURL(blob); r.duration = (Date.now() - r.started) / 1000; r.state = 'stopped'; if (M.part === p) redrawRec(); };
-    r.iv = setInterval(function () { var s = Math.floor((Date.now() - r.started) / 1000); if ($('mkRecT')) $('mkRecT').textContent = Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); if (s >= max && mr.state === 'recording') mr.stop(); }, 500);
-    mr.start(); redrawRec();
-  }
-  function recStop() { var r = M.rec[M.part]; if (r && r.mr && r.mr.state === 'recording') r.mr.stop(); }
-
   function encodeWav(pcm, rate) {
     var n = pcm.length, dv = new DataView(new ArrayBuffer(44 + n * 2)), w = function (o, s) { for (var i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
     w(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true); dv.setUint32(28, rate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data'); dv.setUint32(40, n * 2, true);
@@ -296,33 +266,6 @@
     var rendered = await off.startRendering();
     return encodeWav(rendered.getChannelData(0), rate);
   }
-  async function submitSpeaking() {
-    var p = M.part, r = M.rec[p], out = $('mkSpkOut'); if (!r || !r.blob || M.busy.spk) return;
-    M.busy.spk = true; out.innerHTML = '<div class="wc-loading"><span class="d"></span> Preparing your recording\u2026</div>';
-    try {
-      var wav = await toWav16k(r.blob);
-      var slot = await api('mock-speaking-upload', { body: { mock_id: M.mock.id, part: p, duration_sec: r.duration } });
-      out.innerHTML = '<div class="wc-loading"><span class="d"></span> Uploading\u2026</div>';
-      var sb = window.TJ.getSb(), up = await sb.storage.from(slot.bucket).uploadToSignedUrl(slot.path, slot.token, wav, { contentType: 'audio/wav', upsert: true });
-      if (up.error) throw new Error('Upload failed. Please try again.');
-      var t = await tok(); await fetch(FN + 'mock-check-speaking-background', { method: 'POST', headers: { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' }, body: JSON.stringify({ id: slot.id }) });
-      out.innerHTML = '<div class="wc-loading"><span class="d"></span> The AI examiner is listening (this can take up to a minute)\u2026</div>';
-      var res = await pollResult(slot.id);
-      if (res.status === 'done') { M.results.unshift({ id: res.id, section: 'speaking', status: 'done', band: res.band, created_at: res.created_at }); M.usage.used = (M.usage.used || 0) + 1; out.innerHTML = resultHtml(res.payload.evaluation, 'speaking'); }
-      else out.innerHTML = '<div class="wc-err">' + esc(res.error || 'We could not mark this recording. Please try again.') + '</div>';
-    } catch (e) { out.innerHTML = '<div class="wc-err">' + esc(e.message || 'Something went wrong.') + '</div>'; }
-    finally { M.busy.spk = false; }
-  }
-  async function pollResult(id) {
-    var started = Date.now(), wait = M.pollMs || 3000;
-    while (Date.now() - started < 6 * 60000) {
-      await new Promise(function (r) { setTimeout(r, wait); });
-      var d = await api('mock-result', { qs: { id: id } });
-      if (d.result.status !== 'pending') return d.result;
-    }
-    return { status: 'error', error: 'This is taking longer than usual. Open "My results" in a minute to see it.' };
-  }
-
   /* ---------- results ---------- */
   function resultsHtml() {
     var b = $('mkBody'), names = { writing_t1: 'Writing Task 1', writing_t2: 'Writing Task 2', speaking: 'Speaking' };
@@ -339,6 +282,7 @@
   /* ---------- events ---------- */
   function onClick(e) {
     var t = e.target.closest('button'); if (!t || !root() || !root().contains(t)) return;
+    if (t.hasAttribute('data-mode')) { M.mode = t.getAttribute('data-mode') === 'practice' ? 'practice' : 'full'; try { localStorage.setItem('tj_mk_mode', M.mode); } catch (e) {} return showList(); }
     if (t.hasAttribute('data-open')) return openMock(t.getAttribute('data-open'));
     if (t.hasAttribute('data-mkback')) return showList();
     if (t.hasAttribute('data-tab')) { stopRecorders(); M.tab = t.getAttribute('data-tab'); return drawTab(); }
@@ -347,15 +291,13 @@
     if (t.hasAttribute('data-file')) return openFile(t.getAttribute('data-file'), t.getAttribute('data-kind'), t);
     if (t.hasAttribute('data-timer')) { var k = t.getAttribute('data-timer'); if (k === 'prep') { var key = 'prep'; if (M.timers[key]) clearInterval(M.timers[key].iv); var end = Date.now() + 60000; var tick = function () { var l = Math.max(0, Math.round((end - Date.now()) / 1000)); if ($('mkTmprep')) $('mkTmprep').textContent = '0:' + (l < 10 ? '0' : '') + l + (l === 0 ? ' \u2014 start speaking!' : ''); if (l === 0) clearInterval(M.timers[key].iv); }; M.timers[key] = { iv: setInterval(tick, 1000) }; tick(); return; } return startTimer(Number(k), Number(t.getAttribute('data-min'))); }
     if (t.hasAttribute('data-check')) return checkWriting(Number(t.getAttribute('data-check')), t);
-    if (t.hasAttribute('data-part')) { stopRecorders(); M.part = Number(t.getAttribute('data-part')); return drawTab(); }
-    if (t.hasAttribute('data-rec')) { var a = t.getAttribute('data-rec'); return a === 'start' ? recStart() : a === 'stop' ? recStop() : submitSpeaking(); }
     if (t.hasAttribute('data-result')) return showResult(t.getAttribute('data-result'));
   }
   function onInput(e) { if (/^mkTa[12]$/.test(e.target.id)) updateWc(Number(e.target.id.slice(-1))); }
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-examclose]')) closeExam(); });
   function init() { var r = root(); if (!r || r.getAttribute('data-ready')) return; r.setAttribute('data-ready', '1'); r.addEventListener('click', onClick); r.addEventListener('input', onInput); }
-  function onView() { var v = document.body.getAttribute('data-view'); if (v !== 'mocks') closeExam(); if (v === 'mocks') { init(); if (window.TJ && window.TJ.getUser && window.TJ.getUser()) showList(); } else { clearTimers(); stopRecorders(); } }
+  function onView() { var v = document.body.getAttribute('data-view'); if (v !== 'mocks') { closeExam(); if (window.TJSitting) window.TJSitting.close(); } if (v === 'mocks') { init(); if (window.TJ && window.TJ.getUser && window.TJ.getUser()) showList(); } else { clearTimers(); stopRecorders(); } }
   init();
   new MutationObserver(onView).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
-  window.TJMocks = { chartHtml: chartHtml, resultHtml: resultHtml, encodeWav: encodeWav, toWav16k: toWav16k, showList: showList, openMock: openMock, _M: M, setPollMs: function (n) { M.pollMs = n; } };
+  window.TJMocks = { api: api, apiText: apiText, esc: esc, band: band, fmtDate: fmtDate, TELEGRAM: TELEGRAM, chartHtml: chartHtml, resultHtml: resultHtml, encodeWav: encodeWav, toWav16k: toWav16k, showList: showList, openMock: openMock, _M: M, setPollMs: function (n) { M.pollMs = n; } };
 })();

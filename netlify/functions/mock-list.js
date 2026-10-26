@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     }));
     const my = {};
     if (mocks.length) {
-      const r = await db.from("mock_results").select("mock_id, section, band, created_at").eq("user_id", user.id).eq("status", "done").order("created_at", { ascending: false }).limit(500);
+      const r = await db.from("mock_results").select("mock_id, section, band, created_at").eq("user_id", user.id).eq("status", "done").is("attempt_id", null).order("created_at", { ascending: false }).limit(500);
       (r.data || []).forEach((x) => { const b = (my[x.mock_id] = my[x.mock_id] || { count: 0, last: null }); b.count++; if (!b.last) b.last = x.created_at; });
     }
     const used = await usedToday(db, user.id);

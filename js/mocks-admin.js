@@ -42,7 +42,8 @@
     return '<div class="mka-card" id="mkaSettings"><h3 style="margin:0 0 4px;font-family:\'Cormorant Garamond\',serif;font-size:24px">AI marking settings</h3><div class="mk-note" style="margin:0 0 10px">These control the Writing checker everywhere (IELTS checker + mocks) and the Speaking check. Changes apply immediately, no deploy.</div>' +
       '<div class="mk-note" style="margin:0 0 10px">The score dials (IELTS and Multilevel) are in <b>Writing checks</b>, together with editing one student\u2019s score.</div>' +
       '<div class="mka-row"><label class="cl-flag"><input type="checkbox" data-s="show_range"' + (s.show_range ? ' checked' : '') + '> Show a likely range (for example 6.0\u20137.0) next to the band</label></div>' +
-      '<div class="mka-row"><label class="cl-flag"><input type="checkbox" data-s="speaking_enabled"' + (s.speaking_enabled ? ' checked' : '') + '> <b>Speaking AI check is ON</b> (students can send recordings)</label></div>' +
+      '<div class="mka-row"><label class="cl-flag"><input type="checkbox" data-s="speaking_enabled"' + (s.speaking_enabled ? ' checked' : '') + '> <b>Speaking AI check is ON</b> (the Speaking part of a full mock)</label></div>' +
+      '<div class="mka-row"><button class="wc-btn ghost" data-testspeaking style="width:auto;padding:8px 16px">\uD83D\uDD0A Test Speaking AI</button><span class="mk-note" style="margin:0">Sends a short test sound to Gemini and tells you at once whether audio works. Run it before switching Speaking on.</span></div><div id="mkaSpkTest"></div>' +
       '<div class="mka-row"><label>AI checks per day \u2014 free users</label><input type="number" min="0" max="200" data-s="daily_limit_free" value="' + esc(s.daily_limit_free) + '" style="width:80px"><label>members</label><input type="number" min="0" max="500" data-s="daily_limit_member" value="' + esc(s.daily_limit_member) + '" style="width:80px"></div>' +
       '<div class="mka-row"><label>Gemini model (leave empty for the default)</label><input type="text" data-s="gemini_model" value="' + esc(s.gemini_model || '') + '" placeholder="gemini-2.5-flash" style="width:220px"></div>' +
       '<details style="margin:10px 0"><summary style="cursor:pointer;font-weight:600">Examiner prompts (advanced)</summary><div class="mk-note">Empty = the built-in prompt, which is calibrated on the official Cambridge sample answers. If you write your own it must still tell the AI to reply as JSON (keep the OUTPUT part).</div>' +
@@ -55,12 +56,17 @@
     return '<div class="mka-card"><h3 style="margin:0 0 8px;font-size:17px">Recent student checks</h3>' + (r.length ? '<div style="overflow-x:auto"><table class="mk-table" style="min-width:420px"><thead><tr><th>Student</th><th>Mock</th><th>Section</th><th>Band</th><th>When</th></tr></thead><tbody>' +
       r.map(function (x) { return '<tr><td>' + esc(x.who) + '</td><td>' + esc(x.mock) + '</td><td>' + esc(names[x.section] || x.section) + (x.status !== 'done' ? ' (' + esc(x.status) + ')' : '') + '</td><td>' + (x.band == null ? '\u2014' : esc(Number(x.band).toFixed(1))) + '</td><td>' + esc(new Date(x.created_at).toLocaleString()) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<div class="wc-empty">No checks yet.</div>') + '</div>';
   }
+  function attemptsCard() {
+    var r = D.attempts || [], f = function (b) { return b == null ? '\u2014' : Number(b).toFixed(1); };
+    return '<div class="mka-card" id="mkaAttempts"><h3 style="margin:0 0 8px;font-size:17px">Full mock sittings</h3>' + (r.length ? '<div style="overflow-x:auto"><table class="mk-table" style="min-width:560px"><thead><tr><th>Student</th><th>Mock</th><th>Status</th><th>Overall</th><th>L</th><th>R</th><th>W</th><th>S</th><th>Started</th></tr></thead><tbody>' +
+      r.map(function (x) { var b = x.bands || {}; return '<tr><td>' + esc(x.who) + '</td><td>' + esc(x.mock) + '</td><td>' + (x.status === 'done' ? 'finished' : x.status === 'in_progress' ? 'in progress' : esc(x.status)) + '</td><td><b>' + f(x.overall) + '</b></td><td>' + f(b.listening) + '</td><td>' + f(b.reading) + '</td><td>' + f(b.writing) + '</td><td>' + f(b.speaking) + '</td><td>' + esc(new Date(x.started_at).toLocaleString()) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<div class="wc-empty">No full-mock sittings yet.</div>') + '</div>';
+  }
   function render() {
     var root = $('mkRoot2'); if (!root) return;
     if (D.setup_needed) { root.innerHTML = '<div class="mka-prob"><b>One step left:</b> run <code>db/migration_mocks.sql</code> in Supabase \u2192 SQL Editor, then reload this tab.</div>'; return; }
     var max = (D.mocks || []).reduce(function (a, m) { return Math.max(a, m.number); }, 0);
     root.innerHTML = '<div class="mka-grid">' + settingsCard() + '<h3 style="margin:10px 0 0;font-family:\'Cormorant Garamond\',serif;font-size:24px">Mocks</h3>' + (D.mocks || []).map(function (m) { return mockCard(m, false); }).join('') +
-      '<div><button class="wc-btn ghost" data-newmock="' + (max + 1) + '" style="width:auto;padding:10px 20px">+ New mock</button></div><div id="mkaNew"></div>' + recentCard() + '</div>';
+      '<div><button class="wc-btn ghost" data-newmock="' + (max + 1) + '" style="width:auto;padding:10px 20px">+ New mock</button></div><div id="mkaNew"></div>' + attemptsCard() + recentCard() + '</div>';
   }
   async function load() {
     var root = $('mkRoot2'); if (!root) return;
@@ -89,6 +95,12 @@
     if (t.hasAttribute('data-del') && card) { if (!window.confirm('Delete this mock and all student results for it? This cannot be undone.')) return; try { await call({ action: 'delete-mock', id: card.getAttribute('data-mid') }); await load(); } catch (er) { if (out) msg_el(out, false, er.message); } return; }
     if (t.hasAttribute('data-showdefault')) { var k = t.getAttribute('data-showdefault'), ta = document.querySelector('[data-s="' + k + '"]'); if (ta && (!ta.value || window.confirm('Replace the text in the box with the built-in prompt?'))) ta.value = D.defaults[k]; return; }
     if (t.hasAttribute('data-reset')) { try { await call({ action: 'reset-prompt', which: t.getAttribute('data-reset') }); await load(); msg('mkaSetOut', true, 'Reset. The built-in prompt is now used.'); } catch (er) { msg('mkaSetOut', false, er.message); } return; }
+    if (t.hasAttribute('data-testspeaking')) {
+      var box = $('mkaSpkTest'); t.disabled = true; box.innerHTML = '<div class="mk-note">Asking Gemini\u2026 (up to 20 seconds)</div>';
+      try { var r2 = await call({ action: 'test-speaking' }); box.innerHTML = '<div class="' + (r2.ok ? 'mka-ok' : 'mka-prob') + '"><b>' + (r2.ok ? '\u2705 It works.' : '\u274C It does not work yet.') + '</b> ' + esc(r2.message || '') + (r2.ms != null ? ' <span class="mk-note">(' + esc(r2.ms) + ' ms' + (r2.model ? ', model ' + esc(r2.model) : '') + ')</span>' : '') + '</div>'; }
+      catch (er) { box.innerHTML = '<div class="mka-prob">' + esc(er.message) + '</div>'; }
+      t.disabled = false; return;
+    }
     if (t.hasAttribute('data-savesettings')) {
       var body = { action: 'save-settings' };
       Array.prototype.forEach.call(document.querySelectorAll('#mkaSettings [data-s]'), function (el) { var k2 = el.getAttribute('data-s'); body[k2] = el.type === 'checkbox' ? el.checked : (el.type === 'number' || k2 === 'calibration_offset') ? Number(el.value) : el.value; });

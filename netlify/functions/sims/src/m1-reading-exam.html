@@ -324,7 +324,6 @@ save()
 applyLook();applyAnswers();$$('.answer-input').forEach(checkWords);
 if(!P.some(p=>p.part===S.part))S.part=P[0].part;showPart(S.part);paintReview();refresh();
 if(S.submitted){$('#timer').textContent='Finished';if(SIT)postSitting()}else startTimer();
-document.addEventListener('keydown',()=>{});
 window.__exam={S:()=>S,finalize,goTo,tick,retake,SIT:()=>SIT};
 </script>
 </body>
