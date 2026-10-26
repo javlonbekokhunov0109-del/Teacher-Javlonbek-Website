@@ -24,7 +24,8 @@ exports.handler = async (event) => {
       const r = await db.from("content_items").select("id, title, kind, mime_type, ready").in("id", ids);
       (r.data || []).forEach((it) => { if (it.ready || access.admin) items[it.id] = { id: it.id, title: it.title, kind: it.kind, mime_type: it.mime_type }; });
     }
-    const res = await db.from("mock_results").select("id, section, status, band, created_at").eq("user_id", user.id).eq("mock_id", id).is("attempt_id", null).order("created_at", { ascending: false }).limit(60);   // practice checks only: a full sitting's marking is shown in the sitting's own report
+    let res = await db.from("mock_results").select("id, section, status, band, created_at").eq("user_id", user.id).eq("mock_id", id).is("attempt_id", null).order("created_at", { ascending: false }).limit(60);
+    if (res.error) res = await db.from("mock_results").select("id, section, status, band, created_at").eq("user_id", user.id).eq("mock_id", id).order("created_at", { ascending: false }).limit(60);   // before the new SQL has been run   // practice checks only: a full sitting's marking is shown in the sitting's own report
     const used = await usedToday(db, user.id);
     return json(200, {
       mock: {
