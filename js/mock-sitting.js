@@ -19,7 +19,7 @@
     var a = S.attempt;
     return '<div class="mk-steps" aria-label="Progress">' + a.order.map(function (s, i) { var st = a.sections[s].status, cls = st === 'done' ? 'done' : i === a.idx ? 'cur' : ''; return '<span class="' + cls + '"><i>' + (st === 'done' ? '\u2713' : (i + 1)) + '</i>' + NAMES[s] + '</span>'; }).join('<em></em>') + '</div>';
   }
-  function barHtml(title) { return '<div class="mk-sit-bar"><button class="mk-sit-leave" data-sit="leave">\u2039 Leave</button><b>' + esc(title) + '</b><span class="mk-sit-clock" id="mkSitClock" aria-live="off"></span></div>'; }
+  function barHtml(title) { var c = secState(), t = c && c.st.status === 'active' && c.st.deadline ? fmtClock(c.st.deadline - Date.now()) : ''; return '<div class="mk-sit-bar"><button class="mk-sit-leave" data-sit="leave">\u2039 Leave</button><b>' + esc(title) + '</b><span class="mk-sit-clock" id="mkSitClock" aria-live="off">' + t + '</span></div>'; }
 
   /* ---------- overlay ---------- */
   function overlay() {
@@ -127,8 +127,8 @@
     var d = S.attempt.drafts || {}, t1 = local ? local.t1 : d.t1 || '', t2 = local ? local.t2 : d.t2 || '', min1 = (w.task1 && w.task1.min_words) || 150, min2 = (w.task2 && w.task2.min_words) || 250;
     S.wState = { tab: 1, min1: min1, min2: min2 };
     setBody(barHtml('Writing') + '<div class="mk-sit-scroll">' + stepsHtml() + '<div class="mk-tabs" id="mkWTabs"><button class="mk-tab on" data-sit="wtab" data-n="1">Task 1</button><button class="mk-tab" data-sit="wtab" data-n="2">Task 2</button></div>' +
-      '<div class="mk-wpane" id="mkWP1"><p class="sub">Spend about 20 minutes. Write at least ' + min1 + ' words.</p><div class="mk-question">' + esc((w.task1 || {}).question) + '</div>' + (w.task1 ? T.chartHtml(w.task1) : '') + wBox(1, t1, min1) + '</div>' +
-      '<div class="mk-wpane" id="mkWP2" hidden><p class="sub">Spend about 40 minutes. Write at least ' + min2 + ' words.</p><div class="mk-question">' + esc((w.task2 || {}).question) + '</div>' + wBox(2, t2, min2) + '</div>' +
+      '<div class="mk-wpane" id="mkWP1"><div class="mk-wl"><p class="sub">Spend about 20 minutes. Write at least ' + min1 + ' words.</p><div class="mk-question">' + esc((w.task1 || {}).question) + '</div>' + (w.task1 ? T.chartHtml(w.task1) : '') + '</div><div class="mk-wr">' + wBox(1, t1, min1) + '</div></div>' +
+      '<div class="mk-wpane" id="mkWP2" hidden><div class="mk-wl"><p class="sub">Spend about 40 minutes. Write at least ' + min2 + ' words.</p><div class="mk-question">' + esc((w.task2 || {}).question) + '</div></div><div class="mk-wr">' + wBox(2, t2, min2) + '</div></div>' +
       '<div class="mk-sit-actions"><button class="wc-btn" data-sit="wsubmit">Submit Writing and continue</button></div><p class="mk-note">Your text is saved as you type. When you submit, the AI examiner marks it while you do the Speaking. You will see the result at the end.</p></div>', 'wr');
     updateW(1); updateW(2); startClock(function () { submitWriting(true); });
     clearInterval(S.timers.draft); S.timers.draft = setInterval(saveDraft, 15000);

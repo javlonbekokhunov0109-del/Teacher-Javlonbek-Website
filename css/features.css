@@ -277,3 +277,13 @@ kbd{font:600 11px/1 ui-monospace,Menlo,monospace; border:1px solid var(--tj-line
 .mk-rep-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:0 0 18px} .mk-rep-card{border:1px solid var(--tj-line); background:var(--tj-card); border-radius:18px; padding:14px 16px} .mk-rep-card .l{font-size:12px; letter-spacing:.07em; text-transform:uppercase; color:var(--tj-fg-soft); font-weight:700} .mk-rep-card b{display:block; font:700 44px/1.1 'Cormorant Garamond',Georgia,serif; color:var(--tj-fg)} .mk-rep-card p{margin:2px 0 6px; font-size:14px} .mk-rep-card small{color:var(--tj-fg-soft)}
 .mk-det{border:1px solid var(--tj-line); border-radius:14px; background:var(--tj-card); margin:10px 0; padding:0 14px} .mk-det summary{cursor:pointer; padding:13px 0; font-weight:700} .mk-det[open]{padding-bottom:14px}
 .mk-rv{overflow-x:auto} .mk-rv table{width:100%; border-collapse:collapse; font-size:14px} .mk-rv th{text-align:left; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--tj-fg-soft); padding:6px 8px} .mk-rv td{padding:7px 8px; border-top:1px solid var(--tj-line)} .mk-rv tr.ok td:last-child{color:var(--tj-green); font-weight:800} .mk-rv tr.no td:last-child{color:#c0504d; font-weight:800} .mk-rv tr.no td:nth-child(2){color:#c0504d} .mk-rv tr.part td:last-child{color:#9a5b00; font-weight:800}
+
+/* ---- Full mock Writing: question on the left, answer box on the right (wide screens) ---- */
+.mk-wpane{display:block} .mk-wpane[hidden]{display:none}
+@media(min-width:980px){
+  .mk-sit.wr .mk-sit-scroll{max-width:1280px}
+  .mk-sit.wr .mk-wpane:not([hidden]){display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
+  .mk-sit.wr .mk-wl{max-height:calc(100vh - 260px); overflow:auto; padding-right:6px}
+  .mk-sit.wr .mk-wr{position:sticky; top:0}
+  .mk-sit.wr .mk-wpane .mk-ta{min-height:calc(100vh - 360px)}
+}
