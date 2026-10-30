@@ -178,7 +178,7 @@
     }).join('<div class="dst-tun"></div>') + '</div>';
   }
   function startMission(deck) {
-    var size = S.pref.size === 'all' ? 40 : Math.min(Number(S.pref.size) || 20, 40), cards = pickSession(deck, Object.assign({}, S.pref, { size: size }), S.book);
+    var size = S.pref.size === 'all' ? deck.length : Number(S.pref.size) || 20, cards = pickSession(deck, Object.assign({}, S.pref, { size: size }), S.book);
     var plan = [{ id: 'fc' }, { id: 'qz' }]; if (cards.length >= 6 && makeMatch(cards, 6).length >= 6) plan.push({ id: 'mt' }); if (cards.filter(spellable).length >= 3) plan.push({ id: 'sp' }); plan.push({ id: 'boss' });
     S.ses = null; S.mis = { cards: cards, deck: deck, plan: plan, idx: -1, res: [], missed: [], t0: Date.now(), meta: sessionMeta(), dirMap: {}, bar: false, live: true, cleared: false };
     S.mis.when = new Date();
@@ -190,8 +190,8 @@
     m.bar = true; m.live = true; var cards = c.id === 'boss' ? shuffle(m.missed).slice(0, 10) : m.cards, mode = c.id === 'boss' ? 'qz' : c.id;
     S.ses = { mode: mode, deck: m.deck, cards: cards, mcards: cards, i: 0, dirMap: m.dirMap, right: 0, wrong: 0, missed: [], queue: cards.slice(), flipped: false, streak: 0, best: 0, t0: Date.now(), pairs: 0, meta: m.meta, mission: true, total: cards.length, boss: c.id === 'boss' };
     if (mode === 'fc') return fcShow(); if (mode === 'qz') return quizQ();
-    if (mode === 'mt') { S.ses.boards = Math.max(1, Math.min(2, Math.floor(cards.length / 6))); S.ses.board = 0; return matchBoard(); }
-    S.ses.queue = shuffle(cards.filter(spellable)).slice(0, 10); S.ses.total = S.ses.queue.length; return spellQ();
+    if (mode === 'mt') { S.ses.boards = Math.max(1, Math.min(8, Math.round(cards.length / 12), Math.floor(cards.length / 6))); S.ses.board = 0; return matchBoard(); }
+    S.ses.queue = shuffle(cards.filter(spellable)).slice(0, Math.min(40, Math.max(10, Math.round(cards.length / 2)))); S.ses.total = S.ses.queue.length; return spellQ();
   }
   function missionChamberDone(o) {
     var m = S.mis, s = S.ses, c = m.plan[m.idx];
@@ -241,8 +241,8 @@
     S.ses = { mode: mode, deck: deck, cards: cards, i: 0, dirMap: map, right: 0, wrong: 0, missed: [], queue: cards.slice(), flipped: false, streak: 0, best: 0, t0: Date.now(), pairs: 0, meta: sessionMeta() };
     if (mode === 'ms') return startMission(deck);
     if (mode === 'ls') return listView('', 'none');
-    if (mode === 'mt') { S.ses.boards = 3; S.ses.board = 0; return matchBoard(); }
-    if (mode === 'sp') { S.ses.queue = shuffle(deck.filter(spellable)).slice(0, S.pref.size === 'all' ? 9999 : Math.min(Number(S.pref.size) || 30, 30)); S.ses.total = S.ses.queue.length; return spellQ(); }
+    if (mode === 'mt') { S.ses.boards = S.pref.size === 'all' ? 10 : Math.max(3, Math.min(10, Math.round((Number(S.pref.size) || 30) / 10))); S.ses.board = 0; return matchBoard(); }
+    if (mode === 'sp') { S.ses.queue = shuffle(deck.filter(spellable)).slice(0, S.pref.size === 'all' ? 9999 : Number(S.pref.size) || 30); S.ses.total = S.ses.queue.length; return spellQ(); }
     S.ses.total = cards.length; if (mode === 'qz') return quizQ(); return fcShow();
   }
   function topBar(label) { var s = S.ses; return '<div class="sy-top"><span>' + label + '</span><button class="sy-chip" data-act="quit">Quit</button></div><div class="sy-bar"><i style="width:' + pct(s.done || 0, s.total || 1) + '%"></i></div>'; }
