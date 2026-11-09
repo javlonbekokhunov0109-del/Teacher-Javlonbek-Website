@@ -12,7 +12,7 @@
     { m: 2, title: 'Expanding Your Grammar and Communication', weeks: 'Weeks 5\u20138', result: 'You can talk about past events, future plans, obligations and make comparisons.', topics: [[13, 'Past simple vs past continuous', 'A2'], [14, 'Future forms (will / going to)', 'A2'], [15, 'Countable & uncountable nouns', 'A2'], [16, 'Quantifiers (some, any, much\u2026)', 'A2'], [17, 'Comparatives', 'A2'], [18, 'Superlatives', 'A2'], [19, 'Modal verbs (can, could, must\u2026)', 'A2'], [20, 'Gerunds and infinitives', 'A2'], [21, 'Present perfect', 'A2'], [22, 'Present perfect vs past simple', 'A2'], [23, 'Zero and first conditionals', 'A2'], [24, 'Review & progress test', 'A2']] },
     { m: 3, title: 'Connecting Ideas and Moving Towards B1', weeks: 'Weeks 9\u201312', result: 'You can build longer sentences, express your ideas more clearly and move towards B1 level.', topics: [[25, 'Present perfect (advanced use)', 'A2\u2013B1'], [26, 'Second conditionals', 'A2\u2013B1'], [27, 'Relative clauses (who, which, that)', 'A2\u2013B1'], [28, 'Passive voice (introduction)', 'A2\u2013B1'], [29, 'Conjunctions (because, although\u2026)', 'A2\u2013B1'], [30, 'Too / enough', 'A2\u2013B1'], [31, 'Basic reported speech', 'A2\u2013B1'], [32, 'Sentence linking (and, but, so\u2026)', 'A2\u2013B1'], [33, 'Review: key grammar points', 'A2\u2013B1'], [34, 'Speaking practice (real-life topics)', 'A2\u2013B1'], [35, 'Writing practice (emails / short essay)', 'A2\u2013B1'], [36, 'Final test & individual feedback', 'A2\u2013B1']] }
   ];
-  var READY = { 1: true, 2: true };                       // months whose question files exist (set to true as they are added)
+  var READY = { 1: true, 2: true, 3: true };                       // months whose question files exist (set to true as they are added)
   var S = { ses: null, loading: false };
 
   /* ---------- helpers ---------- */
@@ -51,12 +51,13 @@
     return shuffle(out).slice(0, QN);
   }
   // fill the blank(s) of a stem with the correct answer, for the feedback line
+  function dlg(h) { return h.replace(/ {2}(?=B:)/g, '<br>'); }   // dialogue questions: speaker B on a new line
   function filled(stem, correct) {
-    var parts = stem.split('___'); if (parts.length === 1) return esc(stem);
-    var ans = parts.length === 2 ? [correct] : correct.split(' / '); if (ans.length !== parts.length - 1) return esc(stem).replace(/___/g, '<span class="grm-gap">\u2026</span>');
-    return parts.map(function (p, i) { return esc(p) + (i < ans.length ? '<b class="grm-fill">' + esc(ans[i]) + '</b>' : ''); }).join('');
+    var parts = stem.split('___'); if (parts.length === 1) return dlg(esc(stem));
+    var ans = parts.length === 2 ? [correct] : correct.split(' / '); if (ans.length !== parts.length - 1) return dlg(esc(stem).replace(/___/g, '<span class="grm-gap">\u2026</span>'));
+    return dlg(parts.map(function (p, i) { return esc(p) + (i < ans.length ? '<b class="grm-fill">' + esc(ans[i]) + '</b>' : ''); }).join(''));
   }
-  function stemHtml(stem) { return esc(stem).replace(/___/g, '<span class="grm-gap" aria-label="blank">&nbsp;</span>'); }
+  function stemHtml(stem) { return dlg(esc(stem).replace(/___/g, '<span class="grm-gap" aria-label="blank">&nbsp;</span>')); }
 
   /* ---------- render ---------- */
   function root() { return $('grmRoot'); }
