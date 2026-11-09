@@ -1,5 +1,5 @@
 /* ===== New features: install banner, Synonym Trainer, Mock Tests, charts, admin extras ===== */
-#mocks-root, #synonyms-root, #destination-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
+#mocks-root, #synonyms-root, #destination-root, #grammar-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
 .tj-door.mocks{--accent:#8C5BB5}  html[data-theme="dark"] .tj-door.mocks{--accent:#B591D9}
 .tj-door.synonyms{--accent:#C47A2C}  html[data-theme="dark"] .tj-door.synonyms{--accent:#E3A25C}
 .tj-menu [data-install]{display:none}  body.tj-can-install .tj-menu [data-install]{display:block}
@@ -287,3 +287,31 @@ kbd{font:600 11px/1 ui-monospace,Menlo,monospace; border:1px solid var(--tj-line
   .mk-sit.wr .mk-wr{position:sticky; top:0}
   .mk-sit.wr .mk-wpane .mk-ta{min-height:calc(100vh - 360px)}
 }
+
+/* ---- Grammar Tests ---- */
+.tj-door.grammar{--accent:#7a4fb5} html[data-theme="dark"] .tj-door.grammar{--accent:#b79be0}
+#grammar-root.grm-live > .wc-eyebrow, #grammar-root.grm-live > .wc-h1, #grammar-root.grm-live > .wc-sub{display:none}
+#grammar-root.grm-live{padding-top:clamp(16px,2.5vw,28px)}
+.grm-sum{margin:0 0 18px; padding:12px 16px; border:1px solid var(--tj-line); background:var(--tj-card); border-radius:14px; font-size:15px} .grm-sum b{color:var(--tj-gold-deep); font-size:20px}
+.grm-month{margin:0 0 26px}
+.grm-mh{display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:10px; border-bottom:2px solid var(--tj-gold)}
+.grm-mh h2{font:700 clamp(22px,3.6vw,30px)/1.2 'Cormorant Garamond',Georgia,serif; margin:4px 0 0}
+.grm-mbadge{display:inline-block; background:var(--tj-gold); color:#fff; border-radius:99px; padding:3px 12px; font-size:12px; font-weight:800; letter-spacing:.04em} .grm-weeks{margin-left:10px; font-size:13px; color:var(--tj-fg-soft); font-weight:600}
+.grm-mprog{font-size:14px; color:var(--tj-fg-soft)} .grm-mprog b{font-size:22px; color:var(--tj-green)}
+.grm-topics{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px}
+.grm-topic{position:relative; display:grid; grid-template-columns:34px 1fr; grid-template-areas:"n t" "n l" "n b"; column-gap:12px; row-gap:1px; align-items:center; text-align:left; border:1.5px solid var(--tj-line); background:var(--tj-card); color:var(--tj-fg); border-radius:14px; padding:12px 14px; cursor:pointer; transition:transform .12s,border-color .12s}
+.grm-topic:hover:not(:disabled){transform:translateY(-2px); border-color:var(--tj-gold)} .grm-topic:focus-visible{outline:3px solid var(--tj-gold)}
+.grm-n{grid-area:n; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:rgba(184,144,30,.14); color:var(--tj-gold-deep); font-weight:800; font-size:14px}
+.grm-tt{grid-area:t; font-weight:700; font-size:15px; line-height:1.25} .grm-lv{grid-area:l; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--tj-fg-soft); font-weight:700} .grm-best{grid-area:b; font-size:12.5px; color:var(--tj-fg-soft)}
+.grm-topic.pass{border-color:var(--tj-green); background:rgba(47,125,85,.07)} .grm-topic.pass .grm-n{background:var(--tj-green); color:#fff} .grm-topic.pass .grm-best{color:var(--tj-green); font-weight:700}
+.grm-topic.rev .grm-n{background:rgba(122,79,181,.16); color:#7a4fb5}
+.grm-topic.soon{opacity:.5; cursor:not-allowed}
+.grm-stem{font:600 clamp(22px,4vw,32px)/1.35 'Cormorant Garamond',Georgia,serif; margin:6px 0 20px; text-align:center}
+.grm-gap{display:inline-block; min-width:90px; border-bottom:3px solid var(--tj-gold); margin:0 4px; vertical-align:baseline} .grm-fill{color:var(--tj-green); border-bottom:3px solid var(--tj-green); padding:0 3px}
+.grm-exp{margin:6px 0; font-size:15px} .grm-uz{margin:4px 0 0; font-size:14.5px; color:#6b3f9a} html[data-theme="dark"] .grm-uz{color:#c3a8ea}
+.grm-scorebox{margin:2px 0 12px} .grm-scorebox .big{font-size:clamp(54px,9vw,84px)} .grm-pct{font-size:20px; font-weight:700; color:#c0504d} .grm-pct.ok{color:var(--tj-green)}
+.grm-stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); max-width:760px; margin:12px auto 16px; text-align:left}
+.grm-list{display:grid; gap:10px; margin-top:8px} .grm-item{border:1px solid var(--tj-line); background:var(--tj-card); border-radius:14px; padding:12px 16px}
+.grm-iq{font-weight:600; margin-bottom:6px} .grm-ia{display:flex; gap:14px; flex-wrap:wrap; font-size:14px; margin-bottom:4px} .grm-ia .bad{color:#c0504d; font-weight:700} .grm-ia .ok{color:var(--tj-green); font-weight:700}
+.grm-hist{display:grid; gap:6px} .grm-hrow{display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; border:1px solid var(--tj-line); background:var(--tj-card); border-radius:12px; padding:9px 13px; font-size:13.5px} .grm-hd{color:var(--tj-fg-soft); font-size:12.5px} .grm-hs{font-weight:800; color:var(--tj-gold-deep); white-space:nowrap}
+@media(max-width:640px){.grm-hrow{grid-template-columns:1fr; gap:3px} .grm-topics{grid-template-columns:1fr}}

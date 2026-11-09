@@ -1106,6 +1106,13 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
       <p>Four books, unit by unit. Flashcards you tap to flip, quizzes and games &mdash; English &rarr; Uzbek or Uzbek &rarr; English, your choice.</p>
       <span class="tj-go">Open Destination <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </button>
+    <button class="tj-door grammar" data-go="grammar">
+      <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/><path d="m14 17 2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="tj-tag">3-Month Grammar Course</div>
+      <h2>Grammar Tests</h2>
+      <p>36 topics from A1 to B1, 30 questions each. Test yourself, learn from every mistake and watch your topics turn green.</p>
+      <span class="tj-go">Open Grammar Tests <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
     <button class="tj-door typing" data-go="typing">
       <div class="tj-di"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7 14h6M15 14h2"/></svg></div>
       <div class="tj-tag">Speed &middot; Typing</div>
@@ -1544,6 +1551,14 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   <div id="dstRoot"></div>
 </section>
 
+<!-- ================= GRAMMAR TESTS ================= -->
+<section id="grammar-root" class="tj-panel" hidden>
+  <div class="wc-eyebrow">3-Month Grammar Course &middot; Tests</div>
+  <h1 class="wc-h1">Grammar Tests</h1>
+  <p class="wc-sub">Pick a topic and answer 30 questions. You pass with 70%. After every answer you see why, with a short hint in Uzbek.</p>
+  <div id="grmRoot"></div>
+</section>
+
 <!-- ================= LEADERBOARD ================= -->
 <section id="leaderboard-root" class="tj-panel" hidden>
   <div class="wc-eyebrow">Premium English &middot; Practice</div>
@@ -1701,7 +1716,7 @@ body[data-view="multilevel"] .tj-home-btn{display:inline-flex}
   function applyFs(){ fs=clamp(fs); document.querySelector('main').style.zoom=fs; localStorage.setItem('tj_fs',fs); }
   function applyTheme(){ root.setAttribute('data-theme',theme); localStorage.setItem('tj_theme',theme); }
   applyTheme(); 
-  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root',multilevel:'multilevel-root',lessons:'lessons-root',mocks:'mocks-root',synonyms:'synonyms-root',destination:'destination-root'};
+  var PANELMAP={home:'home',lex:'lexup-root',ck:'ck-root',write:'writing-root',admin:'admin-root',auth:'auth-root',leaderboard:'leaderboard-root',typing:'typing-root',share:'share-root',boom:'boom-root',about:'about-root',multilevel:'multilevel-root',lessons:'lessons-root',mocks:'mocks-root',synonyms:'synonyms-root',destination:'destination-root',grammar:'grammar-root'};
   var navHist=[]; var curView=null; window.__tjUserNavigated=false;
   function updateBackBtn(){ var b=document.getElementById('tjBackBtn'); if(b) b.style.display=(navHist.length>0)?'inline-flex':'none'; }
   function showPanel(name, isBack){
@@ -6360,5 +6375,6 @@ setTimeout(restoreFields, 1200);
 <script src="/js/mock-sitting.js?v=20261025" defer></script>
 <script src="/js/mocks-admin.js?v=20261020" defer></script>
 <script src="/js/destination.js?v=20261024" defer></script>
+<script src="/js/grammar.js?v=20261107" defer></script>
 </body>
 </html>
