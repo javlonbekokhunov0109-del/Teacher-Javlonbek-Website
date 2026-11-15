@@ -1,5 +1,5 @@
 /* ===== New features: install banner, Synonym Trainer, Mock Tests, charts, admin extras ===== */
-#mocks-root, #synonyms-root, #destination-root, #grammar-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
+#mocks-root, #synonyms-root, #destination-root, #grammar-root, #exams-root{max-width:1040px; margin:0 auto; padding:clamp(26px,4vw,54px) clamp(16px,4vw,28px) 90px}
 .tj-door.mocks{--accent:#8C5BB5}  html[data-theme="dark"] .tj-door.mocks{--accent:#B591D9}
 .tj-door.synonyms{--accent:#C47A2C}  html[data-theme="dark"] .tj-door.synonyms{--accent:#E3A25C}
 .tj-menu [data-install]{display:none}  body.tj-can-install .tj-menu [data-install]{display:block}
@@ -315,3 +315,48 @@ kbd{font:600 11px/1 ui-monospace,Menlo,monospace; border:1px solid var(--tj-line
 .grm-iq{font-weight:600; margin-bottom:6px} .grm-ia{display:flex; gap:14px; flex-wrap:wrap; font-size:14px; margin-bottom:4px} .grm-ia .bad{color:#c0504d; font-weight:700} .grm-ia .ok{color:var(--tj-green); font-weight:700}
 .grm-hist{display:grid; gap:6px} .grm-hrow{display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; border:1px solid var(--tj-line); background:var(--tj-card); border-radius:12px; padding:9px 13px; font-size:13.5px} .grm-hd{color:var(--tj-fg-soft); font-size:12.5px} .grm-hs{font-weight:800; color:var(--tj-gold-deep); white-space:nowrap}
 @media(max-width:640px){.grm-hrow{grid-template-columns:1fr; gap:3px} .grm-topics{grid-template-columns:1fr}}
+
+/* ===== Real Exam Tests ===== */
+.tj-door.exams{--accent:#C0392B} html[data-theme="dark"] .tj-door.exams{--accent:#ef8f84}
+#exams-root.ex-live > .wc-eyebrow{margin-bottom:4px}
+.ex-seg{display:inline-flex; gap:0; border:1.5px solid var(--tj-line); border-radius:99px; padding:3px; background:var(--tj-card); margin:0 0 18px}
+.ex-seg button{appearance:none; border:0; background:transparent; color:var(--tj-fg-soft); font:700 14px/1 inherit; padding:10px 22px; border-radius:99px; cursor:pointer}
+.ex-seg button.on{background:var(--tj-gold); color:#fff}
+.ex-mode{margin-right:10px}
+.ex-banner{margin:0 0 16px; padding:13px 16px; border:1.5px solid var(--tj-gold); background:var(--tj-card2); border-radius:14px; font-size:15px; line-height:1.5} .ex-banner a{color:var(--tj-gold-deep); font-weight:700}
+.ex-banner.pulse{animation:exPulse .8s ease 2} @keyframes exPulse{50%{box-shadow:0 0 0 6px rgba(184,144,30,.35)}}
+.ex-empty{padding:34px 16px; text-align:center; color:var(--tj-fg-soft); font-size:16px}
+.ex-series{margin:0 0 26px} .ex-sh{font-size:12.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:800; color:var(--tj-fg-soft); margin:0 0 10px}
+.ex-test{border:1px solid var(--tj-line); background:var(--tj-card); border-radius:18px; padding:14px; margin:0 0 12px}
+.ex-tn{font:800 18px/1.2 inherit; color:var(--tj-gold-deep); margin:2px 4px 10px}
+.ex-tiles{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px}
+.ex-tile{appearance:none; text-align:left; cursor:pointer; background:var(--tj-card2); color:var(--tj-fg); border:1.5px solid var(--tj-line); border-radius:14px; padding:13px 14px; display:flex; flex-direction:column; gap:5px; transition:transform .12s,border-color .12s; font:inherit}
+.ex-tile:hover{border-color:var(--tj-gold); transform:translateY(-2px)} .ex-tile.done{border-color:#2f7d55}
+.ex-tile.locked{opacity:.72; cursor:not-allowed} .ex-tile.locked:hover{transform:none; border-color:var(--tj-line)}
+.ex-tl{font-size:12px; letter-spacing:.06em; text-transform:uppercase; font-weight:800; color:var(--tj-fg-soft)} .ex-tile b{font-size:16px; line-height:1.3} .ex-ts{font-size:13px; color:var(--tj-fg-soft)}
+.ex-free{font-style:normal; background:#2f7d55; color:#fff; border-radius:6px; padding:1px 6px; margin-left:6px; font-size:10.5px}
+.ex-done{color:#2f7d55; font-weight:800; font-size:14px} .ex-new{color:var(--tj-fg-soft); font-size:13px} .ex-lock{color:var(--tj-fg-soft); font-weight:700; font-size:13px; display:inline-flex; gap:5px; align-items:center}
+/* the full-screen exam frame */
+.ex-shell{position:fixed; inset:0; z-index:400; display:flex; flex-direction:column; background:#f3f3f3} .ex-shell[hidden]{display:none}
+body.ex-open{overflow:hidden}
+.ex-bar{flex:0 0 44px; height:44px; display:flex; align-items:center; gap:12px; padding:0 12px; background:#14213d; color:#fff}
+.ex-back{appearance:none; border:1px solid rgba(255,255,255,.35); background:transparent; color:#fff; border-radius:8px; padding:6px 12px; font:700 13.5px/1 inherit; cursor:pointer; white-space:nowrap}
+.ex-back:hover{background:rgba(255,255,255,.12)}
+.ex-bt{flex:1; min-width:0; text-align:center; font:700 14px/1 inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:.95}
+.ex-tg{display:inline-flex; align-items:center; gap:7px; color:#14213d; background:#f5c842; border-radius:99px; padding:6px 13px; font:800 13px/1 inherit; text-decoration:none; white-space:nowrap}
+.ex-tg:hover{filter:brightness(1.07)}
+.ex-stage{flex:1; position:relative; min-height:0; background:#fff} .ex-frame{position:absolute; inset:0; width:100%; height:100%; border:0; background:#fff}
+.ex-load{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; font-size:17px; color:#444}
+.ex-toast{position:fixed; left:50%; bottom:22px; transform:translate(-50%,30px); opacity:0; pointer-events:none; z-index:500; background:#14213d; color:#fff; padding:12px 18px; border-radius:12px; font:700 14.5px/1.35 inherit; max-width:92vw; transition:.25s} .ex-toast.on{opacity:1; transform:translate(-50%,0)}
+@media(max-width:560px){.ex-tg span{display:none} .ex-tg{padding:8px 10px} .ex-back span{display:none} .ex-bt{font-size:12.5px; text-align:left} .ex-tiles{grid-template-columns:1fr}}
+/* teacher tools */
+.ex-admin{display:grid; gap:16px} .ex-card{border:1px solid var(--tj-line); background:var(--tj-card); border-radius:18px; padding:16px} .ex-card h3{margin:0 0 6px; font-size:18px}
+.ex-p{color:var(--tj-fg-soft); font-size:14.5px; line-height:1.5; margin:4px 0 12px}
+.ex-checks{display:flex; flex-wrap:wrap; gap:8px 18px; margin:0 0 12px} .ex-checks label{font-size:15px; display:inline-flex; gap:6px; align-items:center}
+.ex-in{border:1.5px solid var(--tj-line); background:var(--tj-card2); color:var(--tj-fg); border-radius:8px; padding:7px 9px; font:inherit; font-size:14px; max-width:100%}
+.ex-file{display:block; margin:0 0 12px; font-size:14px} .ex-defs{margin:0 0 12px; font-size:14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.ex-tw{overflow-x:auto; margin:0 0 12px} .ex-t{border-collapse:collapse; width:100%; font-size:14px} .ex-t th{text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--tj-fg-soft); padding:6px 8px; white-space:nowrap}
+.ex-t td{padding:6px 8px; border-top:1px solid var(--tj-line); vertical-align:middle} .ex-fn{max-width:210px; word-break:break-all; font-size:12.5px} .ex-st{font-size:13px; white-space:nowrap}
+.wc-btn.sm{padding:7px 12px; font-size:13px; border-radius:9px}
+.ex-sum{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px} .ex-chip{appearance:none; cursor:pointer; border:1.5px solid var(--tj-line); background:var(--tj-card2); color:var(--tj-fg); border-radius:99px; padding:7px 12px; font:600 13.5px/1 inherit} .ex-chip b{color:var(--tj-gold-deep); margin-left:4px} .ex-chip.on{border-color:var(--tj-gold)}
+.ex-fil{margin:0 0 12px} .ex-edit{margin-top:14px; padding:14px; border:1.5px solid var(--tj-gold); border-radius:14px} .ex-er{margin:10px 0; display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:14px}
